@@ -291,6 +291,23 @@ if ($userId) {
             background-color: #e9ecef;
             cursor: not-allowed;
         }
+
+        /* Dropdown styles */
+        select.form-control {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+            width: 100%;
+            height: 40px; /* To match the height of your input fields */
+            cursor: pointer;
+        }
+
+        select.form-control:focus {
+            outline: none;
+            border-color: #007bff;
+        }
     </style>
 </head>
 <body>
@@ -332,12 +349,38 @@ if ($userId) {
             
             <div class="form-group">
                 <label for="purpose">Purpose:</label>
-                <input type="text" id="purpose" name="purpose" placeholder="C Programming" class="form-control">
+                <select id="purpose" name="purpose" class="form-control">
+                    <option value="" disabled selected>Select a Purpose</option>
+                    <option value="C Programming">C Programming</option>
+                    <option value="C++ Programming">C++ Programming</option>
+                    <option value="C# Programming">C# Programming</option>
+                    <option value="Java Programming">Java Programming</option>
+                    <option value="Python Programming">Python Programming</option>
+                    <option value="Other">Other</option>
+                </select>
             </div>
             
             <div class="form-group">
                 <label for="lab">Lab:</label>
-                <input type="text" id="lab" name="lab" placeholder="524" class="form-control">
+                <select id="lab" name="lab" class="form-control">
+                    <option value="" disabled selected>Select a Lab</option>
+                    <option value="524">524</option>
+                    <option value="526">526</option>
+                    <option value="528">528</option>
+                    <option value="530">530</option>
+                    <option value="542">542</option>
+                    <option value="544">544</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="available_pc">Available PC:</label>
+                <select id="available_pc" name="available_pc" class="form-control">
+                    <option value="" disabled selected>Select a PC</option>
+                    <?php for ($i = 1; $i <= 50; $i++): ?>
+                        <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                    <?php endfor; ?>
+                </select>
             </div>
             
             <div class="form-group">

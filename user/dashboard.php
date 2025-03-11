@@ -319,7 +319,7 @@ while ($row = $result->fetch_assoc()) {
                 <p>There are no announcements yet.</p>
             <?php else: ?>
                 <div class="announcement-list">
-                    <?php foreach ($announcements as $announcement): ?>
+                    <?php foreach (array_reverse($announcements) as $announcement): ?>
                         <div class="announcement-item">
                             <div class="announcement-header">
                                 ADMIN | <?php echo date('Y-M-d', strtotime($announcement['CREATED_DATE'])); ?>

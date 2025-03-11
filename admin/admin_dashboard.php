@@ -28,9 +28,9 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Sample statistics data (hardcoded for UI only)
-$totalStudents = 180;
-$currentSitIns = 5;
-$totalSitIns = 70;
+$totalStudents = 0;
+$currentSitIns = 0;
+$totalSitIns = 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,104 +43,104 @@ $totalSitIns = 70;
     <title>Admin Dashboard</title>
     <style>
         body {
-        background-image: linear-gradient(104.1deg, rgba(0,61,100,1) 13.6%, rgba(47,127,164,1) 49.4%, rgba(30,198,198,1) 93.3%);
-        background-attachment: fixed;
+            background-image: linear-gradient(104.1deg, rgba(0,61,100,1) 13.6%, rgba(47,127,164,1) 49.4%, rgba(30,198,198,1) 93.3%);
+            background-attachment: fixed;
         }
 
         .logo, .student-info img {
-        width: 150px; 
-        height: 150px; 
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        border: 1px solid black;
-        border-radius: 50%; 
-        object-fit: cover; 
+            width: 150px; 
+            height: 150px; 
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid black;
+            border-radius: 50%; 
+            object-fit: cover; 
         }
 
         .sidenav {
-        height: 100%;
-        width: 250px;
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        left: -250px;
-        background-color: white; 
-        overflow-x: hidden;
-        padding-top: 20px;
-        font-family: 'Roboto', sans-serif;
-        font-size: 18px;
-        transition: 0.3s;
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: -250px;
+            background-color: white; 
+            overflow-x: hidden;
+            padding-top: 20px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 18px;
+            transition: 0.3s;
         }
 
         .sidenav.show {
-        left: 0;
+            left: 0;
         }
 
         .sidenav a {
-        padding: 8px 8px 8px 16px;
-        text-decoration: none;
-        font-size: 15px;
-        color: black; 
-        display: flex;
-        align-items: center;
-        position: relative;
-        padding-left: 16px; 
+            padding: 8px 8px 8px 16px;
+            text-decoration: none;
+            font-size: 15px;
+            color: black; 
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-left: 16px; 
         }
 
         .sidenav a i {
-        font-size: 15px; 
-        margin-right: 10px; 
+            font-size: 15px; 
+            margin-right: 10px; 
         }
 
         .sidenav a:hover {
-        background-color: black; 
-        color: white; 
-        transform: scale(1.05); 
-        transition: transform 0.3s, background-color 0.3s, color 0.3s; 
+            background-color: black; 
+            color: white; 
+            transform: scale(1.05); 
+            transition: transform 0.3s, background-color 0.3s, color 0.3s; 
         }
 
         .sidenav a:hover i {
-        color: white; 
+            color: white; 
         }
 
         .sidenav a::before {
-        content: '';
-        position: absolute;
-        left: -10px; 
-        top: 0;
-        bottom: 0;
-        width: 5px; 
-        background-color: transparent;
-        transition: background-color 0.3s;
+            content: '';
+            position: absolute;
+            left: -10px; 
+            top: 0;
+            bottom: 0;
+            width: 5px; 
+            background-color: transparent;
+            transition: background-color 0.3s;
         }
 
         .sidenav a:hover::before {
-        background-color: black; 
+            background-color: black; 
         }
 
         .user-name {
-        color: #000; 
-        text-align: center;
-        font-family: 'Roboto', sans-serif;
-        font-size: 22px;
-        font-weight: bold; 
+            color: #000; 
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-size: 22px;
+            font-weight: bold; 
         }
 
         .container {
-        display: inline-block;
-        cursor: pointer;
-        position: absolute;
-        top: 15px; 
-        left: 25px; 
+            display: inline-block;
+            cursor: pointer;
+            position: absolute;
+            top: 15px; 
+            left: 25px; 
         }
 
         .bar1, .bar2, .bar3 {
-        width: 35px;
-        height: 5px;
-        background-color: black; 
-        margin: 6px 0;
-        transition: 0.4s;
+            width: 35px;
+            height: 5px;
+            background-color: black; 
+            margin: 6px 0;
+            transition: 0.4s;
         }
 
         .closebtn {
@@ -197,13 +197,17 @@ $totalSitIns = 70;
             justify-content: space-between;
         }
 
+        /* Fixed height for both cards to maintain consistent sizing */
         .dashboard-card {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             width: 48%;
-            overflow: hidden;
+            height: 550px; /* Fixed height for both cards */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Hide overflow */
         }
 
         .card-header {
@@ -223,8 +227,18 @@ $totalSitIns = 70;
             margin-right: 10px;
         }
 
+        /* Make card body take remaining space with scroll */
         .card-body {
             padding: 15px;
+            flex: 1;
+            overflow: hidden; /* Hide overflow */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Stats section with fixed layout */
+        .stats-section {
+            margin-bottom: 20px;
         }
 
         .stats-item {
@@ -239,6 +253,7 @@ $totalSitIns = 70;
             font-weight: bold;
         }
 
+        /* Chart container with fixed height */
         .chart-container {
             width: 100%;
             height: 300px;
@@ -246,9 +261,11 @@ $totalSitIns = 70;
             margin-top: 20px;
         }
 
+        /* Make announcement form take only the space it needs */
         .announcement-form {
             margin-bottom: 20px;
-            width: 100%; /* Ensure the form takes full width of parent */
+            width: 100%;
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
         .announcement-form textarea {
@@ -274,9 +291,10 @@ $totalSitIns = 70;
             margin-top: 10px;
         }
 
+        /* Give the announcement list a fixed height with scroll */
         .announcement-list {
-            max-height: 300px;
-            overflow-y: auto;
+            flex: 1; /* Take remaining space */
+            overflow-y: auto; /* Add scroll when needed */
             border: 1px solid #eee;
             border-radius: 4px;
             padding: 10px;
@@ -304,9 +322,12 @@ $totalSitIns = 70;
             padding-left: 10px; /* Indentation for the announcement text */
         }
 
+        /* Responsive design for mobile */
         @media (max-width: 768px) {
             .dashboard-card {
                 width: 100%;
+                height: auto; /* Let it be responsive on mobile */
+                max-height: 550px; /* But with a maximum height */
             }
         }
     </style>
@@ -324,8 +345,8 @@ $totalSitIns = 70;
         <span class="closebtn" onclick="closeNav()">&times;</span>
         <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="logo">
         <p class="user-name"><?php echo htmlspecialchars($firstName); ?></p>
-        <a href="#"><i class="fas fa-home"></i> HOME</a>
-        <a href="#"><i class="fas fa-search"></i> SEARCH</a>
+        <a href="admin_dashboard.php"><i class="fas fa-home"></i> HOME</a>
+        <a href="admin_search.php"><i class="fas fa-search"></i> SEARCH</a>
         <a href="#"><i class="fas fa-edit"></i> VIEW SIT-IN RECORDS</a>
         <a href="#"><i class="fas fa-list"></i> VIEW LIST OF STUDENT</a>
         <a href="#"><i class="fas fa-chart-line"></i> SIT-IN REPORT</a>
@@ -346,17 +367,19 @@ $totalSitIns = 70;
                 <i class="fas fa-chart-bar"></i> Statistics
             </div>
             <div class="card-body">
-                <div class="stats-item">
-                    <span class="stats-label">Students Registered:</span>
-                    <span><?php echo $totalStudents; ?></span>
-                </div>
-                <div class="stats-item">
-                    <span class="stats-label">Currently Sit-In:</span>
-                    <span><?php echo $currentSitIns; ?></span>
-                </div>
-                <div class="stats-item">
-                    <span class="stats-label">Total Sit-Ins:</span>
-                    <span><?php echo $totalSitIns; ?></span>
+                <div class="stats-section">
+                    <div class="stats-item">
+                        <span class="stats-label">Students Registered:</span>
+                        <span><?php echo $totalStudents; ?></span>
+                    </div>
+                    <div class="stats-item">
+                        <span class="stats-label">Currently Sit-In:</span>
+                        <span><?php echo $currentSitIns; ?></span>
+                    </div>
+                    <div class="stats-item">
+                        <span class="stats-label">Total Sit-Ins:</span>
+                        <span><?php echo $totalSitIns; ?></span>
+                    </div>
                 </div>
                 
                 <div class="chart-container">
@@ -383,7 +406,7 @@ $totalSitIns = 70;
                     <?php if (empty($announcements)): ?>
                         <p>No announcements available.</p>
                     <?php else: ?>
-                        <?php foreach ($announcements as $announcement): ?>
+                        <?php foreach (array_reverse($announcements) as $announcement): ?>
                             <div class="announcement-item">
                                 <div class="announcement-header">
                                     <?php echo htmlspecialchars($announcement['CREATED_BY']); ?> | <?php echo date('Y-M-d', strtotime($announcement['CREATED_DATE'])); ?>
@@ -417,7 +440,7 @@ $totalSitIns = 70;
             
             // Sample data for UI demonstration
             const programData = {
-                labels: ['BSCS', 'BSIT', 'BSEMC', 'ACT', 'MMA', 'DCT'],
+                labels: ['C', 'C++', 'C#', 'Java', 'Python', 'Other'],
                 datasets: [{
                     data: [45, 25, 15, 8, 5, 2],
                     backgroundColor: [
