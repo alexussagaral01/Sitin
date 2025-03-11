@@ -266,8 +266,9 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
         <p class="user-name"><?php echo htmlspecialchars($firstName); ?></p>
         <a href="admin_dashboard.php"><i class="fas fa-home"></i> HOME</a>
         <a href="admin_search.php"><i class="fas fa-search"></i> SEARCH</a>
-        <a href="#"><i class="fas fa-edit"></i> VIEW SIT-IN RECORDS</a>
-        <a href="#"><i class="fas fa-list"></i> VIEW LIST OF STUDENT</a>
+        <a href="admin_sitin.php"><i class="fas fa-user-check"></i> SIT-IN</a>
+        <a href="admin_sitinrec.php"><i class="fas fa-book"></i> VIEW SIT-IN RECORDS</a>
+        <a href="admin_studlist.php"><i class="fas fa-list"></i> VIEW LIST OF STUDENT</a>
         <a href="#"><i class="fas fa-chart-line"></i> SIT-IN REPORT</a>
         <a href="#"><i class="fas fa-comments"></i> VIEW FEEDBACKS</a>
         <a href="#"><i class="fas fa-chart-pie"></i> VIEW DAILY ANALYTICS</a>
@@ -279,7 +280,7 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
     </div>
 
     <div class="content-container">
-        <div class="history-header">History Information</div>       
+        <div class="history-header">Search Student</div>       
         <div class="table-controls">
             <div class="search-box">
                 <form method="GET" action="">
@@ -287,6 +288,10 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
                     Search: <input type="text" name="search" value="">
                 </form>
             </div>
+        </div>
+        
+        <div class="no-data">
+            There is no data available.
         </div>
         
     </div>

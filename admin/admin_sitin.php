@@ -206,6 +206,36 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             font-family: 'Roboto', sans-serif;
         }
 
+        .table-controls {
+            display: flex;
+            justify-content: flex-end; /* Align items to the right */
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-left: 5px;
+        }
+
+        table, th, td {
+            /* CSS removed */
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            font-style: italic;
+        }
+
         .action-button {
             padding: 6px 12px;
             background-color: #024d80;
@@ -250,7 +280,7 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
     </div>
 
     <div class="content-container">
-        <div class="history-header">Student Information</div>      
+        <div class="history-header">Current Sit-in</div>  
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
