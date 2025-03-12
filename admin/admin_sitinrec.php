@@ -160,27 +160,35 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             color: white; 
         }
 
-        /* Dashboard content */
-        .dashboard-content {
-            margin-left: 20px;
-            margin-right: 20px;
-            margin-top: 50px;
+        /* Updated dashboard content */
+        .charts-container {
             display: flex;
-            flex-wrap: wrap;
             justify-content: space-between;
+            margin: 30px 20px;
+            gap: 20px;
         }
 
-        /* Fixed height for both cards to maintain consistent sizing */
-        .dashboard-card {
+        .chart-card {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            width: 48%;
-            height: 550px; /* Fixed height for both cards */
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Hide overflow */
+            padding: 15px;
+            width: 48%; /* Set width to approximately half the container */
+            height: 350px;
+        }
+
+        .chart-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #003d64;
+        }
+
+        .chart-wrapper {
+            height: 280px;
+            position: relative;
         }
 
         .content-container {
@@ -196,7 +204,7 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             background-color: #003d64;
             color: white;
             padding: 15px;
-            margin: -20px -20px 20px -20px; /* Adjusted to match your container's padding */
+            margin: -20px -20px 20px -20px;
             border-radius: 8px 8px 0 0; 
             text-align: center;
             font-size: 24px;
@@ -206,11 +214,30 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             font-family: 'Roboto', sans-serif;
         }
 
+        /* Data table styles */
+        .table-container {
+            margin-top: 30px;
+            padding: 0 20px;
+        }
+
         .table-controls {
             display: flex;
-            justify-content: flex-end; /* Align items to the right */
+            justify-content: space-between;
             margin-bottom: 15px;
             align-items: center;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .entries-selector {
+            display: flex;
+            align-items: center;
+        }
+
+        .entries-selector select {
+            margin: 0 5px;
+            padding: 3px 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
         }
 
         .search-box {
@@ -218,17 +245,79 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             align-items: center;
         }
 
+        .search-box label {
+            margin-right: 5px;
+        }
+
         .search-box input {
             padding: 5px 10px;
             border-radius: 4px;
             border: 1px solid #ddd;
-            margin-left: 5px;
+            width: 200px;
         }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .data-table th {
+            background-color: #f2f2f2;
+            color: #000;
+            font-weight: 500;
+            text-align: left;
+            padding: 12px 10px;
+            border: 1px solid #ddd;
+        }
+
+        .data-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
         .no-data {
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             color: #666;
             font-style: italic;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .pagination-info {
+            color: #666;
+        }
+
+        .pagination-buttons a {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 0 2px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        .pagination-buttons a.active {
+            background-color: #003d64;
+            color: white;
+            border-color: #003d64;
+        }
+
+        .pagination-buttons a:hover:not(.active) {
+            background-color: #ddd;
         }
 
         .action-button {
@@ -276,6 +365,75 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
 
     <div class="content-container">
         <div class="history-header">Current Sit-in Records</div>  
+        
+        <!-- Charts container -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-title">Programming Languages Distribution</div>
+                <div class="chart-wrapper">
+                    <canvas id="pieChart1"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-title">Room Distribution</div>
+                <div class="chart-wrapper">
+                    <canvas id="pieChart2"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Table section -->
+        <div class="table-container">
+            <div class="table-controls">
+                <div class="entries-selector">
+                    Show
+                    <select>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    entries
+                </div>
+                
+                <div class="search-box">
+                    <label>Search:</label>
+                    <input type="text" placeholder="Search...">
+                </div>
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Sit ID Number</th>
+                        <th>ID Number</th>
+                        <th>Name</th>
+                        <th>Purpose</th>
+                        <th>Sit Lab</th>
+                        <th>Session</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="8" class="no-data">No data available</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="pagination">
+                <div class="pagination-info">
+                    Showing 1 to 1 of 1 entry
+                </div>
+                <div class="pagination-buttons">
+                    <a href="#">«</a>
+                    <a href="#" class="active">1</a>
+                    <a href="#">»</a>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
@@ -290,6 +448,88 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             document.querySelector(".container").classList.remove("change");
         }
         
+        // Data for the pie charts
+        const data1 = {
+            labels: ['C#', 'C', 'Java', 'ASP.Net', 'Php'],
+            datasets: [{
+                data: [0, 0, 0, 0, 100],
+                backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#FF9F40', '#4BC0C0']
+            }]
+        };
+
+        const data2 = {
+            labels: ['524', '526', '528', '530', '542'],
+            datasets: [{
+                data: [100, 0, 0, 0, 0],
+                backgroundColor: ['#FF6384', '#FFCE56', '#FF9F40', '#36A2EB', '#9966FF']
+            }]
+        };
+
+        // Configurations for the pie charts
+        const config1 = {
+            type: 'pie',
+            data: data1,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 10,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    title: {
+                        display: false
+                    }
+                },
+                layout: {
+                    padding: 15
+                }
+            }
+        };
+
+        const config2 = {
+            type: 'pie',
+            data: data2,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 10,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    title: {
+                        display: false
+                    }
+                },
+                layout: {
+                    padding: 15
+                }
+            }
+        };
+
+        // Render the pie charts after the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const pieChart1 = new Chart(
+                document.getElementById('pieChart1'),
+                config1
+            );
+
+            const pieChart2 = new Chart(
+                document.getElementById('pieChart2'),
+                config2
+            );
+        });
     </script>
 </body>
 </html>

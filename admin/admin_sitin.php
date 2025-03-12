@@ -244,6 +244,55 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
         .action-button:hover {
             background-color: #036199;
         }
+
+        .table-container {
+            margin: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-left: 5px;
+        }
     </style>
 </head>   
 <body>
@@ -276,6 +325,51 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
 
     <div class="content-container">
         <div class="history-header">Current Sit-in</div>  
+        <div class="table-container">
+            <div class="table-controls">
+                <div>
+                    <label for="entries">Show 
+                        <select id="entries">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select> entries
+                    </label>
+                </div>
+                <div class="search-box">
+                    <label for="search">Search:</label>
+                    <input type="text" id="search">
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sit ID Number</th>
+                        <th>ID Number</th>
+                        <th>Name</th>
+                        <th>Purpose</th>
+                        <th>Sit Lab</th>
+                        <th>Session</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="8" class="no-data">No data available</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <span>Showing 1 to 1 of 1 entry</span>
+                <div>
+                    <button>&laquo;</button>
+                    <button>1</button>
+                    <button>&raquo;</button>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
