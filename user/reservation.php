@@ -6,16 +6,19 @@ $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
 
 if ($userId) {
-    $stmt = $conn->prepare("SELECT UPLOAD_IMAGE FROM users WHERE STUD_NUM = ?");
+    $stmt = $conn->prepare("SELECT UPLOAD_IMAGE, IDNO, FIRST_NAME, LAST_NAME FROM users WHERE STUD_NUM = ?");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
-    $stmt->bind_result($userImage);
+    $stmt->bind_result($userImage, $idNumber, $firstName, $lastName);
     $stmt->fetch();
     $stmt->close();
     
     $profileImage = !empty($userImage) ? '../images/' . $userImage : "../images/image.jpg";
+    $studentName = $firstName . ' ' . $lastName;
 } else {
     $profileImage = "../images/image.jpg";
+    $idNumber = '';
+    $studentName = 'Guest';
 }
 ?>
 <!DOCTYPE html>
@@ -26,380 +29,171 @@ if ($userId) {
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Reservation</title>
     <style>
-        body {
-        background-image: linear-gradient(104.1deg, rgba(0,61,100,1) 13.6%, rgba(47,127,164,1) 49.4%, rgba(30,198,198,1) 93.3%);
-        background-attachment: fixed;
-        font-family: 'Roboto', sans-serif;
-        color: black; /* Set font color to black */
+        .change .bar1 {
+            transform: rotate(-45deg) translate(-9px, 6px);
         }
-
-        .logo {
-        width: 150px; 
-        height: 150px; 
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        border: 1px solid black;
-        border-radius: 50%; 
-        object-fit: cover; 
-        }
-
-        .sidenav {
-        height: 100%;
-        width: 250px;
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        left: -250px;
-        background-color: white; 
-        overflow-x: hidden;
-        padding-top: 20px;
-        font-family: 'Roboto', sans-serif;
-        font-size: 18px;
-        transition: 0.3s;
-        }
-
-        .sidenav.show {
-        left: 0;
-        }
-
-        .sidenav a {
-        padding: 8px 8px 8px 16px;
-        text-decoration: none;
-        font-size: 15px;
-        color: black; 
-        display: flex;
-        align-items: center;
-        position: relative;
-        padding-left: 16px; 
-        }
-
-        .sidenav a i {
-        font-size: 15px; 
-        margin-right: 10px; 
-        }
-
-        .sidenav a:hover {
-        background-color: black; 
-        color: white; 
-        transform: scale(1.05); 
-        transition: transform 0.3s, background-color 0.3s, color 0.3s; 
-        }
-
-        .sidenav a:hover i {
-        color: white; 
-        }
-
-        .sidenav a::before {
-        content: '';
-        position: absolute;
-        left: -10px; 
-        top: 0;
-        bottom: 0;
-        width: 5px; 
-        background-color: transparent;
-        transition: background-color 0.3s;
-        }
-
-        .sidenav a:hover::before {
-        background-color: black; 
-        }
-
-        .user-name {
-        color: #000; 
-        text-align: center;
-        font-family: 'Roboto', sans-serif;
-        font-size: 22px;
-        font-weight: bold; 
-        }
-
-        .container {
-        display: inline-block;
-        cursor: pointer;
-        position: absolute;
-        top: 15px; 
-        left: 25px; 
-        }
-
-        .bar1, .bar2, .bar3 {
-        width: 35px;
-        height: 5px;
-        background-color: black; 
-        margin: 6px 0;
-        transition: 0.4s;
-        }
-
-        .closebtn {
-            position: absolute;
-            top: 0; 
-            right: 0; 
-            padding: 10px 15px;
-            font-size: 36px;
-            cursor: pointer;
-            color: #818181;
-        }
-
-        .closebtn:hover {
-            color: #000; 
-        }
-
-        .header {
-            text-align: center;
-            background-color: white; 
-            color: black; 
-            font-family: 'Roboto', sans-serif;
-            font-size: 25px; 
-            font-weight: bold; 
-            padding: 10px; 
-        }
-
-        .logout-section {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .logout-section a {
-            color:  black;
-        }
-
-        .logout-section a:hover {
-            background-color: black; 
-            color: white; 
-        }
-
-        .logout-section a:hover i {
-            color: white; 
-        }
-
-        /* Reservation Form Styles */
-        .reservation-container {
-            max-width: 600px;
-            margin: 30px auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.4);
-        }
-
-        .reservation-title {
-            background-color: #003d64;
-            color: white;
-            padding: 15px;
-            margin: -20px -20px 20px -20px; /* Adjusted to match your container's padding */
-            border-radius: 8px 8px 0 0; 
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            font-family: 'Roboto', sans-serif; /* Set font family to Roboto */
-            color: black; /* Set font color to black */
-        }
-
-        .form-group label {
-            width: 150px;
-            font-weight: 500;
-            color: #444;
-        }
-
-        .form-group input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f8f8f8;
-            width: 100%;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .btn-reserve {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            min-width: 100px;
-        }
-
-        .btn-reserve:hover {
-            background-color: #0056b3;
-        }
-
-        /* Special styling for date and time inputs */
-        input[type="date"], input[type="time"] {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f8f8f8;
-            padding: 10px;
-            width: 100%;
-        }
-
-        /* Hide default date and time icons */
-        input::-webkit-calendar-picker-indicator {
-            opacity: 1;
-            display: block;
-            float: right;
-            cursor: pointer;
-        }
-
-        /* Custom placeholder for date and time */
-        .time-placeholder::before {
-            content: "--:-- --";
-            color: #777;
-            position: absolute;
-            pointer-events: none;
-        }
-
-        .date-placeholder::before {
-            content: "dd/mm/yyyy";
-            color: #777;
-            position: absolute;
-            pointer-events: none;
-        }
-
-        /* Success message */
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .readonly-input {
-            background-color: #e9ecef;
-            cursor: not-allowed;
-        }
-
-        /* Dropdown styles */
-        select.form-control {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f8f8f8;
-            width: 100%;
-            height: 40px; /* To match the height of your input fields */
-            cursor: pointer;
-        }
-
-        select.form-control:focus {
-            outline: none;
-            border-color: #007bff;
+        .change .bar2 {opacity: 0;}
+        .change .bar3 {
+            transform: rotate(45deg) translate(-8px, -8px);
         }
     </style>
 </head>
-<body>
-    <div class="header">
+<body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
+    <!-- Header -->
+    <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
         CCS SIT-IN MONITORING SYSTEM
-    </div>
-    <div class="container" onclick="toggleNav(this)">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-    </div>
-    <div class="sidenav" id="mySidenav">
-        <span class="closebtn" onclick="closeNav()">&times;</span>
-        <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="logo">
-        <p class="user-name"><?php echo htmlspecialchars($firstName); ?></p>
-        <a href="dashboard.php"><i class="fas fa-home"></i> HOME</a>
-        <a href="profile.php"><i class="fas fa-user"></i> PROFILE</a>
-        <a href="edit.php"><i class="fas fa-edit"></i> EDIT</a>
-        <a href="history.php"><i class="fas fa-history"></i> HISTORY</a>
-        <a href="reservation.php"><i class="fas fa-calendar-alt"></i> RESERVATION</a>
-
-        <div class="logout-section">
-            <a href="../login.php"><i class="fas fa-sign-out-alt"></i> LOG OUT</a>
+        <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
+            <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
+            <div class="bar2 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
+            <div class="bar3 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
         </div>
     </div>
 
-    <div class="reservation-container">
-        <div class="reservation-title">Reservation</div>
-        <form action="reservation.php" method="post">
-            <div class="form-group">
-                <label for="id_number">ID Number:</label>
-                <input type="text" id="id_number" name="id_number" value="22680649" class="form-control readonly-input" readonly>
+    <!-- Side Navigation -->
+    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
+        <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+        
+        <div class="flex flex-col items-center mt-4">
+            <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
+            <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+        </div>
+
+        <nav class="flex flex-col space-y-0.5 px-2">
+            <div class="overflow-hidden">
+                <a href="dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-home w-6 text-base"></i>
+                    <span class="text-sm font-medium">HOME</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="profile.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-user w-6 text-base"></i>
+                    <span class="text-sm font-medium">PROFILE</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="edit.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-edit w-6 text-base"></i>
+                    <span class="text-sm font-medium">EDIT</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="history.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-history w-6 text-base"></i>
+                    <span class="text-sm font-medium">HISTORY</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="reservation.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-calendar-alt w-6 text-base"></i>
+                    <span class="text-sm font-medium">RESERVATION</span>
+                </a>
+            </div>
+
+        <div class="overflow-hidden">
+            <a href="../login.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-sign-out-alt w-6 text-base"></i>
+                <span class="text-sm font-medium">LOG OUT</span> <!-- Updated font size and weight -->
+            </a>
+        </div>
+    </div>
+
+    <!-- Reservation Form Container -->
+    <div class="max-w-2xl mx-auto mt-8 mb-8 bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-200/50 backdrop-blur-sm">
+        <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-6 text-center">
+            <h2 class="text-2xl font-bold uppercase tracking-wider flex items-center justify-center">
+                <i class="fas fa-calendar-alt mr-3"></i>
+                Reservation
+            </h2>
+        </div>
+        <form action="reservation.php" method="post" class="p-8 space-y-6">
+            <!-- Form Groups -->
+            <div class="space-y-4">
+                <!-- ID Number -->
+                <div class="flex items-center gap-4">
+                    <label for="id_number" class="w-40 font-medium text-gray-700">ID Number:</label>
+                    <input type="text" id="id_number" name="id_number" value="<?php echo htmlspecialchars($idNumber); ?>" 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly>
+                </div>
+                
+                <!-- Student Name -->
+                <div class="flex items-center gap-4">
+                    <label for="student_name" class="w-40 font-medium text-gray-700">Student Name:</label>
+                    <input type="text" id="student_name" name="student_name" value="<?php echo htmlspecialchars($studentName); ?>" 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly>
+                </div>
+                
+                <!-- Purpose -->
+                <div class="flex items-center gap-4">
+                    <label for="purpose" class="w-40 font-medium text-gray-700">Purpose:</label>
+                    <select id="purpose" name="purpose" 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
+                        <option value="" disabled selected>Select a Purpose</option>
+                        <option value="C Programming">C Programming</option>
+                        <option value="C++ Programming">C++ Programming</option>
+                        <option value="C# Programming">C# Programming</option>
+                        <option value="Java Programming">Java Programming</option>
+                        <option value="Python Programming">Python Programming</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <!-- Lab -->
+                <div class="flex items-center gap-4">
+                    <label for="lab" class="w-40 font-medium text-gray-700">Lab:</label>
+                    <select id="lab" name="lab" 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
+                        <option value="" disabled selected>Select a Lab</option>
+                        <?php foreach ([524, 526, 528, 530, 542, 544] as $labNumber): ?>
+                            <option value="<?php echo $labNumber; ?>"><?php echo $labNumber; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <!-- Available PC -->
+                <div class="flex items-center gap-4">
+                    <label for="available_pc" class="w-40 font-medium text-gray-700">Available PC:</label>
+                    <select id="available_pc" name="available_pc" 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
+                        <option value="" disabled selected>Select a PC</option>
+                        <?php for ($i = 1; $i <= 50; $i++): ?>
+                            <option value="<?php echo $i; ?>">PC <?php echo $i; ?></option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+                
+                <!-- Time In -->
+                <div class="flex items-center gap-4">
+                    <label for="time_in" class="w-40 font-medium text-gray-700">Time In:</label>
+                    <input type="time" id="time_in" name="time_in" 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
+                </div>
+                
+                <!-- Date -->
+                <div class="flex items-center gap-4">
+                    <label for="date" class="w-40 font-medium text-gray-700">Date:</label>
+                    <input type="date" id="date" name="date" 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
+                </div>
+                
+                <!-- Remaining Session -->
+                <div class="flex items-center gap-4">
+                    <label for="remaining_session" class="w-40 font-medium text-gray-700">Remaining Session:</label>
+                    <input type="text" id="remaining_session" name="remaining_session" value="30" 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly>
+                </div>
             </div>
             
-            <div class="form-group">
-                <label for="student_name">Student Name:</label>
-                <input type="text" id="student_name" name="student_name" value="Alexus Jamilo Sagaral" class="form-control readonly-input" readonly>
-            </div>
-            
-            <div class="form-group">
-                <label for="purpose">Purpose:</label>
-                <select id="purpose" name="purpose" class="form-control">
-                    <option value="" disabled selected>Select a Purpose</option>
-                    <option value="C Programming">C Programming</option>
-                    <option value="C++ Programming">C++ Programming</option>
-                    <option value="C# Programming">C# Programming</option>
-                    <option value="Java Programming">Java Programming</option>
-                    <option value="Python Programming">Python Programming</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="lab">Lab:</label>
-                <select id="lab" name="lab" class="form-control">
-                    <option value="" disabled selected>Select a Lab</option>
-                    <option value="524">524</option>
-                    <option value="526">526</option>
-                    <option value="528">528</option>
-                    <option value="530">530</option>
-                    <option value="542">542</option>
-                    <option value="544">544</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="available_pc">Available PC:</label>
-                <select id="available_pc" name="available_pc" class="form-control">
-                    <option value="" disabled selected>Select a PC</option>
-                    <?php for ($i = 1; $i <= 50; $i++): ?>
-                        <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                    <?php endfor; ?>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="time_in">Time In:</label>
-                <input type="time" id="time_in" name="time_in" class="form-control">
-            </div>
-            
-            <div class="form-group">
-                <label for="date">Date:</label>
-                <input type="date" id="date" name="date" class="form-control">
-            </div>
-            
-            <div class="form-group">
-                <label for="remaining_session">Remaining Session:</label>
-                <input type="text" id="remaining_session" name="remaining_session" value="30" class="form-control readonly-input" readonly>
-            </div>
-            
-            <div class="button-group">
-                <button type="button" class="btn-reserve" style="margin: 0 auto;">Reserve</button>
+            <!-- Submit Button -->
+            <div class="flex justify-center pt-4">
+                <button type="submit" 
+                    class="px-8 py-3 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-semibold rounded-lg 
+                    hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50">
+                    Reserve Now
+                </button>
             </div>
         </form>
     </div>
@@ -407,44 +201,14 @@ if ($userId) {
     <script>
         function toggleNav(x) {
             x.classList.toggle("change");
-            document.getElementById("mySidenav").classList.toggle("show");
+            document.getElementById("mySidenav").classList.toggle("-translate-x-full");
         }
 
         function closeNav() {
-            document.getElementById("mySidenav").classList.remove("show");
-            document.querySelector(".container").classList.remove("change");
+            document.getElementById("mySidenav").classList.add("-translate-x-full");
+            document.querySelector(".change")?.classList.remove("change");
         }
 
-        // Add date and time pickers with custom formatting
-        document.addEventListener('DOMContentLoaded', function() {
-            // Time picker setup
-            const timeInput = document.getElementById('time_in');
-            timeInput.addEventListener('focus', function() {
-                // Convert text input to time input on focus
-                this.type = 'time';
-            });
-            
-            timeInput.addEventListener('blur', function() {
-                // If no value is selected, convert back to text
-                if (!this.value) {
-                    this.type = 'text';
-                }
-            });
-            
-            // Date picker setup
-            const dateInput = document.getElementById('date');
-            dateInput.addEventListener('focus', function() {
-                // Convert text input to date input on focus
-                this.type = 'date';
-            });
-            
-            dateInput.addEventListener('blur', function() {
-                // If no value is selected, convert back to text
-                if (!this.value) {
-                    this.type = 'text';
-                }
-            });
-        });
     </script>
 </body>
 </html>

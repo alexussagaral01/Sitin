@@ -25,382 +25,150 @@ if ($userId) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="icon" href="../logo/ccs.png" type="image/x-icon"> <!-- Updated path -->
+    <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>History</title>
     <style>
-        body {
-        background-image: linear-gradient(104.1deg, rgba(0,61,100,1) 13.6%, rgba(47,127,164,1) 49.4%, rgba(30,198,198,1) 93.3%);
-        background-attachment: fixed;
+        /* Only keep the burger menu animation styles */
+        .change .bar1 {
+            transform: rotate(-45deg) translate(-9px, 6px);
         }
-
-        .logo {
-        width: 150px; 
-        height: 150px; 
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        border: 1px solid black;
-        border-radius: 50%; 
-        object-fit: cover; 
-        }
-
-        .sidenav {
-        height: 100%;
-        width: 250px;
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        left: -250px;
-        background-color: white; 
-        overflow-x: hidden;
-        padding-top: 20px;
-        font-family: 'Roboto', sans-serif;
-        font-size: 18px;
-        transition: 0.3s;
-        }
-
-        .sidenav.show {
-        left: 0;
-        }
-
-        .sidenav a {
-        padding: 8px 8px 8px 16px;
-        text-decoration: none;
-        font-size: 15px;
-        color: black; 
-        display: flex;
-        align-items: center;
-        position: relative;
-        padding-left: 16px; 
-        }
-
-        .sidenav a i {
-        font-size: 15px; 
-        margin-right: 10px; 
-        }
-
-        .sidenav a:hover {
-        background-color: black; 
-        color: white; 
-        transform: scale(1.05); 
-        transition: transform 0.3s, background-color 0.3s, color 0.3s; 
-        }
-
-        .sidenav a:hover i {
-        color: white; 
-        }
-
-        .sidenav a::before {
-        content: '';
-        position: absolute;
-        left: -10px; 
-        top: 0;
-        bottom: 0;
-        width: 5px; 
-        background-color: transparent;
-        transition: background-color 0.3s;
-        }
-
-        .sidenav a:hover::before {
-        background-color: black; 
-        }
-
-        .user-name {
-        color: #000; 
-        text-align: center;
-        font-family: 'Roboto', sans-serif;
-        font-size: 22px;
-        font-weight: bold; 
-        }
-
-        .container {
-        display: inline-block;
-        cursor: pointer;
-        position: absolute;
-        top: 15px; 
-        left: 25px; 
-        }
-
-        .bar1, .bar2, .bar3 {
-        width: 35px;
-        height: 5px;
-        background-color: black; 
-        margin: 6px 0;
-        transition: 0.4s;
-        }
-
-        .closebtn {
-            position: absolute;
-            top: 0; 
-            right: 0; 
-            padding: 10px 15px;
-            font-size: 36px;
-            cursor: pointer;
-            color: #818181;
-        }
-
-        .closebtn:hover {
-            color: #000; 
-        }
-
-        .header {
-            text-align: center;
-            background-color: white; 
-            color: black; 
-            font-family: 'Roboto', sans-serif;
-            font-size: 25px; 
-            font-weight: bold; 
-            padding: 10px; 
-        }
-
-        .logout-section {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .logout-section a {
-            color:  black;
-        }
-
-        .logout-section a:hover {
-            background-color: black; 
-            color: white; 
-        }
-
-        .logout-section a:hover i {
-            color: white; 
-        }
-
-        /* New styles for history table */
-        .content-container {
-            width: 90%;
-            margin: 30px auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .history-header {
-            background-color: #003d64;
-            color: white;
-            padding: 15px;
-            margin: -20px -20px 20px -20px; /* Adjusted to match your container's padding */
-            border-radius: 8px 8px 0 0; 
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .table-controls {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-
-        .entries-select {
-            display: flex;
-            align-items: center;
-        }
-
-        .entries-select select {
-            margin: 0 5px;
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-        }
-
-        .search-box input {
-            padding: 5px 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            margin-left: 5px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #024d80;
-            color: white;
-            font-weight: normal;
-            cursor: pointer;
-        }
-
-        th:hover {
-            background-color: #036199;
-        }
-
-        th i {
-            margin-left: 5px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
-        }
-
-        .pagination a {
-            color: black;
-            float: left;
-            padding: 8px 16px;
-            text-decoration: none;
-            border: 1px solid #ddd;
-            margin: 0 4px;
-        }
-
-        .pagination a.active {
-            background-color: #024d80;
-            color: white;
-            border: 1px solid #024d80;
-        }
-
-        .pagination a:hover:not(.active) {
-            background-color: #ddd;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 15px;
-            color: #666;
-            font-style: italic;
-        }
-
-        .showing-entries {
-            margin-top: 10px;
-            color: #666;
-        }
-
-        .action-button {
-            padding: 6px 12px;
-            background-color: #024d80;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .action-button:hover {
-            background-color: #036199;
+        .change .bar2 {opacity: 0;}
+        .change .bar3 {
+            transform: rotate(45deg) translate(-8px, -8px);
         }
     </style>
 </head>
-<body>
-    <div class="header">
+<body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
+    <!-- Header -->
+    <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
         CCS SIT-IN MONITORING SYSTEM
-    </div>
-    <div class="container" onclick="toggleNav(this)">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-    </div>
-    <div class="sidenav" id="mySidenav">
-        <span class="closebtn" onclick="closeNav()">&times;</span>
-        <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="logo">
-        <p class="user-name"><?php echo htmlspecialchars($firstName); ?></p>
-        <a href="dashboard.php"><i class="fas fa-home"></i> HOME</a>
-        <a href="profile.php"><i class="fas fa-user"></i> PROFILE</a>
-        <a href="edit.php"><i class="fas fa-edit"></i> EDIT</a>
-        <a href="history.php"><i class="fas fa-history"></i> HISTORY</a>
-        <a href="reservation.php"><i class="fas fa-calendar-alt"></i> RESERVATION</a>
-
-        <div class="logout-section">
-            <a href="../login.php"><i class="fas fa-sign-out-alt"></i> LOG OUT</a>
+        <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
+            <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
+            <div class="bar2 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
+            <div class="bar3 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
         </div>
     </div>
-    
-    <div class="content-container">
-        <div class="history-header">History Information</div>       
-        <div class="table-controls">
-            <div class="entries-select">
-                <form id="entriesForm" method="GET">
-                    <select name="entries" onchange="this.form.submit()">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    entries per page
-                </form>
+
+    <!-- Side Navigation -->
+    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
+        <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+        
+        <div class="flex flex-col items-center mt-4">
+            <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
+            <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+        </div>
+
+        <nav class="flex flex-col space-y-0.5 px-2">
+            <div class="overflow-hidden">
+                <a href="dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-home w-6 text-base"></i>
+                    <span class="text-sm font-medium">HOME</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="profile.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-user w-6 text-base"></i>
+                    <span class="text-sm font-medium">PROFILE</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="edit.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-edit w-6 text-base"></i>
+                    <span class="text-sm font-medium">EDIT</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="history.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-history w-6 text-base"></i>
+                    <span class="text-sm font-medium">HISTORY</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="reservation.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-calendar-alt w-6 text-base"></i>
+                    <span class="text-sm font-medium">RESERVATION</span>
+                </a>
+            </div>
+
+        <div class="overflow-hidden">
+            <a href="../login.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-sign-out-alt w-6 text-base"></i>
+                <span class="text-sm font-medium">LOG OUT</span> <!-- Updated font size and weight -->
+            </a>
+        </div>
+    </div>
+
+    <!-- History Content -->
+    <div class="container mx-auto px-4 mt-8">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white py-4 px-6">
+                <h2 class="text-xl font-bold text-center">HISTORY INFORMATION</h2>
             </div>
             
-            <div class="search-box">
-                <form method="GET" action="">
-                    <input type="hidden" name="entries" value="10">
-                    Search: <input type="text" name="search" value="">
-                </form>
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center">
+                        <select class="border rounded px-2 py-1 mr-2">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span>entries per page</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">Search:</span>
+                        <input type="text" class="border rounded px-2 py-1">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white">
+                            <tr>
+                                <th class="px-6 py-3 text-left">ID Number</th>
+                                <th class="px-6 py-3 text-left">Name</th>
+                                <th class="px-6 py-3 text-left">Sit Purpose</th>
+                                <th class="px-6 py-3 text-left">Laboratory</th>
+                                <th class="px-6 py-3 text-left">Login</th>
+                                <th class="px-6 py-3 text-left">Logout</th>
+                                <th class="px-6 py-3 text-left">Date</th>
+                                <th class="px-6 py-3 text-left">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white">
+                            <tr>
+                                <td colspan="8" class="px-6 py-4 text-center text-gray-500 italic">No data available</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-between items-center mt-4">
+                    <div class="text-gray-600">Showing 0 to 0 of 0 entries</div>
+                    <div class="flex space-x-1">
+                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&laquo;</button>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&lt;</button>
+                        <button class="px-3 py-1 border rounded bg-blue-500 text-white">1</button>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&gt;</button>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&raquo;</button>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>ID Number <i class="fas fa-sort"></i></th>
-                    <th>Name <i class="fas fa-sort"></i></th>
-                    <th>Sit Purpose <i class="fas fa-sort"></i></th>
-                    <th>Laboratory <i class="fas fa-sort"></i></th>
-                    <th>Login <i class="fas fa-sort"></i></th>
-                    <th>Logout <i class="fas fa-sort"></i></th>
-                    <th>Date <i class="fas fa-sort"></i></th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-        </table>
-        
-        <div class="showing-entries">
-            Not data available
-        </div>
-        
-        <div class="pagination">
-            <a href="?page=1&entries=10&search=">&laquo;</a>
-            <a href="?page=1&entries=10&search=">&lt;</a>
-            <a href="?page=1&entries=10&search=" class="active">1</a>
-            <a href="?page=1&entries=10&search=">&gt;</a>
-            <a href="?page=1&entries=10&search=">&raquo;</a>
-        </div>
     </div>
-    
+
     <script>
         function toggleNav(x) {
             x.classList.toggle("change");
-            document.getElementById("mySidenav").classList.toggle("show");
+            document.getElementById("mySidenav").classList.toggle("-translate-x-full");
         }
 
         function closeNav() {
-            document.getElementById("mySidenav").classList.remove("show");
-            document.querySelector(".container").classList.remove("change");
+            document.getElementById("mySidenav").classList.add("-translate-x-full");
+            document.querySelector(".change")?.classList.remove("change");
         }
-
-        // Auto-submit search form on input change
-        document.querySelector('.search-box input').addEventListener('input', function() {
-            this.form.submit();
-        });
     </script>
 </body>
 </html>

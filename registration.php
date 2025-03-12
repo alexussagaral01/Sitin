@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close();
     exit;
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -34,77 +35,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" href="logo/ccs.png" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>Registration</title>
-    <style>
-        body {
-            background-image: linear-gradient(104.1deg, rgba(0,61,100,1) 13.6%, rgba(47,127,164,1) 49.4%, rgba(30,198,198,1) 93.3%);
-            background-attachment: fixed;
-        }
-        
-        .w3-input:focus::placeholder {
-            opacity: 0;
-        }
-
-        .w3-input::placeholder {
-            transition: opacity 0.3s ease;
-        }
-
-        label {
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .w3-display-container {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .w3-button {
-            background-image: linear-gradient(104.1deg, rgba(0,61,100,1) 13.6%, rgba(47,127,164,1) 49.4%, rgba(30,198,198,1) 93.3%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 12px;
-        }
-
-        .w3-button:hover {
-            background-image: linear-gradient(104.1deg, rgba(30,198,198,1) 13.6%, rgba(47,127,164,1) 49.4%, rgba(0,61,100,1) 93.3%);
-        }
-
-        .w3-input {
-            padding-right: 30px;
-            border-radius: 15px; 
-            border: 1px solid black;
-        }
-
-        .input-container {
-            position: relative;
-        }
-
-        .input-container i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: gray;
-        }
-
-        .input-container input,
-        .input-container select {
-            padding-left: 40px; 
-        }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="script.js" defer></script>
     <script>
@@ -142,39 +77,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         });
     </script>
 </head>
-<body>
-    <div class="w3-display-container w3-animate-zoom">
-        <div class="w3-display-middle w3-card w3-white w3-padding" style="max-width: 500px; width: 90%; padding: 30px; border-radius: 15px; border: 1px solid black; box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.4);">
-            <h2 class="w3-center" style="font-family: 'Roboto', sans-serif; font-weight: bold">Student Registration</h2>
-            <form id="registerForm" method="POST" action="">
-                <div class="w3-margin-bottom input-container">
-                    <i class="fa fa-id-card"></i>
-                    <label for="Idno"></label>
-                    <input type="text" id="Idno" name="Idno" class="w3-input w3-border w3-serif" placeholder="Id Number" required>
+<body class="h-screen flex items-center justify-center" style="background-image: linear-gradient(111.3deg, rgba(74,105,187,1) 9.6%, rgba(205,77,204,1) 93.6%);">
+    <div class="fixed bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <h2 class="text-center text-2xl font-bold mb-6">Student Registration</h2>
+        <form id="registerForm" method="POST" action="">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="mb-4 relative col-span-1 md:col-span-2">
+                    <i class="fa fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                    <input type="text" id="Idno" name="Idno" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Id Number" required>
                 </div>
 
-                <div class="w3-margin-bottom input-container">
-                    <i class="fa fa-user"></i>
-                    <label for="Lastname"></label>
-                    <input type="text" id="Lastname" name="Lastname" class="w3-input w3-border w3-serif" placeholder="Last Name" required>
+                <div class="mb-4 relative col-span-1 md:col-span-2 grid grid-cols-3 gap-4">
+                    <div class="relative">
+                        <i class="fa fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                        <input type="text" id="Lastname" name="Lastname" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Last Name" required>
+                    </div>
+                    <div class="relative">
+                        <i class="fa fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                        <input type="text" id="Firstname" name="Firstname" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="First Name" required>
+                    </div>
+                    <div class="relative">
+                        <i class="fa fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                        <input type="text" id="Midname" name="Midname" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Middle Name">
+                    </div>
                 </div>
 
-                <div class="w3-margin-bottom input-container">
-                    <i class="fa fa-user"></i>
-                    <label for="Firstname"></label>
-                    <input type="text" id="Firstname" name="Firstname" class="w3-input w3-border w3-serif" placeholder="First Name" required>
-                </div>
-
-                <div class="w3-margin-bottom input-container">
-                    <i class="fa fa-user"></i>
-                    <label for="Midname"></label>
-                    <input type="text" id="Midname" name="Midname" class="w3-input w3-border w3-serif" placeholder="Middle Name">
-                </div>
-
-                <div class="w3-margin-bottom input-container">
-                    <i class="fa fa-book"></i>
-                    <label for="Course"></label>
-                    <select id="Course" name="Course" class="w3-input w3-border w3-serif" required>
+                <div class="mb-4 relative">
+                    <i class="fa fa-book absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                    <select id="Course" name="Course" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         <option value="" disabled selected>Select a Course</option>
                         <option value="BS IN ACCOUNTANCY">BS IN ACCOUNTANCY</option>
                         <option value="BS IN BUSINESS ADMINISTRATION">BS IN BUSINESS ADMINISTRATION</option>
@@ -189,10 +119,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </select>
                 </div>
                 
-                <div class="w3-margin-bottom input-container">
-                    <i class="fa fa-graduation-cap"></i>
-                    <label for="Year_Level"></label>
-                    <select id="Year_Level" name="Year_Level" class="w3-input w3-border w3-serif" required>
+                <div class="mb-4 relative">
+                    <i class="fa fa-graduation-cap absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                    <select id="Year_Level" name="Year_Level" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         <option value="" disabled selected>Select a Year Level</option>
                         <option value="1">1st Year</option>
                         <option value="2">2nd Year</option>
@@ -201,27 +130,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </select>
                 </div>
 
-                <div class="w3-margin-bottom input-container">
-                    <i class="fa fa-user"></i>
-                    <label for="Username"></label>
-                    <input type="text" id="Username" name="Username" class="w3-input w3-border w3-serif" placeholder="User Name" required>
+                <div class="mb-4 relative col-span-1 md:col-span-2">
+                    <i class="fa fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                    <input type="text" id="Username" name="Username" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="User Name" required>
                 </div>
 
-                <div class="w3-margin-bottom input-container">
-                    <i class="fa fa-lock"></i>
-                    <label for="Password"></label>
-                    <input type="password" id="Password" name="Password" class="w3-input w3-border w3-serif" placeholder="Password" required>
+                <div class="mb-4 relative col-span-1 md:col-span-2">
+                    <i class="fa fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                    <input type="password" id="Password" name="Password" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password" required>
                 </div>
+            </div>
 
-                <div class="w3-center">
-                    <button class="w3-button w3-blue" type="submit">Register</button>
-                </div>
+            <div class="text-center">
+                <button class="bg-gradient-to-r from-purple-700 to-pink-500 text-white py-2 px-4 rounded-lg hover:from-pink-500 hover:to-purple-700 hover:text-black" type="submit">Register</button>
+            </div>
 
-                <div class="w3-center w3-margin-top">
-                    <p>Already have account?<a href="login.php" class="w3-text-blue">Log In</a></p>
-                </div>
-            </form> 
-        </div>
+            <div class="text-center mt-4">
+                <p>Already have an account? <a href="login.php" class="text-blue-500">Log In</a></p>
+            </div>
+        </form> 
     </div>
 </body>
 </html>

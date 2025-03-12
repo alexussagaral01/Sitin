@@ -18,7 +18,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     icon: data.status,
                     timer: data.status === "success" ? 2000 : null,
                     showConfirmButton: true, 
-                    confirmButtonText: "Okay" 
+                    confirmButtonText: "Okay",
+                    allowOutsideClick: false,
+                    scrollbarPadding: false,
+                    heightAuto: false
                 }).then(() => {
                     if (data.status === "success") {
                         registerForm.reset();
@@ -50,7 +53,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     text: data.message,
                     icon: data.status,
                     showConfirmButton: true, 
-                    confirmButtonText: "Okay" 
+                    confirmButtonText: "Okay",
+                    allowOutsideClick: false,
+                    scrollbarPadding: false,
+                    heightAuto: false
                 }).then((result) => {
                     if (result.isConfirmed && data.status === "success") {
                         if (formData.get('Username') === 'admin') {
@@ -123,7 +129,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     text: data.message,
                     icon: data.status,
                     showConfirmButton: true, 
-                    confirmButtonText: "Okay" 
+                    confirmButtonText: "Okay",
+                    allowOutsideClick: false,
+                    scrollbarPadding: false,
+                    heightAuto: false
                 }).then(() => {
                     if (data.status === "success") {
                         window.location.href = "profile.php";

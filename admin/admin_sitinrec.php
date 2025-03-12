@@ -224,11 +224,6 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             border: 1px solid #ddd;
             margin-left: 5px;
         }
-
-        table, th, td {
-            /* CSS removed */
-        }
-
         .no-data {
             text-align: center;
             padding: 15px;
