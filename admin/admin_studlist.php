@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../db.php'; // Add database connection
+require '../db.php';
 
 $firstName = isset($_SESSION['admin']) && $_SESSION['admin'] === true ? 'Admin' : (isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest');
 $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] : '../images/image.jpg';
@@ -13,176 +13,16 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Admin Dashboard</title>
     <style>
+        /* Keep only necessary custom styles that aren't covered by Tailwind */
         body {
             background-image: linear-gradient(104.1deg, rgba(0,61,100,1) 13.6%, rgba(47,127,164,1) 49.4%, rgba(30,198,198,1) 93.3%);
             background-attachment: fixed;
         }
 
-        .logo, .student-info img {
-            width: 150px; 
-            height: 150px; 
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            border: 1px solid black;
-            border-radius: 50%; 
-            object-fit: cover; 
-        }
-
-        .sidenav {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            z-index: 1;
-            top: 0;
-            left: -250px;
-            background-color: white; 
-            overflow-x: hidden;
-            padding-top: 20px;
-            font-family: 'Roboto', sans-serif;
-            font-size: 18px;
-            transition: 0.3s;
-        }
-
-        .sidenav.show {
-            left: 0;
-        }
-
-        .sidenav a {
-            padding: 8px 8px 8px 16px;
-            text-decoration: none;
-            font-size: 15px;
-            color: black; 
-            display: flex;
-            align-items: center;
-            position: relative;
-            padding-left: 16px; 
-        }
-
-        .sidenav a i {
-            font-size: 15px; 
-            margin-right: 10px; 
-        }
-
-        .sidenav a:hover {
-            background-color: black; 
-            color: white; 
-            transform: scale(1.05); 
-            transition: transform 0.3s, background-color 0.3s, color 0.3s; 
-        }
-
-        .sidenav a:hover i {
-            color: white; 
-        }
-
-        .sidenav a::before {
-            content: '';
-            position: absolute;
-            left: -10px; 
-            top: 0;
-            bottom: 0;
-            width: 5px; 
-            background-color: transparent;
-            transition: background-color 0.3s;
-        }
-
-        .sidenav a:hover::before {
-            background-color: black; 
-        }
-
-        .user-name {
-            color: #000; 
-            text-align: center;
-            font-family: 'Roboto', sans-serif;
-            font-size: 22px;
-            font-weight: bold; 
-        }
-
-        .container {
-            display: inline-block;
-            cursor: pointer;
-            position: absolute;
-            top: 15px; 
-            left: 25px; 
-        }
-
-        .bar1, .bar2, .bar3 {
-            width: 35px;
-            height: 5px;
-            background-color: black; 
-            margin: 6px 0;
-            transition: 0.4s;
-        }
-
-        .closebtn {
-            position: absolute;
-            top: 0; 
-            right: 0; 
-            padding: 10px 15px;
-            font-size: 36px;
-            cursor: pointer;
-            color: #818181;
-        }
-
-        .closebtn:hover {
-            color: #000; 
-        }
-
-        .header {
-            text-align: center;
-            background-color: white; 
-            color: black; 
-            font-family: 'Roboto', sans-serif;
-            font-size: 25px; 
-            font-weight: bold; 
-            padding: 10px; 
-        }
-
-        .logout-section {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .logout-section a {
-            color:  black;
-        }
-
-        .logout-section a:hover {
-            background-color: black; 
-            color: white; 
-        }
-
-        .logout-section a:hover i {
-            color: white; 
-        }
-
-        /* Dashboard content */
-        .dashboard-content {
-            margin-left: 20px;
-            margin-right: 20px;
-            margin-top: 50px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-
-        /* Fixed height for both cards to maintain consistent sizing */
-        .dashboard-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            width: 48%;
-            height: 550px; /* Fixed height for both cards */
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Hide overflow */
-        }
-
+        /* Any remaining custom styles for content area */
         .content-container {
             width: 90%;
             margin: 30px auto;
@@ -196,8 +36,8 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             background-color: #003d64;
             color: white;
             padding: 15px;
-            margin: -20px -20px 20px -20px; /* Adjusted to match your container's padding */
-            border-radius: 8px 8px 0 0; 
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
             text-align: center;
             font-size: 24px;
             font-weight: bold;
@@ -205,66 +45,92 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             letter-spacing: 2px;
             font-family: 'Roboto', sans-serif;
         }
-
-        .action-button {
-            padding: 6px 12px;
-            background-color: #024d80;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .action-button:hover {
-            background-color: #036199;
-        }
     </style>
 </head>   
-<body>
-    <div class="header">
+<body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
+    <!-- Header -->
+    <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
         CCS SIT-IN MONITORING SYSTEM
-    </div>
-    <div class="container" onclick="toggleNav(this)">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-    </div>
-    <div class="sidenav" id="mySidenav">
-        <span class="closebtn" onclick="closeNav()">&times;</span>
-        <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="logo">
-        <p class="user-name"><?php echo htmlspecialchars($firstName); ?></p>
-        <a href="admin_dashboard.php"><i class="fas fa-home"></i> HOME</a>
-        <a href="admin_search.php"><i class="fas fa-search"></i> SEARCH</a>
-        <a href="admin_sitin.php"><i class="fas fa-user-check"></i> SIT-IN</a>
-        <a href="admin_sitinrec.php"><i class="fas fa-book"></i> VIEW SIT-IN RECORDS</a>
-        <a href="admin_studlist.php"><i class="fas fa-list"></i> VIEW LIST OF STUDENT</a>
-        <a href="#"><i class="fas fa-chart-line"></i> SIT-IN REPORT</a>
-        <a href="#"><i class="fas fa-comments"></i> VIEW FEEDBACKS</a>
-        <a href="#"><i class="fas fa-chart-pie"></i> VIEW DAILY ANALYTICS</a>
-        <a href="#"><i class="fas fa-calendar-check"></i> RESERVATION/APPROVAL</a>
-
-        <div class="logout-section">
-          <a href="../login.php"><i class="fas fa-sign-out-alt"></i> LOG OUT</a>
+        <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
+            <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
+            <div class="bar2 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
+            <div class="bar3 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
         </div>
     </div>
 
-    <div class="content-container">
-        <div class="history-header">Student Information</div>      
+    <!-- Side Navigation -->
+    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
+        <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+        
+        <div class="flex flex-col items-center mt-4">
+            <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
+            <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+        </div>
+
+        <nav class="flex flex-col space-y-0.5 px-2">
+            <!-- Navigation items -->
+            <a href="admin_dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-home w-6 text-base"></i>
+                <span class="text-sm font-medium">HOME</span>
+            </a>
+            <a href="admin_search.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-search w-6 text-base"></i>
+                <span class="text-sm font-medium">SEARCH</span>
+            </a>
+            <a href="admin_sitin.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-user-check w-6 text-base"></i>
+                <span class="text-sm font-medium">SIT-IN</span>
+            </a>
+            <a href="admin_sitinrec.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-book w-6 text-base"></i>
+                <span class="text-sm font-medium">VIEW SIT-IN RECORDS</span>
+            </a>
+            <a href="admin_studlist.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-list w-6 text-base"></i>
+                <span class="text-sm font-medium">VIEW LIST OF STUDENT</span>
+            </a>
+            <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-chart-line w-6 text-base"></i>
+                <span class="text-sm font-medium">SIT-IN REPORT</span>
+            </a>
+            <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-comments w-6 text-base"></i>
+                <span class="text-sm font-medium">VIEW FEEDBACKS</span>
+            </a>
+            <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-chart-pie w-6 text-base"></i>
+                <span class="text-sm font-medium">VIEW DAILY ANALYTICS</span>
+            </a>
+            <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-calendar-check w-6 text-base"></i>
+                <span class="text-sm font-medium">RESERVATION/APPROVAL</span>
+            </a>
+        </nav>
+
+        <div class="mt-3 px-2 pb-2">
+            <a href="../login.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <i class="fas fa-sign-out-alt w-6 text-base"></i>
+                <span class="text-sm font-medium">LOG OUT</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="content-container w-11/12 mx-auto my-8 bg-white p-6 rounded-lg shadow-lg overflow-hidden border border-gray-200">
+        <div class="history-header bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white py-4 px-6 -mx-6 -mt-6 mb-6 rounded-t-lg text-center text-2xl font-bold uppercase tracking-wider font-roboto">
+            <h2 class="text-xl font-bold text-center">STUDENT INFORMATION</h2>
+        </div>      
     </div>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
         function toggleNav(x) {
-            x.classList.toggle("change");
-            document.getElementById("mySidenav").classList.toggle("show");
+            document.getElementById("mySidenav").classList.toggle("-translate-x-0");
+            document.getElementById("mySidenav").classList.toggle("-translate-x-full");
         }
 
         function closeNav() {
-            document.getElementById("mySidenav").classList.remove("show");
-            document.querySelector(".container").classList.remove("change");
+            document.getElementById("mySidenav").classList.remove("-translate-x-0");
+            document.getElementById("mySidenav").classList.add("-translate-x-full");
         }
-        
     </script>
 </body>
 </html>
