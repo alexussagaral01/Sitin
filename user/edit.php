@@ -36,7 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['Email'];
     $address = $_POST['Address'];
     
-    $uploadImagePath = $userImage; 
+    $uploadImagePath = $userImage; // Keep existing image by default
+    
+    // Handle image upload
     if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] == 0) {
         $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
         $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -44,43 +46,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         finfo_close($fileInfo);
         
         if (in_array($fileType, $allowedTypes)) {
-            $targetDir = "images/";
-            
-            $fileName = uniqid() . '_' . basename($_FILES["profileImage"]["name"]);
-            $targetFile = $targetDir . $fileName;
-            
+            // Create images directory if it doesn't exist
+            $targetDir = "../images/";
             if (!is_dir($targetDir)) {
                 mkdir($targetDir, 0777, true);
             }
             
+            // Generate unique filename
+            $fileName = uniqid() . '_' . basename($_FILES["profileImage"]["name"]);
+            $targetFile = $targetDir . $fileName;
+            
             if (move_uploaded_file($_FILES["profileImage"]["tmp_name"], $targetFile)) {
                 $uploadImagePath = $fileName;
-                $_SESSION['profile_image'] = $targetFile; 
-            } else {
-                echo json_encode([
-                    "status" => "error",
-                    "message" => "Failed to upload image."
-                ]);
-                exit;
+                $_SESSION['profile_image'] = $fileName;
+                
+                // Delete old image if it exists and is not the default image
+                if (!empty($userImage) && $userImage != "image.jpg" && file_exists($targetDir . $userImage)) {
+                    unlink($targetDir . $userImage);
+                }
             }
-        } else {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Invalid file type. Only JPEG, JPG, and PNG files are allowed."
-            ]);
-            exit;
         }
     }
 
     try {
-       
         $stmt = $conn->prepare("UPDATE users SET IDNO = ?, LAST_NAME = ?, FIRST_NAME = ?, MID_NAME = ?, COURSE = ?, YEAR_LEVEL = ?, EMAIL = ?, ADDRESS = ?, UPLOAD_IMAGE = ? WHERE STUD_NUM = ?");
-        $stmt->bind_param("issssssssi", $idno, $lastname, $firstname, $midname, $course, $year_level, $email, $address, $uploadImagePath, $userId);
+        $stmt->bind_param("sssssssssi", $idno, $lastname, $firstname, $midname, $course, $year_level, $email, $address, $uploadImagePath, $userId);
         
         if ($stmt->execute()) {
             echo json_encode([
                 "status" => "success",
-                "message" => "Profile updated successfully."
+                "message" => "Profile updated successfully.",
+                "image" => $uploadImagePath
             ]);
         } else {
             throw new Exception("Failed to update profile");
@@ -94,7 +90,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ]);
     }
     
-    $conn->close();
     exit;
 }
 ?>
@@ -322,6 +317,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     });
                 });
             }
+        });
+
+        // Add image upload handler
+        document.getElementById('profileImage').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImage').src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Update form submission
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message
+                    }).then(() => {
+                        // Update the profile image in the sidebar if it was changed
+                        if (data.image) {
+                            const sidebarImage = document.querySelector('#mySidenav img');
+                            if (sidebarImage) {
+                                sidebarImage.src = '../images/' + data.image;
+                            }
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An unexpected error occurred'
+                });
+            });
         });
     </script>
 </body>

@@ -2,9 +2,6 @@
 session_start();
 require '../db.php'; // Add database connection
 
-$firstName = isset($_SESSION['admin']) && $_SESSION['admin'] === true ? 'Admin' : (isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest');
-$profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] : '../images/image.jpg';
-
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_announcement'])) {
     $content = $_POST['new_announcement'];
@@ -68,8 +65,8 @@ $totalSitIns = 0;
         <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
         
         <div class="flex flex-col items-center mt-4">
-            <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
-            <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+            <img src="../images/image.jpg" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
+            <p class="text-white font-bold text-lg mb-3">Admin</p>
         </div>
 
         <nav class="flex flex-col space-y-0.5 px-2">

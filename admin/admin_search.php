@@ -2,19 +2,28 @@
 session_start();
 require '../db.php'; // Add database connection
 
-$firstName = isset($_SESSION['admin']) && $_SESSION['admin'] === true ? 'Admin' : (isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest');
-$profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] : '../images/image.jpg';
+// Only fetch student data when search button is clicked via POST
+$student = null;
+$searched = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($_POST['search'])) {
+    $searched = true;
+    $stmt = $conn->prepare("SELECT * FROM users WHERE IDNO = ?");
+    $stmt->bind_param("s", $_POST['search']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $student = $result->fetch_assoc();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Search</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Admin Search</title>
 </head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <!-- Header -->
@@ -32,8 +41,8 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
         <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
         
         <div class="flex flex-col items-center mt-4">
-            <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
-            <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+            <img src="../images/image.jpg" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
+            <p class="text-white font-bold text-lg mb-3">Admin</p>
         </div>
 
         <nav class="flex flex-col space-y-0.5 px-2">
@@ -110,14 +119,113 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             </div>
             <div class="p-6 h-[calc(100%-4rem)] flex flex-col">
                 <div class="mb-6">
-                    <form method="GET" action="" class="space-y-3">
-                        <input type="hidden" name="entries" value="10">
-                        <input type="text" name="search" placeholder="Search..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <form method="POST" action="" class="space-y-3">
+                        <div class="flex gap-2">
+                            <input type="text" name="search" placeholder="Enter ID Number..." 
+                                   class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white rounded-lg hover:opacity-90 group">
+                                <i class="fas fa-search group-hover:text-black transition-colors"></i>
+                            </button>
+                        </div>
                     </form>
                 </div>
+                
+                <!-- Student Results Area -->
                 <div class="flex-1 overflow-y-auto">
                     <div class="space-y-4 pr-2">
-                        <p class="text-gray-500 text-center py-4">There is no data available.</p>
+                        <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && $searched): ?>
+                            <?php if ($student): ?>
+                                <!-- Student Card -->
+                                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col md:flex-row border border-gray-200">
+                                    <!-- Left side with student info -->
+                                    <div class="md:w-1/4 flex flex-col items-center">
+                                        <?php if (!empty($student['UPLOAD_IMAGE'])): ?>
+                                            <img src="../images/<?php echo htmlspecialchars($student['UPLOAD_IMAGE']); ?>" 
+                                                 alt="Student Photo"
+                                                 class="w-28 h-28 rounded-full object-cover border-2 border-gray-200 mb-3"
+                                                 onerror="this.src='../images/image.jpg'">
+                                        <?php else: ?>
+                                            <img src="../images/image.jpg"
+                                                 alt="Default Photo"
+                                                 class="w-28 h-28 rounded-full object-cover border-2 border-gray-200 mb-3">
+                                        <?php endif; ?>
+                                        <h3 class="text-lg font-semibold text-center">
+                                            <?php echo htmlspecialchars($student['FIRST_NAME'] . ' ' . $student['LAST_NAME']); ?>
+                                        </h3>
+                                        <p class="text-blue-600 font-medium text-center"><?php echo htmlspecialchars($student['IDNO']); ?></p>
+                                        <div class="mt-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                                            Active Student
+                                        </div>
+                                        
+                                        <div class="w-full mt-4 px-4">
+                                            <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                                <span>Remaining:</span>
+                                                <span><?php echo htmlspecialchars($student['SESSION']); ?></span>
+                                            </div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                                <div class="bg-green-500 h-2 rounded-full" style="width: <?php echo ($student['SESSION'] / 30) * 100; ?>%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Right side with details -->
+                                    <div class="md:w-3/4 md:pl-6 mt-6 md:mt-0">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <p class="text-gray-500 text-sm">Course</p>
+                                                <p class="font-medium"><?php echo htmlspecialchars($student['COURSE']); ?></p>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-500 text-sm">Year Level</p>
+                                                <p class="font-medium"><?php echo htmlspecialchars($student['YEAR_LEVEL']); ?></p>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-500 text-sm">Email</p>
+                                                <p class="font-medium"><?php echo htmlspecialchars($student['EMAIL']); ?></p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Register Session Section -->
+                                        <div class="mt-4 pt-4 border-t border-gray-200">
+                                            <h4 class="text-md font-semibold mb-3 flex items-center">
+                                                <i class="fas fa-clipboard-list mr-2 text-blue-600"></i>
+                                                Register New Sit-In Session
+                                            </h4>
+                                            
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <select class="w-full p-2 border border-gray-300 rounded-lg">
+                                                        <option value="">Select Purpose</option>
+                                                        <option value="research">Research</option>
+                                                        <option value="assignment">Assignment</option>
+                                                        <option value="project">Project</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <select class="w-full p-2 border border-gray-300 rounded-lg">
+                                                        <option value="">Select Laboratory</option>
+                                                        <option value="lab1">Laboratory 1</option>
+                                                        <option value="lab2">Laboratory 2</option>
+                                                        <option value="lab3">Laboratory 3</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-4 flex justify-end">
+                                                <button class="px-4 py-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white rounded-lg hover:opacity-90 flex items-center">
+                                                    <i class="fas fa-clock mr-2"></i>
+                                                    Time - In
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <div class="text-center py-4">
+                                    <p class="text-gray-500">No student found with ID Number: <?php echo htmlspecialchars($_POST['search']); ?></p>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
