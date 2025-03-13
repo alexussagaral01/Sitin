@@ -165,29 +165,27 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
             </div>
             
             <!-- Table -->
-            <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-                <table class="w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Sit ID Number</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">ID Number</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Name</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Purpose</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Sit Lab</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Session</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        <tr>
-                            <td colspan="8" class="px-4 py-8 text-center text-gray-500 italic">
-                                No data available
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white">
+                            <tr>
+                                <th class="px-6 py-3 text-left">ID Number</th>
+                                <th class="px-6 py-3 text-left">Name</th>
+                                <th class="px-6 py-3 text-left">Purpose</th>
+                                <th class="px-6 py-3 text-left">Laboratory</th>
+                                <th class="px-6 py-3 text-left">Login</th>
+                                <th class="px-6 py-3 text-left">Logout</th>
+                                <th class="px-6 py-3 text-left">Date</th>
+                                <th class="px-6 py-3 text-left">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white">
+                            <tr>
+                                <td colspan="8" class="px-6 py-4 text-center text-gray-500 italic">No data available</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             
             <!-- Pagination -->
             <div class="flex justify-between items-center mt-4">
@@ -217,18 +215,18 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
         
         // Data for the pie charts
         const data1 = {
-            labels: ['C#', 'C', 'Java', 'ASP.Net', 'Php'],
+            labels: ['C', 'C++', 'C#', 'Java', 'Python', 'Other'],
             datasets: [{
-                data: [0, 0, 0, 0, 100],
-                backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#FF9F40', '#4BC0C0']
+            data: [10, 20, 30, 25, 15, 5],
+            backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#FF9F40', '#4BC0C0', '#9966FF']
             }]
         };
 
         const data2 = {
-            labels: ['524', '526', '528', '530', '542'],
+            labels: ['524', '526', '528', '530', '542', '544'],
             datasets: [{
-                data: [100, 0, 0, 0, 0],
-                backgroundColor: ['#FF6384', '#FFCE56', '#FF9F40', '#36A2EB', '#9966FF']
+            data: [100, 0, 0, 0, 0, 0],
+            backgroundColor: ['#FF6384', '#FFCE56', '#FF9F40', '#36A2EB', '#9966FF', '#4BC0C0']
             }]
         };
 

@@ -185,7 +185,7 @@ $totalSitIns = 0;
                             class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y min-h-[100px]"
                         ></textarea>
                         <button type="submit" 
-                            class="px-4 py-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white rounded-lg hover:opacity-90 transition-opacity">
+                            class="bg-gradient-to-r from-purple-700 to-pink-500 text-white py-2 px-4 rounded-lg hover:from-pink-500 hover:to-purple-700 hover:text-black transition-all">
                             Post Announcement
                         </button>
                     </form>

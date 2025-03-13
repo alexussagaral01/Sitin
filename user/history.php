@@ -129,11 +129,12 @@ if ($userId) {
                             <tr>
                                 <th class="px-6 py-3 text-left">ID Number</th>
                                 <th class="px-6 py-3 text-left">Name</th>
-                                <th class="px-6 py-3 text-left">Sit Purpose</th>
+                                <th class="px-6 py-3 text-left">Purpose</th>
                                 <th class="px-6 py-3 text-left">Laboratory</th>
                                 <th class="px-6 py-3 text-left">Login</th>
                                 <th class="px-6 py-3 text-left">Logout</th>
                                 <th class="px-6 py-3 text-left">Date</th>
+                                <th class="px-6 py-3 text-left">Session</th>
                                 <th class="px-6 py-3 text-left">Action</th>
                             </tr>
                         </thead>

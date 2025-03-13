@@ -142,8 +142,8 @@ $profileImage = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] :
                                 <th class="px-6 py-3 text-left">Sit Purpose</th>
                                 <th class="px-6 py-3 text-left">Laboratory</th>
                                 <th class="px-6 py-3 text-left">Login</th>
-                                <th class="px-6 py-3 text-left">Logout</th>
                                 <th class="px-6 py-3 text-left">Date</th>
+                                <th class="px-6 py-3 text-left">Status</th>
                                 <th class="px-6 py-3 text-left">Action</th>
                             </tr>
                         </thead>
