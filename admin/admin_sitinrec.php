@@ -2,6 +2,10 @@
 session_start();
 require '../db.php';
 
+// Update query to match database column names
+$query = "SELECT IDNO, FULL_NAME, PURPOSE, LABORATORY, TIME_IN, TIME_OUT, DATE, STATUS FROM curr_sitin ORDER BY DATE DESC";
+$result = mysqli_query($conn, $query);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -164,26 +168,41 @@ require '../db.php';
             
             <!-- Table -->
             <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white">
-                            <tr>
-                                <th class="px-6 py-3 text-left">ID Number</th>
-                                <th class="px-6 py-3 text-left">Name</th>
-                                <th class="px-6 py-3 text-left">Purpose</th>
-                                <th class="px-6 py-3 text-left">Laboratory</th>
-                                <th class="px-6 py-3 text-left">Login</th>
-                                <th class="px-6 py-3 text-left">Logout</th>
-                                <th class="px-6 py-3 text-left">Date</th>
-                                <th class="px-6 py-3 text-left">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white">
-                            <tr>
-                                <td colspan="8" class="px-6 py-4 text-center text-gray-500 italic">No data available</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table class="min-w-full">
+                    <thead class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white">
+                        <tr>
+                            <th class="px-6 py-3 text-left">ID Number</th>
+                            <th class="px-6 py-3 text-left">Name</th>
+                            <th class="px-6 py-3 text-left">Purpose</th>
+                            <th class="px-6 py-3 text-left">Laboratory</th>
+                            <th class="px-6 py-3 text-left">Login</th>
+                            <th class="px-6 py-3 text-left">Logout</th>
+                            <th class="px-6 py-3 text-left">Date</th>
+                            <th class="px-6 py-3 text-left">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        <?php
+                        if (mysqli_num_rows($result) > 0) {
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<tr class='hover:bg-gray-50'>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['IDNO']) . "</td>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['FULL_NAME']) . "</td>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['PURPOSE']) . "</td>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['LABORATORY']) . "</td>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['TIME_IN']) . "</td>";
+                                echo "<td class='px-6 py-4'>" . ($row['TIME_OUT'] ?? 'N/A') . "</td>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['DATE']) . "</td>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['STATUS']) . "</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='8' class='px-6 py-4 text-center text-gray-500 italic'>No data available</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
             
             <!-- Pagination -->
             <div class="flex justify-between items-center mt-4">

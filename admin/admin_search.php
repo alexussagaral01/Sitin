@@ -1,6 +1,41 @@
 <?php
 session_start();
-require '../db.php'; // Add database connection
+require '../db.php';
+
+// Add time-in handling
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['time_in'])) {
+    $idno = $_POST['idno'];
+    $fullName = $_POST['full_name'];
+    $purpose = $_POST['purpose'];
+    $laboratory = $_POST['laboratory'];
+    
+    // Check if student already has an active session
+    $checkStmt = $conn->prepare("SELECT * FROM curr_sitin WHERE IDNO = ? AND STATUS = 'Active'");
+    $checkStmt->bind_param("i", $idno);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $_SESSION['error'] = "Student already has an active sit-in session.";
+    } else {
+        // Insert new sit-in record
+        $stmt = $conn->prepare("INSERT INTO curr_sitin (IDNO, FULL_NAME, PURPOSE, LABORATORY, TIME_IN, DATE, STATUS) VALUES (?, ?, ?, ?, NOW(), CURDATE(), 'Active')");
+        $stmt->bind_param("isss", $idno, $fullName, $purpose, $laboratory);
+        
+        if ($stmt->execute()) {
+            // Decrease the session count in users table
+            $updateStmt = $conn->prepare("UPDATE users SET SESSION = SESSION - 1 WHERE IDNO = ? AND SESSION > 0");
+            $updateStmt->bind_param("i", $idno);
+            $updateStmt->execute();
+            
+            $_SESSION['success'] = "Time-in recorded successfully.";
+            header("Location: admin_sitin.php");
+            exit();
+        } else {
+            $_SESSION['error'] = "Error recording time-in.";
+        }
+    }
+}
 
 // Only fetch student data when search button is clicked via POST
 $student = null;
@@ -132,97 +167,131 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($
                 
                 <!-- Student Results Area -->
                 <div class="flex-1 overflow-y-auto">
-                    <div class="space-y-4 pr-2">
+                    <div class="space-y-6 pr-2">
                         <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && $searched): ?>
                             <?php if ($student): ?>
                                 <!-- Student Card -->
-                                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col md:flex-row border border-gray-200">
-                                    <!-- Left side with student info -->
-                                    <div class="md:w-1/4 flex flex-col items-center">
-                                        <?php if (!empty($student['UPLOAD_IMAGE'])): ?>
-                                            <img src="../images/<?php echo htmlspecialchars($student['UPLOAD_IMAGE']); ?>" 
-                                                 alt="Student Photo"
-                                                 class="w-28 h-28 rounded-full object-cover border-2 border-gray-200 mb-3"
-                                                 onerror="this.src='../images/image.jpg'">
-                                        <?php else: ?>
-                                            <img src="../images/image.jpg"
-                                                 alt="Default Photo"
-                                                 class="w-28 h-28 rounded-full object-cover border-2 border-gray-200 mb-3">
-                                        <?php endif; ?>
-                                        <h3 class="text-lg font-semibold text-center">
-                                            <?php echo htmlspecialchars($student['FIRST_NAME'] . ' ' . $student['LAST_NAME']); ?>
-                                        </h3>
-                                        <p class="text-blue-600 font-medium text-center"><?php echo htmlspecialchars($student['IDNO']); ?></p>
-                                        <div class="mt-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-                                            Active Student
+                                <div class="bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-purple-500">
+                                    <!-- Student Header -->
+                                    <div class="flex flex-col lg:flex-row items-center gap-8">
+                                        <div class="relative group">
+                                            <?php if (!empty($student['UPLOAD_IMAGE'])): ?>
+                                                <img src="../images/<?php echo htmlspecialchars($student['UPLOAD_IMAGE']); ?>" 
+                                                     alt="Student Photo"
+                                                     class="w-32 h-32 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform duration-300"
+                                                     onerror="this.src='../images/image.jpg'">
+                                            <?php else: ?>
+                                                <img src="../images/image.jpg"
+                                                     alt="Default Photo"
+                                                     class="w-32 h-32 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform duration-300">
+                                            <?php endif; ?>
+                                            <div class="absolute -bottom-2 -right-2 bg-green-400 rounded-full p-2">
+                                                <i class="fas fa-check text-white"></i>
+                                            </div>
                                         </div>
-                                        
-                                        <div class="w-full mt-4 px-4">
-                                            <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                                <span>Remaining:</span>
-                                                <span><?php echo htmlspecialchars($student['SESSION']); ?></span>
+
+                                        <div class="flex-1 text-center lg:text-left">
+                                            <h3 class="text-2xl font-bold text-gray-800 mb-2">
+                                                <?php echo htmlspecialchars($student['FIRST_NAME'] . ' ' . $student['LAST_NAME']); ?>
+                                            </h3>
+                                            <div class="inline-block bg-purple-100 text-purple-700 px-4 py-1 rounded-full font-medium mb-2">
+                                                <?php echo htmlspecialchars($student['IDNO']); ?>
                                             </div>
-                                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                                <div class="bg-green-500 h-2 rounded-full" style="width: <?php echo ($student['SESSION'] / 30) * 100; ?>%"></div>
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                                <div class="bg-blue-50 p-3 rounded-xl">
+                                                    <p class="text-blue-600 text-sm font-medium">Course</p>
+                                                    <p class="font-semibold text-gray-800"><?php echo htmlspecialchars($student['COURSE']); ?></p>
+                                                </div>
+                                                <div class="bg-purple-50 p-3 rounded-xl">
+                                                    <p class="text-purple-600 text-sm font-medium">Year Level</p>
+                                                    <p class="font-semibold text-gray-800"><?php echo htmlspecialchars($student['YEAR_LEVEL']); ?></p>
+                                                </div>
+                                                <div class="bg-pink-50 p-3 rounded-xl">
+                                                    <p class="text-pink-600 text-sm font-medium">Email</p>
+                                                    <p class="font-semibold text-gray-800 truncate"><?php echo htmlspecialchars($student['EMAIL']); ?></p>
+                                                </div>
                                             </div>
+                                        </div>
+
+                                        <div class="w-full lg:w-48 bg-white p-4 rounded-xl shadow-sm">
+                                            <div class="text-center mb-3">
+                                                <p class="text-sm text-gray-600">Sessions Remaining</p>
+                                                <p class="text-3xl font-bold text-purple-600"><?php echo htmlspecialchars($student['SESSION']); ?></p>
+                                            </div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                                                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2.5 rounded-full transition-all duration-500" 
+                                                     style="width: <?php echo ($student['SESSION'] / 30) * 100; ?>%"></div>
+                                            </div>
+                                            <p class="text-xs text-gray-500 text-center">
+                                                <?php echo htmlspecialchars($student['SESSION']); ?>/30 sessions
+                                            </p>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Right side with details -->
-                                    <div class="md:w-3/4 md:pl-6 mt-6 md:mt-0">
-                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div>
-                                                <p class="text-gray-500 text-sm">Course</p>
-                                                <p class="font-medium"><?php echo htmlspecialchars($student['COURSE']); ?></p>
-                                            </div>
-                                            <div>
-                                                <p class="text-gray-500 text-sm">Year Level</p>
-                                                <p class="font-medium"><?php echo htmlspecialchars($student['YEAR_LEVEL']); ?></p>
-                                            </div>
-                                            <div>
-                                                <p class="text-gray-500 text-sm">Email</p>
-                                                <p class="font-medium"><?php echo htmlspecialchars($student['EMAIL']); ?></p>
-                                            </div>
-                                        </div>
+
+                                    <!-- Register Session Section -->
+                                    <div class="mt-8 pt-6 border-t border-gray-200">
+                                        <h4 class="text-lg font-semibold mb-4 flex items-center text-purple-700">
+                                            <i class="fas fa-clipboard-list mr-2"></i>
+                                            New Sit-In Session Registration
+                                        </h4>
                                         
-                                        <!-- Register Session Section -->
-                                        <div class="mt-4 pt-4 border-t border-gray-200">
-                                            <h4 class="text-md font-semibold mb-3 flex items-center">
-                                                <i class="fas fa-clipboard-list mr-2 text-blue-600"></i>
-                                                Register New Sit-In Session
-                                            </h4>
-                                            
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <select class="w-full p-2 border border-gray-300 rounded-lg">
-                                                        <option value="">Select Purpose</option>
-                                                        <option value="research">Research</option>
-                                                        <option value="assignment">Assignment</option>
-                                                        <option value="project">Project</option>
+                                        <?php if (isset($_SESSION['error'])): ?>
+                                            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-r-lg">
+                                                <?php 
+                                                    echo $_SESSION['error'];
+                                                    unset($_SESSION['error']);
+                                                ?>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <form method="POST" action="" class="space-y-4">
+                                            <input type="hidden" name="idno" value="<?php echo htmlspecialchars($student['IDNO']); ?>">
+                                            <input type="hidden" name="full_name" value="<?php echo htmlspecialchars($student['FIRST_NAME'] . ' ' . $student['LAST_NAME']); ?>">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div class="relative">
+                                                    <select name="purpose" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl appearance-none cursor-pointer hover:border-purple-500 transition-colors" required>
+                                                        <option value=""disabled selected>Select Purpose</option>
+                                                        <option value="C Programming">C Programming</option>
+                                                        <option value="C++ Programming">C++ Programming</option>
+                                                        <option value="C# Programming">C# Programming</option>
+                                                        <option value="Java Programming">Java Programming</option>
+                                                        <option value="Python Programming">Python Programming</option>
+                                                        <option value="Other">Other</option>
                                                     </select>
+                                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <select class="w-full p-2 border border-gray-300 rounded-lg">
-                                                        <option value="">Select Laboratory</option>
-                                                        <option value="lab1">Laboratory 1</option>
-                                                        <option value="lab2">Laboratory 2</option>
-                                                        <option value="lab3">Laboratory 3</option>
+                                                <div class="relative">
+                                                    <select name="laboratory" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl appearance-none cursor-pointer hover:border-purple-500 transition-colors" required>
+                                                        <option value=""disabled selected>Select Laboratory</option>
+                                                        <option value="Lab 524">Lab 524</option>
+                                                        <option value="Lab 526">Lab 526</option>
+                                                        <option value="Lab 528">Lab 528</option>
+                                                        <option value="Lab 530">Lab 530</option>
+                                                        <option value="Lab 542">Lab 542</option>
+                                                        <option value="Lab 544">Lab 544</option>
                                                     </select>
+                                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            
-                                            <div class="mt-4 flex justify-end">
-                                                <button class="px-4 py-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white rounded-lg hover:opacity-90 flex items-center">
-                                                    <i class="fas fa-clock mr-2"></i>
+                                            <div class="flex justify-end">
+                                                <button type="submit" name="time_in" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:opacity-90 transform hover:scale-105 transition-all duration-300 flex items-center gap-2 shadow-lg">
+                                                    <i class="fas fa-clock"></i>
                                                     Time - In
                                                 </button>
                                             </div>
-                                        </div>
+                                        </form>
                                     </div>
                                 </div>
                             <?php else: ?>
-                                <div class="text-center py-4">
-                                    <p class="text-gray-500">No student found with ID Number: <?php echo htmlspecialchars($_POST['search']); ?></p>
+                                <div class="text-center py-8">
+                                    <div class="bg-red-50 p-6 rounded-xl inline-block">
+                                        <i class="fas fa-user-times text-4xl text-red-400 mb-3"></i>
+                                        <p class="text-gray-600">No student found with ID Number: <span class="font-semibold"><?php echo htmlspecialchars($_POST['search']); ?></span></p>
+                                    </div>
                                 </div>
                             <?php endif; ?>
                         <?php endif; ?>

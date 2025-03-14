@@ -2,6 +2,12 @@
 session_start();
 require '../db.php'; // Add database connection
 
+// Fetch current sit-ins
+$stmt = $conn->prepare("SELECT * FROM curr_sitin WHERE STATUS = 'Active' ORDER BY TIME_IN DESC");
+$stmt->execute();
+$result = $stmt->get_result();
+$current_sitins = $result->fetch_all(MYSQLI_ASSOC);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -146,9 +152,35 @@ require '../db.php'; // Add database connection
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                            <tr>
-                                <td colspan="8" class="px-6 py-4 text-center text-gray-500 italic">No data available</td>
-                            </tr>
+                            <?php if (count($current_sitins) > 0): ?>
+                                <?php foreach ($current_sitins as $sitin): ?>
+                                    <tr class="border-b hover:bg-gray-50">
+                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['IDNO']); ?></td>
+                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['FULL_NAME']); ?></td>
+                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['PURPOSE']); ?></td>
+                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['LABORATORY']); ?></td>
+                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['TIME_IN']); ?></td>
+                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['DATE']); ?></td>
+                                        <td class="px-6 py-4">
+                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-sm">
+                                                <?php echo htmlspecialchars($sitin['STATUS']); ?>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <form method="POST" action="time_out.php" class="inline">
+                                                <input type="hidden" name="sitin_id" value="<?php echo $sitin['SITIN_ID']; ?>">
+                                                <button type="submit" name="time_out" class="text-red-600 hover:text-red-800">
+                                                    <i class="fas fa-sign-out-alt"></i> Time-Out
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="8" class="px-6 py-4 text-center text-gray-500 italic">No data available</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
