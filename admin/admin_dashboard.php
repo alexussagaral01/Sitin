@@ -194,7 +194,7 @@ $totalSitIns = 0;
                         <?php if (empty($announcements)): ?>
                             <p class="text-gray-500 text-center py-4">No announcements available.</p>
                         <?php else: ?>
-                            <?php foreach (array_reverse($announcements) as $announcement): ?>
+                            <?php foreach ($announcements as $announcement): ?>
                                 <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-[rgba(0,61,100,1)]">
                                     <div class="text-sm font-bold text-[rgba(0,61,100,1)] mb-2">
                                         <?php echo htmlspecialchars($announcement['CREATED_BY']); ?> | 

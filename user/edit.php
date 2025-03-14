@@ -152,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <!-- ID Number -->
                             <div class="mb-4 relative col-span-1 md:col-span-2">
                                 <i class="fas fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                <input type="text" id="Idno" name="Idno" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100" value="<?php echo htmlspecialchars($idNo); ?>" readonly>
+                                <input type="text" id="Idno" name="Idno" class="w-full pl-12 py-2 border rounded-lg focus:outline-none cursor-not-allowed focus:ring-2 focus:ring-blue-500 bg-gray-100" value="<?php echo htmlspecialchars($idNo); ?>" readonly>
                             </div>
 
                             <!-- Name Fields -->

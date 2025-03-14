@@ -117,7 +117,7 @@ while ($row = $result->fetch_assoc()) {
                 <p class="text-gray-600 text-center">There are no announcements yet.</p>
             <?php else: ?>
                 <div class="h-[60vh] overflow-y-auto bg-gray-50 rounded-lg p-4">
-                    <?php foreach (array_reverse($announcements) as $announcement): ?>
+                    <?php foreach ($announcements as $announcement): ?>
                         <div class="bg-white rounded-lg shadow-sm p-4 mb-4 border-l-4 border-blue-900">
                             <div class="text-sm font-bold text-blue-900 mb-2">
                                 ADMIN | <?php echo date('Y-M-d', strtotime($announcement['CREATED_DATE'])); ?>
