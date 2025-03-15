@@ -19,15 +19,6 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Admin Sit-in</title>
-    <style>
-        .change .bar1 {
-            transform: rotate(-45deg) translate(-9px, 6px);
-        }
-        .change .bar2 {opacity: 0;}
-        .change .bar3 {
-            transform: rotate(45deg) translate(-8px, -8px);
-        }
-    </style>
 </head>   
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <!-- Header -->
@@ -202,13 +193,13 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
         function toggleNav(x) {
-            x.classList.toggle("change");
+            document.getElementById("mySidenav").classList.toggle("-translate-x-0");
             document.getElementById("mySidenav").classList.toggle("-translate-x-full");
         }
 
         function closeNav() {
+            document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
-            document.querySelector(".change")?.classList.remove("change");
         }
         
     </script>

@@ -104,22 +104,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <title>Edit</title>
-    <style>
-        .change .bar1 {
-            transform: rotate(-45deg) translate(-9px, 6px);
-        }
-        .change .bar2 {opacity: 0;}
-        .change .bar3 {
-            transform: rotate(45deg) translate(-8px, -8px);
-        }
-        .hidden-input {
-            display: none;
-        }
-        .content-wrapper {
-            height: 100vh;
-            overflow-y: auto;
-        }
-    </style>
 </head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <div class="content-wrapper">
@@ -143,9 +127,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="p-6">
                     <img src="<?php echo htmlspecialchars($profileImage); ?>" 
                          alt="Student Image" 
-                         class="w-[150px] h-[150px] rounded-full object-cover mx-auto block cursor-pointer border-3 border-white shadow-[0_0_15px_rgba(0,0,0,0.2)] mb-6"
-                         id="profileImage">
-                    <input type="file" id="fileInput" name="profileImage" class="hidden-input" form="editForm">
+                         class="w-[150px] h-[150px] rounded-full object-cover mx-auto block cursor-pointer border-3 border-white shadow-[0_0_15px_rgba(0,0,0,0.2)] mb-6 hover:opacity-80 transition-opacity"
+                         id="profileImage"
+                         title="Click to change profile picture">
+                    <input type="file" id="fileInput" name="profileImage" accept="image/*" class="hidden" form="editForm">
                     
                     <form id="editForm" method="POST" action="" class="mt-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -275,13 +260,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
     <script>
         function toggleNav(x) {
-            x.classList.toggle("change");
+            document.getElementById("mySidenav").classList.toggle("-translate-x-0");
             document.getElementById("mySidenav").classList.toggle("-translate-x-full");
         }
 
         function closeNav() {
+            document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
-            document.querySelector(".change").classList.remove("change");
         }
 
         document.addEventListener('DOMContentLoaded', function() {

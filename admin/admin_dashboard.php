@@ -24,10 +24,27 @@ while ($row = $result->fetch_assoc()) {
     $announcements[] = $row;
 }
 
-// Sample statistics data (hardcoded for UI only)
+// Get actual statistics from database
 $totalStudents = 0;
+$result = $conn->query("SELECT COUNT(*) as total FROM users");
+if ($row = $result->fetch_assoc()) {
+    $totalStudents = $row['total'];
+}
+
+// Get current active sit-ins
 $currentSitIns = 0;
+$result = $conn->query("SELECT COUNT(*) as total FROM curr_sitin WHERE STATUS = 'Active' AND TIME_OUT IS NULL");
+if ($row = $result->fetch_assoc()) {
+    $currentSitIns = $row['total'];
+}
+
+// Get total sit-ins (including completed ones)
 $totalSitIns = 0;
+$result = $conn->query("SELECT COUNT(*) as total FROM curr_sitin");
+if ($row = $result->fetch_assoc()) {
+    $totalSitIns = $row['total'];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,15 +56,6 @@ $totalSitIns = 0;
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Admin Dashboard</title>
-    <style>
-        .change .bar1 {
-            transform: rotate(-45deg) translate(-9px, 6px);
-        }
-        .change .bar2 {opacity: 0;}
-        .change .bar3 {
-            transform: rotate(45deg) translate(-8px, -8px);
-        }
-    </style>
 </head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <!-- Header -->
@@ -215,13 +223,13 @@ $totalSitIns = 0;
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
         function toggleNav(x) {
-            x.classList.toggle("change");
+            document.getElementById("mySidenav").classList.toggle("-translate-x-0");
             document.getElementById("mySidenav").classList.toggle("-translate-x-full");
         }
 
         function closeNav() {
+            document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
-            document.querySelector(".change")?.classList.remove("change");
         }
         
         // Initialize the chart

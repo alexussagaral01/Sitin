@@ -17,16 +17,6 @@ $result = mysqli_query($conn, $query);
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Admin Sit-in Records</title>
-    <style>
-        /* Remove all existing burger menu and sidenav styles */
-        .change .bar1 {
-            transform: rotate(-45deg) translate(-9px, 6px);
-        }
-        .change .bar2 {opacity: 0;}
-        .change .bar3 {
-            transform: rotate(45deg) translate(-8px, -8px);
-        }
-    </style>
 </head>   
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <!-- Header -->
@@ -161,7 +151,9 @@ $result = mysqli_query($conn, $query);
                 <div class="flex items-center space-x-2">
                     <label>Search:</label>
                     <input type="text" 
+                           id="searchInput"
                            placeholder="Search..." 
+                           onkeypress="handleKeyPress(event)"
                            class="border rounded px-3 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
@@ -181,7 +173,7 @@ $result = mysqli_query($conn, $query);
                             <th class="px-6 py-3 text-left">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white">
+                    <tbody id="tableBody" class="bg-white">
                         <?php
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
@@ -220,14 +212,45 @@ $result = mysqli_query($conn, $query);
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
+        // Replace the existing searchTable function with these new functions
+        function handleKeyPress(event) {
+            // Check if the pressed key is Enter
+            if (event.key === "Enter") {
+                searchTable();
+            }
+        }
+
+        function searchTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const tbody = document.getElementById('tableBody');
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let row of rows) {
+                let found = false;
+                const cells = row.getElementsByTagName('td');
+                
+                for (let cell of cells) {
+                    const text = cell.textContent || cell.innerText;
+                    if (text.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                row.style.display = found ? '' : 'none';
+            }
+        }
+
+        // Existing scripts continue here...
         function toggleNav(x) {
-            x.classList.toggle("change");
+            document.getElementById("mySidenav").classList.toggle("-translate-x-0");
             document.getElementById("mySidenav").classList.toggle("-translate-x-full");
         }
 
         function closeNav() {
+            document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
-            document.querySelector(".change")?.classList.remove("change");
         }
         
         // Data for the pie charts

@@ -2,6 +2,9 @@
 session_start();
 require '../db.php';
 
+// Add query to fetch users
+$query = "SELECT * FROM users";
+$result = mysqli_query($conn, $query);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,37 +16,6 @@ require '../db.php';
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Admin Student List</title>
-    <style>
-        /* Keep only necessary custom styles that aren't covered by Tailwind */
-        body {
-            background-image: linear-gradient(104.1deg, rgba(0,61,100,1) 13.6%, rgba(47,127,164,1) 49.4%, rgba(30,198,198,1) 93.3%);
-            background-attachment: fixed;
-        }
-
-        /* Any remaining custom styles for content area */
-        .content-container {
-            width: 90%;
-            margin: 30px auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .history-header {
-            background-color: #003d64;
-            color: white;
-            padding: 15px;
-            margin: -20px -20px 20px -20px;
-            border-radius: 8px 8px 0 0;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-family: 'Roboto', sans-serif;
-        }
-    </style>
 </head>   
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <!-- Header -->
@@ -137,7 +109,11 @@ require '../db.php';
                 </div>
                 <div class="flex items-center">
                     <span class="mr-2">Search:</span>
-                    <input type="text" class="border rounded px-2 py-1">
+                    <input type="text" 
+                           id="searchInput"
+                           placeholder="Search..." 
+                           onkeypress="handleKeyPress(event)"
+                           class="border rounded px-2 py-1">
                 </div>
             </div>
 
@@ -153,10 +129,31 @@ require '../db.php';
                             <th class="px-6 py-3 text-left">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white">
-                        <tr>
-                            <td colspan="8" class="px-6 py-4 text-center text-gray-500 italic">No data available</td>
-                        </tr>
+                    <tbody id="tableBody" class="bg-white">
+                        <?php
+                        if (mysqli_num_rows($result) > 0) {
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                $fullName = $row['LAST_NAME'] . ', ' . $row['FIRST_NAME'] . ' ' . $row['MID_NAME'];
+                                echo "<tr class='hover:bg-gray-100'>";
+                                echo "<td class='px-6 py-4'>" . $row['IDNO'] . "</td>";
+                                echo "<td class='px-6 py-4'>" . $fullName . "</td>";
+                                echo "<td class='px-6 py-4'>" . $row['YEAR_LEVEL'] . "</td>";
+                                echo "<td class='px-6 py-4'>" . $row['COURSE'] . "</td>";
+                                echo "<td class='px-6 py-4'>" . $row['SESSION'] . "</td>";
+                                echo "<td class='px-6 py-4'>
+                                        <a href='edit_student.php?id=" . $row['STUD_NUM'] . "' class='text-blue-500 hover:text-blue-700 mr-3'>
+                                            <i class='fas fa-edit'></i>
+                                        </a>
+                                        <a href='delete_student.php?id=" . $row['STUD_NUM'] . "' class='text-red-500 hover:text-red-700' onclick='return confirm(\"Are you sure you want to delete this student?\");'>
+                                            <i class='fas fa-trash-alt'></i>
+                                        </a>
+                                    </td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='6' class='px-6 py-4 text-center text-gray-500 italic'>No data available</td></tr>";
+                        }
+                        ?>
                     </tbody>
                 </table>
             </div>
@@ -175,6 +172,34 @@ require '../db.php';
     </div>
     
     <script>
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                searchTable();
+            }
+        }
+
+        function searchTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const tbody = document.getElementById('tableBody');
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let row of rows) {
+                let found = false;
+                const cells = row.getElementsByTagName('td');
+                
+                for (let cell of cells) {
+                    const text = cell.textContent || cell.innerText;
+                    if (text.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                row.style.display = found ? '' : 'none';
+            }
+        }
+
         function toggleNav(x) {
             document.getElementById("mySidenav").classList.toggle("-translate-x-0");
             document.getElementById("mySidenav").classList.toggle("-translate-x-full");

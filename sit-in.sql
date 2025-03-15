@@ -104,11 +104,6 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`STUD_NUM`, `IDNO`, `LAST_NAME`, `FIRST_NAME`, `MID_NAME`, `COURSE`, `YEAR_LEVEL`, `USER_NAME`, `PASSWORD_HASH`, `UPLOAD_IMAGE`, `EMAIL`, `ADDRESS`, `SESSION`) VALUES
-(1, 22680649, 'Sagaral', 'Alexus Sundae', 'Jamilo', 'BS IN INFORMATION TECHNOLOGY', '3rd Year', 'alexus123', '$2y$10$0YT1OIVzEl/DMSkZlEa90et4KhbVxQfpbpSYnT7WnhY0mQ75Yl7Uq', 0x363763363831346131343834355f363762363164653731383739645f3437333031303239345f3539353133333735363436333136355f373134393832313131373437373839303134305f6e202831292e6a7067, 'alexussagaral3@gmail.com', '1101 Andres Abellana Brgy. Guadaluper Cebu City', 30),
-(2, 23213123, 'Cabunilas', 'Vince Bryant', 'N', 'BS IN INFORMATION TECHNOLOGY', '3rd Year', 'vince123', '$2y$10$g/mTL8TuqIZPHuRfGEaJuekUS48sx9CG.xJpoYc59zqPAf4tNZDp6', 0x363764326662346665643266335f706572736f6e2e6a7067, 'vince@gmail.com', '1101 Andres Abellana Brgy. Guadalupe Cebu City', 30),
-(3, 43534534, 'Sagaral', 'Niel', 'Jamilo', 'BS IN INFORMATION TECHNOLOGY', '2nd Year', 'niel123', '$2y$10$oEDvwRdAUDMq3zXAHG4ha.vtMdayirC6ViZMYtW3dFkKwWKCBcS1q', 0x696d6167652e6a7067, '', '', 30);
-
 --
 -- Indexes for dumped tables
 --

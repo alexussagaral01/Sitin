@@ -303,13 +303,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($
 
     <script>
         function toggleNav(x) {
-            x.classList.toggle("change");
+            document.getElementById("mySidenav").classList.toggle("-translate-x-0");
             document.getElementById("mySidenav").classList.toggle("-translate-x-full");
         }
 
         function closeNav() {
+            document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
-            document.querySelector(".change")?.classList.remove("change");
         }
     </script>
 </body>
