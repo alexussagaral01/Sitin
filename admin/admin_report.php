@@ -5,33 +5,29 @@ require '../db.php';
 // Initialize search query
 $search = isset($_POST['search']) ? mysqli_real_escape_string($conn, $_POST['search']) : '';
 
-// Modify the query to include search
-$query = "SELECT * FROM curr_sitin WHERE STATUS = 'Active'";
+// Modify the base query to include search
+$query = "SELECT IDNO, FULL_NAME, PURPOSE, LABORATORY, TIME_IN, TIME_OUT, DATE FROM curr_sitin";
 if (!empty($search)) {
-    $query .= " AND (IDNO LIKE '%$search%' 
+    $query .= " WHERE IDNO LIKE '%$search%' 
                 OR FULL_NAME LIKE '%$search%' 
                 OR PURPOSE LIKE '%$search%' 
-                OR LABORATORY LIKE '%$search%')";
+                OR LABORATORY LIKE '%$search%'";
 }
-$query .= " ORDER BY TIME_IN DESC";
+$query .= " ORDER BY DATE DESC";
 
-$stmt = $conn->prepare($query);
-$stmt->execute();
-$result = $stmt->get_result();
-$current_sitins = $result->fetch_all(MYSQLI_ASSOC);
-
+$result = mysqli_query($conn, $query);
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitin Reports</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Admin Sit-in</title>
-</head>   
+</head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <!-- Header -->
     <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
@@ -44,7 +40,7 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
     </div>
 
     <!-- Side Navigation -->
-    <div id="mySidenav" class="fixed top-0 left-0 h-full w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg">
+    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
         <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
         
         <div class="flex flex-col items-center mt-4">
@@ -84,13 +80,13 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
                 </a>
             </div>
             <div class="overflow-hidden">
-                <a href="admin_report.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <a href="admin_sitinreport.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                     <i class="fas fa-chart-line w-6 text-base"></i>
                     <span class="text-sm font-medium">SIT-IN REPORT</span>
                 </a>
             </div>
             <div class="overflow-hidden">
-                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <a href="admin_report.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                     <i class="fas fa-comments w-6 text-base"></i>
                     <span class="text-sm font-medium">VIEW FEEDBACKS</span>
                 </a>
@@ -117,18 +113,43 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="container mx-auto px-4 mt-8">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
             <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                <i class="fas fa-user-check text-2xl mr-4 relative z-10"></i>
-                <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Current Sit-in</h2>
+                <i class="fas fa-chart-line text-2xl mr-4 relative z-10"></i>
+                <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Generate Reports</h2>
             </div>
-            
+
             <div class="p-6">
+                <!-- Date and Search Controls -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex space-x-3">
+                        <input type="date" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <button class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-2 rounded hover:opacity-90 transition-opacity duration-200">
+                            <i class="fas fa-search mr-2"></i>Search
+                        </button>
+                        <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors duration-200">
+                            <i class="fas fa-undo mr-2"></i>Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex space-x-2">
+                        <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-colors duration-200">CSV</button>
+                        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition-colors duration-200">Excel</button>
+                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors duration-200">PDF</button>
+                        <button class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition-colors duration-200">Print</button>
+                    </div>
+                </div>
+
+                <!-- Entries per page and Search Bar -->
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex items-center">
-                        <select class="border rounded px-2 py-1 mr-2">
+                        <select class="border rounded px-2 py-1 mr-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
@@ -137,11 +158,11 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
                         <span>entries per page</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="mr-2">Search:</span>
                         <form method="POST" class="flex items-center">
+                            <span class="mr-2">Search:</span>
                             <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
-                                   class="border rounded px-2 py-1">
-                            <button type="submit" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90">
+                                   class="border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                            <button type="submit" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90 transition-opacity duration-200">
                                 <i class="fas fa-search"></i>
                             </button>
                         </form>
@@ -154,44 +175,33 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
                             <tr>
                                 <th class="px-6 py-3 text-left">ID Number</th>
                                 <th class="px-6 py-3 text-left">Name</th>
-                                <th class="px-6 py-3 text-left">Sit Purpose</th>
+                                <th class="px-6 py-3 text-left">Purpose</th>
                                 <th class="px-6 py-3 text-left">Laboratory</th>
                                 <th class="px-6 py-3 text-left">Login</th>
+                                <th class="px-6 py-3 text-left">Logout</th>
                                 <th class="px-6 py-3 text-left">Date</th>
-                                <th class="px-6 py-3 text-left">Status</th>
-                                <th class="px-6 py-3 text-left">Action</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                            <?php if (count($current_sitins) > 0): ?>
-                                <?php foreach ($current_sitins as $sitin): ?>
-                                    <tr class="border-b hover:bg-gray-50">
-                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['IDNO']); ?></td>
-                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['FULL_NAME']); ?></td>
-                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['PURPOSE']); ?></td>
-                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['LABORATORY']); ?></td>
-                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['TIME_IN']); ?></td>
-                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['DATE']); ?></td>
-                                        <td class="px-6 py-4">
-                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-sm">
-                                                <?php echo htmlspecialchars($sitin['STATUS']); ?>
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <form method="POST" action="time_out.php" class="inline">
-                                                <input type="hidden" name="sitin_id" value="<?php echo $sitin['SITIN_ID']; ?>">
-                                                <button type="submit" name="time_out" class="text-red-600 hover:text-red-800">
-                                                    <i class="fas fa-sign-out-alt"></i> Time-Out
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="8" class="px-6 py-4 text-center text-gray-500 italic">No data available</td>
-                                </tr>
-                            <?php endif; ?>
+                            <?php
+                            if (mysqli_num_rows($result) > 0) {
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<tr class='border-b hover:bg-gray-50'>";
+                                    echo "<td class='px-6 py-4'>" . $row['IDNO'] . "</td>";
+                                    echo "<td class='px-6 py-4'>" . $row['FULL_NAME'] . "</td>";
+                                    echo "<td class='px-6 py-4'>" . $row['PURPOSE'] . "</td>";
+                                    echo "<td class='px-6 py-4'>" . $row['LABORATORY'] . "</td>";
+                                    echo "<td class='px-6 py-4'>" . $row['TIME_IN'] . "</td>";
+                                    echo "<td class='px-6 py-4'>" . ($row['TIME_OUT'] ? $row['TIME_OUT'] : 'Active') . "</td>";
+                                    echo "<td class='px-6 py-4'>" . $row['DATE'] . "</td>";
+                                    echo "</tr>";
+                                }
+                            } else {
+                                echo "<tr class='border-b hover:bg-gray-50'>";
+                                echo "<td colspan='7' class='px-6 py-4 text-center text-gray-500 italic'>No data available</td>";
+                                echo "</tr>";
+                            }
+                            ?>
                         </tbody>
                     </table>
                 </div>
@@ -209,8 +219,7 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
             </div>
         </div>
     </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+
     <script>
         function toggleNav(x) {
             document.getElementById("mySidenav").classList.toggle("-translate-x-0");
@@ -221,7 +230,6 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
             document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
         }
-        
     </script>
 </body>
 </html>

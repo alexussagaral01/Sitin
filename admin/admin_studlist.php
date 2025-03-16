@@ -2,8 +2,18 @@
 session_start();
 require '../db.php';
 
-// Add query to fetch users
+// Initialize search query
+$search = isset($_POST['search']) ? mysqli_real_escape_string($conn, $_POST['search']) : '';
+
+// Modify query to include search
 $query = "SELECT * FROM users";
+if (!empty($search)) {
+    $query .= " WHERE IDNO LIKE '%$search%' 
+                OR LAST_NAME LIKE '%$search%' 
+                OR FIRST_NAME LIKE '%$search%' 
+                OR COURSE LIKE '%$search%'
+                OR YEAR_LEVEL LIKE '%$search%'";
+}
 $result = mysqli_query($conn, $query);
 ?>
 <!DOCTYPE html>
@@ -39,42 +49,61 @@ $result = mysqli_query($conn, $query);
 
         <nav class="flex flex-col space-y-0.5 px-2">
             <!-- Navigation items -->
-            <a href="admin_dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-home w-6 text-base"></i>
-                <span class="text-sm font-medium">HOME</span>
-            </a>
-            <a href="admin_search.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-search w-6 text-base"></i>
-                <span class="text-sm font-medium">SEARCH</span>
-            </a>
-            <a href="admin_sitin.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-user-check w-6 text-base"></i>
-                <span class="text-sm font-medium">SIT-IN</span>
-            </a>
-            <a href="admin_sitinrec.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-book w-6 text-base"></i>
-                <span class="text-sm font-medium">VIEW SIT-IN RECORDS</span>
-            </a>
-            <a href="admin_studlist.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-list w-6 text-base"></i>
-                <span class="text-sm font-medium">VIEW LIST OF STUDENT</span>
-            </a>
-            <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-chart-line w-6 text-base"></i>
-                <span class="text-sm font-medium">SIT-IN REPORT</span>
-            </a>
-            <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-comments w-6 text-base"></i>
-                <span class="text-sm font-medium">VIEW FEEDBACKS</span>
-            </a>
-            <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-chart-pie w-6 text-base"></i>
-                <span class="text-sm font-medium">VIEW DAILY ANALYTICS</span>
-            </a>
-            <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-calendar-check w-6 text-base"></i>
-                <span class="text-sm font-medium">RESERVATION/APPROVAL</span>
-            </a>
+            <div class="overflow-hidden">
+                <a href="admin_dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-home w-6 text-base"></i>
+                    <span class="text-sm font-medium">HOME</span>
+                </a>
+            </div>
+            <!-- Rest of navigation items -->
+            <div class="overflow-hidden">
+                <a href="admin_search.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-search w-6 text-base"></i>
+                    <span class="text-sm font-medium">SEARCH</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="admin_sitin.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-user-check w-6 text-base"></i>
+                    <span class="text-sm font-medium">SIT-IN</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="admin_sitinrec.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-book w-6 text-base"></i>
+                    <span class="text-sm font-medium">VIEW SIT-IN RECORDS</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="admin_studlist.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-list w-6 text-base"></i>
+                    <span class="text-sm font-medium">VIEW LIST OF STUDENT</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="admin_report.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-chart-line w-6 text-base"></i>
+                    <span class="text-sm font-medium">SIT-IN REPORT</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-comments w-6 text-base"></i>
+                    <span class="text-sm font-medium">VIEW FEEDBACKS</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-chart-pie w-6 text-base"></i>
+                    <span class="text-sm font-medium">VIEW DAILY ANALYTICS</span>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-calendar-check w-6 text-base"></i>
+                    <span class="text-sm font-medium">RESERVATION/APPROVAL</span>
+                </a>
+            </div>
         </nav>
 
         <div class="mt-3 px-2 pb-2">
@@ -110,12 +139,16 @@ $result = mysqli_query($conn, $query);
                     <span>entries per page</span>
                 </div>
                 <div class="flex items-center">
-                    <span class="mr-2">Search:</span>
-                    <input type="text" 
-                           id="searchInput"
-                           placeholder="Search..." 
-                           onkeypress="handleKeyPress(event)"
-                           class="border rounded px-2 py-1">
+                    <form method="POST" class="flex items-center">
+                        <span class="mr-2">Search:</span>
+                        <input type="text" 
+                               name="search"
+                               value="<?php echo htmlspecialchars($search); ?>"
+                               class="border rounded px-2 py-1">
+                        <button type="submit" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
 

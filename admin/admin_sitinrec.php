@@ -114,7 +114,7 @@ $labCountsJSON = json_encode(array_values($labCounts));
                 </a>
             </div>
             <div class="overflow-hidden">
-                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <a href="admin_report.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                     <i class="fas fa-chart-line w-6 text-base"></i>
                     <span class="text-sm font-medium">SIT-IN REPORT</span>
                 </a>
@@ -195,11 +195,15 @@ $labCountsJSON = json_encode(array_values($labCounts));
                 
                 <div class="flex items-center space-x-2">
                     <label>Search:</label>
-                    <input type="text" 
-                           id="searchInput"
-                           placeholder="Search..." 
-                           onkeypress="handleKeyPress(event)"
-                           class="border rounded px-3 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <form method="POST" class="flex items-center">
+                        <input type="text" 
+                               name="search"
+                               placeholder="Search..." 
+                               class="border rounded px-3 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
             
