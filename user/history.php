@@ -92,8 +92,10 @@ if ($userId) {
     <!-- History Content -->
     <div class="container mx-auto px-4 mt-8">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white py-4 px-6">
-                <h2 class="text-xl font-bold text-center">HISTORY INFORMATION</h2>
+            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <i class="fas fa-history text-2xl mr-4 relative z-10"></i>
+                <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">History Information</h2>
             </div>
             
             <div class="p-6">

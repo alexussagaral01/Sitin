@@ -148,9 +148,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($
     <!-- Dashboard Content -->
     <div class="px-8 py-8 w-full flex flex-wrap gap-8">
         <div class="flex-1 min-w-[400px] bg-white rounded-xl shadow-lg overflow-hidden h-[700px] border border-[rgba(255,255,255,1)]">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center">
-                <i class="fas fa-search text-2xl mr-3"></i>
-                <h2 class="text-xl font-bold tracking-wider uppercase text-center">Search Student</h2>
+            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <i class="fas fa-search text-2xl mr-4 relative z-10"></i>
+                <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Search Student</h2>
             </div>
             <div class="p-6 h-[calc(100%-4rem)] flex flex-col">
                 <div class="mb-6">

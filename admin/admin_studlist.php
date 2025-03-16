@@ -86,9 +86,11 @@ $result = mysqli_query($conn, $query);
     </div>
 
     <div class="content-container w-11/12 mx-auto my-8 bg-white p-6 rounded-lg shadow-lg overflow-hidden border border-gray-200">
-        <div class="history-header bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white py-4 px-6 -mx-6 -mt-6 mb-6 rounded-t-lg text-center text-2xl font-bold uppercase tracking-wider font-roboto">
-            <h2 class="text-xl font-bold text-center">STUDENT INFORMATION</h2>
-        </div>  
+        <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden -mx-6 -mt-6 mb-6">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <i class="fas fa-list text-2xl mr-4 relative z-10"></i>
+            <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Student Information</h2>
+        </div>
         
         <div class="p-6">
             <!-- Buttons moved above the search bar and entry selector -->

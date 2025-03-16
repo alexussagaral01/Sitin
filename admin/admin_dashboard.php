@@ -45,6 +45,47 @@ if ($row = $result->fetch_assoc()) {
     $totalSitIns = $row['total'];
 }
 
+// Initialize program counts correctly based on PURPOSE enum values
+$programCounts = [
+    'C Programming' => 0,
+    'C++ Programming' => 0,
+    'C# Programming' => 0,
+    'Java Programming' => 0,
+    'Python Programming' => 0,
+    'Other' => 0
+];
+
+$result = $conn->query("SELECT PURPOSE, COUNT(*) as count FROM curr_sitin GROUP BY PURPOSE");
+while ($row = $result->fetch_assoc()) {
+    $purpose = $row['PURPOSE'];
+    if (array_key_exists($purpose, $programCounts)) {
+        $programCounts[$purpose] = $row['count'];
+    } else {
+        $programCounts['Other'] += $row['count'];
+    }
+}
+
+// Convert to JavaScript array
+$programCountsJSON = json_encode(array_values($programCounts));
+
+// Get students by year level
+$yearLevelCounts = [
+    '1st Year' => 0,
+    '2nd Year' => 0,
+    '3rd Year' => 0,
+    '4th Year' => 0
+];
+
+$result = $conn->query("SELECT YEAR_LEVEL, COUNT(*) as count FROM users GROUP BY YEAR_LEVEL");
+while ($row = $result->fetch_assoc()) {
+    if (isset($yearLevelCounts[$row['YEAR_LEVEL']])) {
+        $yearLevelCounts[$row['YEAR_LEVEL']] = $row['count'];
+    }
+}
+
+// Convert to JavaScript array
+$yearLevelJSON = json_encode(array_values($yearLevelCounts));
+$yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -145,76 +186,119 @@ if ($row = $result->fetch_assoc()) {
     <!-- Dashboard Content -->
     <div class="px-8 py-8 w-full flex flex-wrap gap-8">
         <!-- Statistics Card -->
-        <div class="flex-1 min-w-[400px] bg-white rounded-xl shadow-lg overflow-hidden h-[700px] border border-[rgba(255,255,255,1)]">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center">
-                <i class="fas fa-chart-bar text-2xl mr-3"></i>
-                <h2 class="text-xl font-bold tracking-wider uppercase">Statistics</h2>
+        <div class="flex-1 min-w-[400px] bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-2xl overflow-hidden h-[700px] backdrop-blur-sm border border-white/30">
+            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <i class="fas fa-chart-bar text-2xl mr-4 relative z-10"></i>
+                <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Statistics</h2>
             </div>
-            <div class="p-6 h-[calc(100%-4rem)] flex flex-col">
+            <div class="p-8 h-[calc(100%-5rem)] flex flex-col">
                 <!-- Stats Section -->
-                <div class="mb-6 space-y-4">
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="font-bold text-gray-700">Students Registered:</span>
-                        <span class="text-blue-600 font-semibold"><?php echo $totalStudents; ?></span>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <!-- Students Registered Card -->
+                    <div class="bg-gradient-to-br from-blue-50 to-white rounded-xl p-4 shadow-lg border border-blue-100/50 transform hover:scale-102 transition-transform duration-300">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="mb-2 bg-blue-500/10 p-2 rounded-full">
+                                <i class="fas fa-user-graduate text-xl text-blue-600"></i>
+                            </div>
+                            <span class="text-3xl font-bold text-blue-600 mb-1"><?php echo $totalStudents; ?></span>
+                            <span class="text-xs text-blue-600/70 font-medium uppercase tracking-wider">Students Registered</span>
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="font-bold text-gray-700">Currently Sit-In:</span>
-                        <span class="text-blue-600 font-semibold"><?php echo $currentSitIns; ?></span>
+
+                    <!-- Currently Sit-In Card -->
+                    <div class="bg-gradient-to-br from-purple-50 to-white rounded-xl p-4 shadow-lg border border-purple-100/50 transform hover:scale-102 transition-transform duration-300">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="mb-2 bg-purple-500/10 p-2 rounded-full">
+                                <i class="fas fa-chair text-xl text-purple-600"></i>
+                            </div>
+                            <span class="text-3xl font-bold text-purple-600 mb-1"><?php echo $currentSitIns; ?></span>
+                            <span class="text-xs text-purple-600/70 font-medium uppercase tracking-wider">Currently Sit-In</span>
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="font-bold text-gray-700">Total Sit-Ins:</span>
-                        <span class="text-blue-600 font-semibold"><?php echo $totalSitIns; ?></span>
+
+                    <!-- Total Sit-Ins Card -->
+                    <div class="bg-gradient-to-br from-green-50 to-white rounded-xl p-4 shadow-lg border border-green-100/50 transform hover:scale-102 transition-transform duration-300">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="mb-2 bg-green-500/10 p-2 rounded-full">
+                                <i class="fas fa-clipboard-list text-xl text-green-600"></i>
+                            </div>
+                            <span class="text-3xl font-bold text-green-600 mb-1"><?php echo $totalSitIns; ?></span>
+                            <span class="text-xs text-green-600/70 font-medium uppercase tracking-wider">Total Sit-Ins</span>
+                        </div>
                     </div>
                 </div>
-                
+
                 <!-- Chart Container -->
-                <div class="flex-1 relative min-h-[350px]">
+                <div class="flex-1 relative min-h-[350px] bg-white/80 rounded-2xl p-4 shadow-inner">
                     <canvas id="sitInChart"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- Announcements Card -->
-        <div class="flex-1 min-w-[400px] bg-white rounded-xl shadow-lg overflow-hidden h-[700px] border border-[rgba(255,255,255,1)]">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center">
-                <i class="fas fa-bullhorn text-2xl mr-3"></i>
-                <h2 class="text-xl font-bold tracking-wider uppercase">Announcements</h2>
+        <div class="flex-1 min-w-[400px] bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-2xl overflow-hidden h-[700px] backdrop-blur-sm border border-white/30">
+            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <i class="fas fa-bullhorn text-2xl mr-4 relative z-10"></i>
+                <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Announcements</h2>
             </div>
-            <div class="p-6 h-[calc(100%-4rem)] flex flex-col">
+            <div class="p-8 h-[calc(100%-5rem)] flex flex-col">
                 <div class="mb-6">
-                    <form action="" method="post" class="space-y-3">
+                    <form action="" method="post" class="space-y-4">
                         <textarea 
                             name="new_announcement" 
                             placeholder="Type your announcement here..." 
                             required
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y min-h-[100px]"
+                            class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-y min-h-[120px] shadow-inner bg-white/80"
                         ></textarea>
                         <button type="submit" 
-                            class="bg-gradient-to-r from-purple-700 to-pink-500 text-white py-2 px-4 rounded-lg hover:from-pink-500 hover:to-purple-700 hover:text-black transition-all">
-                            Post Announcement
+                            class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white py-3 px-6 rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 font-medium">
+                            <i class="fas fa-paper-plane mr-2"></i>Post Announcement
                         </button>
                     </form>
                 </div>
 
                 <div class="flex-1 overflow-y-auto">
-                    <h3 class="font-bold text-gray-700 mb-3">Posted Announcements</h3>
+                    <h3 class="font-bold text-gray-700 mb-4 text-lg">Posted Announcements</h3>
                     <div class="space-y-4 pr-2">
                         <?php if (empty($announcements)): ?>
                             <p class="text-gray-500 text-center py-4">No announcements available.</p>
                         <?php else: ?>
                             <?php foreach ($announcements as $announcement): ?>
-                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-[rgba(0,61,100,1)]">
-                                    <div class="text-sm font-bold text-[rgba(0,61,100,1)] mb-2">
-                                        <?php echo htmlspecialchars($announcement['CREATED_BY']); ?> | 
+                                <div class="bg-white/80 rounded-xl p-5 shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                                    <div class="flex items-center text-sm font-bold text-purple-600 mb-3">
+                                        <i class="fas fa-user-shield mr-2"></i>
+                                        <?php echo htmlspecialchars($announcement['CREATED_BY']); ?>
+                                        <span class="mx-2">•</span>
+                                        <i class="far fa-calendar-alt mr-2"></i>
                                         <?php echo date('Y-M-d', strtotime($announcement['CREATED_DATE'])); ?>
                                     </div>
-                                    <div class="text-gray-700 pl-2 border-l-2 border-gray-200">
+                                    <div class="text-gray-700 pl-4 border-l-4 border-gradient-purple">
                                         <?php echo htmlspecialchars($announcement['CONTENT']); ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Year Level Chart Section -->
+    <div class="px-8 pb-8 w-full">
+        <!-- Year Level Chart Card -->
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-2xl overflow-hidden backdrop-blur-sm border border-white/30">
+            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <i class="fas fa-users text-2xl mr-4 relative z-10"></i>
+                <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Students Year Level</h2>
+            </div>
+            <div class="p-8">
+                <!-- Chart Container -->
+                <div class="h-[400px] bg-white/80 rounded-2xl p-4 shadow-inner">
+                    <canvas id="yearLevelChart"></canvas>
                 </div>
             </div>
         </div>
@@ -232,15 +316,15 @@ if ($row = $result->fetch_assoc()) {
             document.getElementById("mySidenav").classList.add("-translate-x-full");
         }
         
-        // Initialize the chart
+        // Initialize the charts
         document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('sitInChart').getContext('2d');
+            // Sit-In Distribution Pie Chart
+            const sitInCtx = document.getElementById('sitInChart').getContext('2d');
             
-            // Sample data for UI demonstration
             const programData = {
-                labels: ['C', 'C++', 'C#', 'Java', 'Python', 'Other'],
+                labels: ['C Programming', 'C++ Programming', 'C# Programming', 'Java Programming', 'Python Programming', 'Other'],
                 datasets: [{
-                    data: [45, 25, 15, 8, 5, 2],
+                    data: <?php echo $programCountsJSON; ?>,
                     backgroundColor: [
                         '#36A2EB', // Blue
                         '#FF6384', // Pink
@@ -253,7 +337,7 @@ if ($row = $result->fetch_assoc()) {
                 }]
             };
             
-            new Chart(ctx, {
+            new Chart(sitInCtx, {
                 type: 'pie',
                 data: programData,
                 options: {
@@ -291,6 +375,69 @@ if ($row = $result->fetch_assoc()) {
                                 top: 5,
                                 bottom: 15
                             }
+                        }
+                    }
+                }
+            });
+            
+            // Year Level Bar Chart
+            const yearLevelCtx = document.getElementById('yearLevelChart').getContext('2d');
+            
+            const yearLevelData = {
+                labels: <?php echo $yearLevelLabelsJSON; ?>,
+                datasets: [{
+                    label: 'College of Computer Studies Students Year Level',
+                    data: <?php echo $yearLevelJSON; ?>,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.5)',  // Blue for 1st Year
+                        'rgba(255, 99, 132, 0.5)',  // Red for 2nd Year
+                        'rgba(75, 192, 192, 0.5)',  // Green for 3rd Year
+                        'rgba(153, 102, 255, 0.5)'  // Purple for 4th Year
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1,
+                    maxBarThickness: 200 // Adjusted bar thickness
+                }]
+            };
+            
+            new Chart(yearLevelCtx, {
+                type: 'bar',
+                data: yearLevelData,
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                stepSize: 20
+                            },
+                            title: {
+                                display: true,
+                                text: 'Number of Students' // Add y-axis label
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: false
                         }
                     }
                 }

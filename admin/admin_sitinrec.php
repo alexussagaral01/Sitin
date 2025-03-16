@@ -6,6 +6,49 @@ require '../db.php';
 $query = "SELECT IDNO, FULL_NAME, PURPOSE, LABORATORY, TIME_IN, TIME_OUT, DATE, STATUS FROM curr_sitin ORDER BY DATE DESC";
 $result = mysqli_query($conn, $query);
 
+// Add this after the existing query
+$programCounts = [
+    'C Programming' => 0,
+    'C++ Programming' => 0,
+    'C# Programming' => 0,
+    'Java Programming' => 0,
+    'Python Programming' => 0,
+    'Other' => 0
+];
+
+$labCounts = [
+    'Lab 524' => 0,
+    'Lab 526' => 0,
+    'Lab 528' => 0,
+    'Lab 530' => 0,
+    'Lab 542' => 0,
+    'Lab 544' => 0
+];
+
+// Get PURPOSE statistics
+$result1 = $conn->query("SELECT PURPOSE, COUNT(*) as count FROM curr_sitin GROUP BY PURPOSE");
+while ($row = $result1->fetch_assoc()) {
+    $purpose = $row['PURPOSE'];
+    if (array_key_exists($purpose, $programCounts)) {
+        $programCounts[$purpose] = $row['count'];
+    } else {
+        $programCounts['Other'] += $row['count'];
+    }
+}
+
+// Get LABORATORY statistics
+$result2 = $conn->query("SELECT LABORATORY, COUNT(*) as count FROM curr_sitin GROUP BY LABORATORY");
+while ($row = $result2->fetch_assoc()) {
+    $lab = $row['LABORATORY'];
+    if (array_key_exists($lab, $labCounts)) {
+        $labCounts[$lab] = $row['count'];
+    }
+}
+
+// Convert to JSON for JavaScript
+$programCountsJSON = json_encode(array_values($programCounts));
+$labCountsJSON = json_encode(array_values($labCounts));
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -106,8 +149,10 @@ $result = mysqli_query($conn, $query);
 
     <!-- Content Container -->
     <div class="w-[90%] mx-auto my-8 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-        <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 text-center text-2xl font-bold uppercase tracking-wider">
-            Current Sit-in Records
+        <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <i class="fas fa-book text-2xl mr-4 relative z-10"></i>
+            <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Current Sit-in Records</h2>
         </div>
 
         <!-- Charts Container -->
@@ -255,18 +300,18 @@ $result = mysqli_query($conn, $query);
         
         // Data for the pie charts
         const data1 = {
-            labels: ['C', 'C++', 'C#', 'Java', 'Python', 'Other'],
+            labels: ['C Programming', 'C++ Programming', 'C# Programming', 'Java Programming', 'Python Programming', 'Other'],
             datasets: [{
-            data: [10, 20, 30, 25, 15, 5],
-            backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#FF9F40', '#4BC0C0', '#9966FF']
+                data: <?php echo $programCountsJSON; ?>,
+                backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
             }]
         };
 
         const data2 = {
-            labels: ['524', '526', '528', '530', '542', '544'],
+            labels: ['Lab 524', 'Lab 526', 'Lab 528', 'Lab 530', 'Lab 542', 'Lab 544'],
             datasets: [{
-            data: [100, 0, 0, 0, 0, 0],
-            backgroundColor: ['#FF6384', '#FFCE56', '#FF9F40', '#36A2EB', '#9966FF', '#4BC0C0']
+                data: <?php echo $labCountsJSON; ?>,
+                backgroundColor: ['#FF6384', '#FFCE56', '#FF9F40', '#36A2EB', '#9966FF', '#4BC0C0']
             }]
         };
 

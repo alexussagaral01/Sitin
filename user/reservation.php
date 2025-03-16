@@ -93,12 +93,11 @@ if ($userId) {
     </div>
 
     <!-- Reservation Form Container -->
-    <div class="max-w-2xl mx-auto mt-8 mb-8 bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-200/50 backdrop-blur-sm">
-        <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-6 text-center">
-            <h2 class="text-2xl font-bold uppercase tracking-wider flex items-center justify-center">
-                <i class="fas fa-calendar-alt mr-3"></i>
-                Reservation
-            </h2>
+    <div class="w-11/12 md:w-8/12 mx-auto my-8 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+        <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <i class="fas fa-calendar-alt text-2xl mr-4 relative z-10"></i>
+            <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Reservation</h2>
         </div>
         <form action="reservation.php" method="post" class="p-8 space-y-6">
             <!-- Form Groups -->
