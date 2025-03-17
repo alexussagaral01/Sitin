@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_announcement'])) 
 
 // Fetch announcements from the database
 $announcements = [];
-$result = $conn->query("SELECT CONTENT, CREATED_DATE, CREATED_BY FROM announcement WHERE CREATED_BY = 'ADMIN' ORDER BY CREATED_DATE DESC");
+$result = $conn->query("SELECT ID, CONTENT, CREATED_DATE, CREATED_BY FROM announcement WHERE CREATED_BY = 'ADMIN' ORDER BY CREATED_DATE DESC");
 while ($row = $result->fetch_assoc()) {
     $announcements[] = $row;
 }
@@ -96,6 +96,7 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts));
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Admin Dashboard</title>
 </head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
@@ -273,9 +274,33 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts));
                                         <span class="mx-2">•</span>
                                         <i class="far fa-calendar-alt mr-2"></i>
                                         <?php echo date('Y-M-d', strtotime($announcement['CREATED_DATE'])); ?>
+                                        <div class="ml-auto flex space-x-2">
+                                            <button onclick="editAnnouncement(<?php echo $announcement['ID']; ?>, this)" 
+                                                    class="text-blue-500 hover:text-blue-700">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <a onclick="confirmDelete(<?php echo $announcement['ID']; ?>)" 
+                                               class="text-red-500 hover:text-red-700 cursor-pointer">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <div class="text-gray-700 pl-4 border-l-4 border-gradient-purple">
+                                    <div class="text-gray-700 pl-4 border-l-4 border-gradient-purple announcement-content" 
+                                         id="content-<?php echo $announcement['ID']; ?>">
                                         <?php echo htmlspecialchars($announcement['CONTENT']); ?>
+                                    </div>
+                                    <div class="hidden edit-form" id="edit-<?php echo $announcement['ID']; ?>">
+                                        <textarea class="w-full p-4 border border-gray-200 rounded-xl resize-y min-h-[100px]"><?php echo htmlspecialchars($announcement['CONTENT']); ?></textarea>
+                                        <div class="mt-3 flex space-x-2">
+                                            <button onclick="saveAnnouncement(<?php echo $announcement['ID']; ?>)" 
+                                                    class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                                                Save
+                                            </button>
+                                            <button onclick="cancelEdit(<?php echo $announcement['ID']; ?>)" 
+                                                    class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                                                Cancel
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -316,6 +341,23 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts));
             document.getElementById("mySidenav").classList.add("-translate-x-full");
         }
         
+        // Add this function before the existing scripts
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `delete_announcement.php?id=${id}`;
+                }
+            })
+        }
+
         // Initialize the charts
         document.addEventListener('DOMContentLoaded', function() {
             // Sit-In Distribution Pie Chart
@@ -443,6 +485,52 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts));
                 }
             });
         });
+
+        function editAnnouncement(id, button) {
+            // Hide content and show edit form
+            document.getElementById(`content-${id}`).style.display = 'none';
+            document.getElementById(`edit-${id}`).style.display = 'block';
+        }
+
+        function cancelEdit(id) {
+            // Show content and hide edit form
+            document.getElementById(`content-${id}`).style.display = 'block';
+            document.getElementById(`edit-${id}`).style.display = 'none';
+        }
+
+        function saveAnnouncement(id) {
+            const content = document.querySelector(`#edit-${id} textarea`).value;
+            
+            fetch('update_announcement.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `announcement_id=${id}&content=${encodeURIComponent(content)}`
+            })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'success') {
+                    // Update the content display
+                    document.getElementById(`content-${id}`).innerText = content;
+                    // Hide edit form
+                    cancelEdit(id);
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Updated!',
+                        text: 'Announcement has been updated successfully.',
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to update announcement'
+                    });
+                }
+            });
+        }
     </script>
 </body>
 </html>

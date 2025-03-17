@@ -15,6 +15,7 @@ if (!empty($search)) {
                 OR YEAR_LEVEL LIKE '%$search%'";
 }
 $result = mysqli_query($conn, $query);
+$total_records = mysqli_num_rows($result);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -194,7 +195,13 @@ $result = mysqli_query($conn, $query);
             </div>
 
             <div class="flex justify-between items-center mt-4">
-                <div class="text-gray-600">Showing 0 to 0 of 0 entries</div>
+                <div class="text-gray-600">
+                    <?php 
+                    $start = 1;
+                    $end = $total_records;
+                    echo "Showing $start to $end of $total_records entries";
+                    ?>
+                </div>
                 <div class="flex space-x-1">
                     <button class="px-3 py-1 border rounded hover:bg-gray-100">&laquo;</button>
                     <button class="px-3 py-1 border rounded hover:bg-gray-100">&lt;</button>

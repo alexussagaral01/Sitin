@@ -107,17 +107,23 @@ while ($row = $result->fetch_assoc()) {
             <?php if (empty($announcements)): ?>
                 <p class="text-gray-600 text-center">There are no announcements yet.</p>
             <?php else: ?>
-                <div class="h-[60vh] overflow-y-auto bg-gray-50 rounded-lg p-4">
-                    <?php foreach ($announcements as $announcement): ?>
-                        <div class="bg-white rounded-lg shadow-sm p-4 mb-4 border-l-4 border-blue-900">
-                            <div class="text-sm font-bold text-blue-900 mb-2">
-                                ADMIN | <?php echo date('Y-M-d', strtotime($announcement['CREATED_DATE'])); ?>
+                <div class="h-[60vh] overflow-y-auto">
+                    <div class="space-y-4 pr-2">
+                        <?php foreach ($announcements as $announcement): ?>
+                            <div class="bg-white/80 rounded-xl p-5 shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                                <div class="flex items-center text-sm font-bold text-purple-600 mb-3">
+                                    <i class="fas fa-user-shield mr-2"></i>
+                                    <?php echo htmlspecialchars($announcement['CREATED_BY']); ?>
+                                    <span class="mx-2">•</span>
+                                    <i class="far fa-calendar-alt mr-2"></i>
+                                    <?php echo date('Y-M-d', strtotime($announcement['CREATED_DATE'])); ?>
+                                </div>
+                                <div class="text-gray-700 pl-4 border-l-4 border-gradient-purple">
+                                    <?php echo htmlspecialchars($announcement['CONTENT']); ?>
+                                </div>
                             </div>
-                            <div class="text-gray-700 pl-2 border-l-2 border-gray-200">
-                                <?php echo htmlspecialchars($announcement['CONTENT']); ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             <?php endif; ?>
         </div>

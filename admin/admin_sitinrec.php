@@ -5,6 +5,7 @@ require '../db.php';
 // Update query to match database column names
 $query = "SELECT IDNO, FULL_NAME, PURPOSE, LABORATORY, TIME_IN, TIME_OUT, DATE, STATUS FROM curr_sitin ORDER BY DATE DESC";
 $result = mysqli_query($conn, $query);
+$total_records = mysqli_num_rows($result);
 
 // Add this after the existing query
 $programCounts = [
@@ -248,7 +249,11 @@ $labCountsJSON = json_encode(array_values($labCounts));
             <!-- Pagination -->
             <div class="flex justify-between items-center mt-4">
                 <div class="text-sm text-gray-600">
-                    Showing 1 to 1 of 1 entry
+                    <?php 
+                    $start = 1;
+                    $end = $total_records;
+                    echo "Showing $start to $end of $total_records entries";
+                    ?>
                 </div>
                 <div class="flex space-x-1">
                     <a href="#" class="px-3 py-1 border rounded hover:bg-gray-100 transition-colors">«</a>
