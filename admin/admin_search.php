@@ -23,11 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['time_in'])) {
         $stmt->bind_param("isss", $idno, $fullName, $purpose, $laboratory);
         
         if ($stmt->execute()) {
-            // Decrease the session count in users table
-            $updateStmt = $conn->prepare("UPDATE users SET SESSION = SESSION - 1 WHERE IDNO = ? AND SESSION > 0");
-            $updateStmt->bind_param("i", $idno);
-            $updateStmt->execute();
-            
             $_SESSION['success'] = "Time-in recorded successfully.";
             header("Location: admin_sitin.php");
             exit();

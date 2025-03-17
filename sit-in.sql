@@ -51,15 +51,6 @@ CREATE TABLE `announcement` (
 -- Dumping data for table `announcement`
 --
 
-INSERT INTO `announcement` (`ID`, `TITLE`, `CONTENT`, `CREATED_DATE`, `CREATED_BY`) VALUES
-(1, '', 'hello', '2025-03-11', 'ADMIN'),
-(2, '', 'goods na ba?\r\n', '2025-03-11', 'ADMIN'),
-(3, '', 'edit mo pa yung iba gamit tailwind', '2025-03-11', 'ADMIN'),
-(4, '', 'gawin mo bukas para di ka na mag habol', '2025-03-11', 'ADMIN'),
-(5, '', 'dami ka pang gagawin', '2025-03-11', 'ADMIN'),
-(6, '', 'OKAY KA NA KAYA?', '2025-03-12', 'ADMIN'),
-(7, '', 'kapagod ah ', '2025-03-13', 'ADMIN');
-
 -- --------------------------------------------------------
 
 --

@@ -2,6 +2,12 @@
 session_start();
 require '../db.php';
 
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    header("Location: ../login.php");
+    exit;
+    
+}
+
 $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
 $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
