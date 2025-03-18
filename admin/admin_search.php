@@ -2,6 +2,13 @@
 session_start();
 require '../db.php';
 
+// Check if admin is not logged in, redirect to login page
+if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+
+
 // Add time-in handling
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['time_in'])) {
     $idno = $_POST['idno'];
@@ -133,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($
         </nav>
 
         <div class="mt-3 px-2 pb-2">
-            <a href="../login.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                 <i class="fas fa-sign-out-alt w-6 text-base"></i>
                 <span class="text-sm font-medium">LOG OUT</span>
             </a>

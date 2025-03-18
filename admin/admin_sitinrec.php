@@ -2,6 +2,11 @@
 session_start();
 require '../db.php';
 
+if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+
 // Update query to match database column names
 $query = "SELECT IDNO, FULL_NAME, PURPOSE, LABORATORY, TIME_IN, TIME_OUT, DATE, STATUS FROM curr_sitin ORDER BY DATE DESC";
 $result = mysqli_query($conn, $query);
@@ -141,7 +146,7 @@ $labCountsJSON = json_encode(array_values($labCounts));
         </nav>
 
         <div class="mt-3 px-2 pb-2">
-            <a href="../login.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                 <i class="fas fa-sign-out-alt w-6 text-base"></i>
                 <span class="text-sm font-medium">LOG OUT</span>
             </a>
