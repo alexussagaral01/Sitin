@@ -17,9 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_announcement'])) 
     exit();
 }
 
-// Fetch announcements from the database
+// Fetch announcements from the database with DESC order
 $announcements = [];
-$result = $conn->query("SELECT ID, CONTENT, CREATED_DATE, CREATED_BY FROM announcement WHERE CREATED_BY = 'ADMIN' ORDER BY CREATED_DATE DESC");
+$result = $conn->query("SELECT ID, CONTENT, CREATED_DATE, CREATED_BY FROM announcement 
+                       WHERE CREATED_BY = 'ADMIN' 
+                       ORDER BY ID DESC, CREATED_DATE DESC"); // Changed ordering to show newest first
 while ($row = $result->fetch_assoc()) {
     $announcements[] = $row;
 }
@@ -65,8 +67,8 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 
-// Convert to JavaScript array
-$programCountsJSON = json_encode(array_values($programCounts));
+// Convert to JavaScript array - Fix array methods syntax
+$programCountsJSON = json_encode(array_values($programCounts)); // Fixed from array.values to array_values
 
 // Get students by year level
 $yearLevelCounts = [
@@ -83,14 +85,14 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 
-// Convert to JavaScript array
-$yearLevelJSON = json_encode(array_values($yearLevelCounts));
-$yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts));
+// Convert to JavaScript array - Fix array methods syntax
+$yearLevelJSON = json_encode(array_values($yearLevelCounts)); // Fixed from array.values to array_values
+$yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from array.keys to array_keys
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta.charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

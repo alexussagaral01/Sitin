@@ -91,7 +91,7 @@ if ($userId) {
             </div>
 
         <div class="overflow-hidden">
-            <a href="../login.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                 <i class="fas fa-sign-out-alt w-6 text-base"></i>
                 <span class="text-sm font-medium">LOG OUT</span> <!-- Updated font size and weight -->
             </a>

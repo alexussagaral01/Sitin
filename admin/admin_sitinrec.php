@@ -217,8 +217,8 @@ $labCountsJSON = json_encode(array_values($labCounts));
                             <th class="px-6 py-3 text-left">Name</th>
                             <th class="px-6 py-3 text-left">Purpose</th>
                             <th class="px-6 py-3 text-left">Laboratory</th>
-                            <th class="px-6 py-3 text-left">Login</th>
-                            <th class="px-6 py-3 text-left">Logout</th>
+                            <th class="px-6 py-3 text-left">Time In</th>
+                            <th class="px-6 py-3 text-left">Time Out</th>
                             <th class="px-6 py-3 text-left">Date</th>
                             <th class="px-6 py-3 text-left">Status</th>
                         </tr>

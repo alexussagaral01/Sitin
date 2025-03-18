@@ -88,7 +88,7 @@ if ($userId) {
             </div>
 
         <div class="overflow-hidden">
-            <a href="../login.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                 <i class="fas fa-sign-out-alt w-6 text-base"></i>
                 <span class="text-sm font-medium">LOG OUT</span> <!-- Updated font size and weight -->
             </a>
@@ -129,17 +129,65 @@ if ($userId) {
                                 <th class="px-6 py-3 text-left">Name</th>
                                 <th class="px-6 py-3 text-left">Purpose</th>
                                 <th class="px-6 py-3 text-left">Laboratory</th>
-                                <th class="px-6 py-3 text-left">Login</th>
-                                <th class="px-6 py-3 text-left">Logout</th>
+                                <th class="px-6 py-3 text-left">Time In</th>
+                                <th class="px-6 py-3 text-left">Time Out</th>
                                 <th class="px-6 py-3 text-left">Date</th>
-                                <th class="px-6 py-3 text-left">Session</th>
+                                <th class="px-6 py-3 text-left">Status</th>
                                 <th class="px-6 py-3 text-left">Action</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                            <tr>
-                                <td colspan="8" class="px-6 py-4 text-center text-gray-500 italic">No data available</td>
-                            </tr>
+                            <?php
+                            // Debug: Print user ID for verification
+                            echo "<!-- Debug: User ID = " . $_SESSION['user_id'] . "-->";
+
+                            // First, get the user's IDNO from users table
+                            $getUserQuery = "SELECT IDNO FROM users WHERE STUD_NUM = ?";
+                            $stmt = $conn->prepare($getUserQuery);
+                            $stmt->bind_param("i", $_SESSION['user_id']);
+                            $stmt->execute();
+                            $userResult = $stmt->get_result();
+                            $userData = $userResult->fetch_assoc();
+                            $userIdno = $userData['IDNO'];
+                            $stmt->close();
+
+                            // Debug: Print IDNO
+                            echo "<!-- Debug: IDNO = " . $userIdno . "-->";
+
+                            // Now fetch sit-in history using IDNO
+                            $query = "SELECT * FROM curr_sitin WHERE IDNO = ? ORDER BY DATE DESC, TIME_IN DESC";
+                            $stmt = $conn->prepare($query);
+                            $stmt->bind_param("i", $userIdno);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+
+                            // Debug: Print number of rows found
+                            echo "<!-- Debug: Number of records found = " . $result->num_rows . "-->";
+
+                            if ($result->num_rows > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                    echo "<tr class='hover:bg-gray-50'>";
+                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['IDNO']) . "</td>";
+                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['FULL_NAME']) . "</td>";
+                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['PURPOSE']) . "</td>";
+                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['LABORATORY']) . "</td>";
+                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['TIME_IN']) . "</td>";
+                                    echo "<td class='px-6 py-4'>" . ($row['TIME_OUT'] ? htmlspecialchars($row['TIME_OUT']) : '-') . "</td>";
+                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['DATE']) . "</td>";
+                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['STATUS']) . "</td>";
+                                    echo "<td class='px-6 py-4'>";
+                                    echo "<button onclick=\"window.location.href='feedback.php?sitin_id=" . $row['SITIN_ID'] . "'\" 
+                                            class='bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm transition duration-200'>
+                                            Feedback
+                                          </button>";
+                                    echo "</td>";
+                                    echo "</tr>";
+                                }
+                            } else {
+                                echo "<tr><td colspan='9' class='px-6 py-4 text-center text-gray-500 italic'>No history records found</td></tr>";
+                            }
+                            $stmt->close();
+                            ?>
                         </tbody>
                     </table>
                 </div>
