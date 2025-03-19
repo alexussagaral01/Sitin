@@ -164,7 +164,7 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
                 </a>
             </div>
             <div class="overflow-hidden">
-                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <a href="admin_feedback.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                     <i class="fas fa-comments w-6 text-base"></i>
                     <span class="text-sm font-medium">VIEW FEEDBACKS</span>
                 </a>

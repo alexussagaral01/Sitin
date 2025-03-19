@@ -136,33 +136,41 @@ if ($userId) {
                                 <th class="px-6 py-3 text-left">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white">
-                            <?php
-                            // Debug: Print user ID for verification
-                            echo "<!-- Debug: User ID = " . $_SESSION['user_id'] . "-->";
+                        <tbody>
+                        <?php
+                        // Get user's IDNO
+                        $getUserQuery = "SELECT IDNO FROM users WHERE STUD_NUM = ?";
+                        $stmt = $conn->prepare($getUserQuery);
+                        $stmt->bind_param("i", $_SESSION['user_id']);
+                        $stmt->execute();
+                        $userResult = $stmt->get_result();
+                        $userData = $userResult->fetch_assoc();
+                        $stmt->close();
 
-                            // First, get the user's IDNO from users table
-                            $getUserQuery = "SELECT IDNO FROM users WHERE STUD_NUM = ?";
-                            $stmt = $conn->prepare($getUserQuery);
-                            $stmt->bind_param("i", $_SESSION['user_id']);
-                            $stmt->execute();
-                            $userResult = $stmt->get_result();
-                            $userData = $userResult->fetch_assoc();
+                        if ($userData) {
                             $userIdno = $userData['IDNO'];
-                            $stmt->close();
-
-                            // Debug: Print IDNO
-                            echo "<!-- Debug: IDNO = " . $userIdno . "-->";
-
-                            // Now fetch sit-in history using IDNO
-                            $query = "SELECT * FROM curr_sitin WHERE IDNO = ? ORDER BY DATE DESC, TIME_IN DESC";
-                            $stmt = $conn->prepare($query);
+                            
+                            // Get total count of records for this user
+                            $total_query = "SELECT COUNT(*) as total FROM curr_sitin WHERE IDNO = ?";
+                            $stmt = $conn->prepare($total_query);
                             $stmt->bind_param("i", $userIdno);
                             $stmt->execute();
-                            $result = $stmt->get_result();
+                            $total_result = $stmt->get_result();
+                            $total_row = $total_result->fetch_assoc();
+                            $total_entries = $total_row['total'];
+                            $stmt->close();
 
-                            // Debug: Print number of rows found
-                            echo "<!-- Debug: Number of records found = " . $result->num_rows . "-->";
+                            // Set entries per page (default 10)
+                            $entries_per_page = isset($_GET['entries']) ? (int)$_GET['entries'] : 10;
+                            $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                            $offset = ($current_page - 1) * $entries_per_page;
+
+                            // Fetch sit-in history with pagination
+                            $query = "SELECT * FROM curr_sitin WHERE IDNO = ? ORDER BY DATE DESC, TIME_IN DESC LIMIT ? OFFSET ?";
+                            $stmt = $conn->prepare($query);
+                            $stmt->bind_param("iii", $userIdno, $entries_per_page, $offset);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
 
                             if ($result->num_rows > 0) {
                                 while ($row = $result->fetch_assoc()) {
@@ -171,12 +179,15 @@ if ($userId) {
                                     echo "<td class='px-6 py-4'>" . htmlspecialchars($row['FULL_NAME']) . "</td>";
                                     echo "<td class='px-6 py-4'>" . htmlspecialchars($row['PURPOSE']) . "</td>";
                                     echo "<td class='px-6 py-4'>" . htmlspecialchars($row['LABORATORY']) . "</td>";
-                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['TIME_IN']) . "</td>";
-                                    echo "<td class='px-6 py-4'>" . ($row['TIME_OUT'] ? htmlspecialchars($row['TIME_OUT']) : '-') . "</td>";
+                                    // Convert time format
+                                    $timeIn = date('h:i A', strtotime($row['TIME_IN']));
+                                    $timeOut = $row['TIME_OUT'] ? date('h:i A', strtotime($row['TIME_OUT'])) : '-';
+                                    echo "<td class='px-6 py-4'>" . $timeIn . "</td>";
+                                    echo "<td class='px-6 py-4'>" . $timeOut . "</td>";
                                     echo "<td class='px-6 py-4'>" . htmlspecialchars($row['DATE']) . "</td>";
                                     echo "<td class='px-6 py-4'>" . htmlspecialchars($row['STATUS']) . "</td>";
                                     echo "<td class='px-6 py-4'>";
-                                    echo "<button onclick=\"window.location.href='feedback.php?sitin_id=" . $row['SITIN_ID'] . "'\" 
+                                    echo "<button onclick=\"openFeedbackModal(" . $row['SITIN_ID'] . ", '" . $row['LABORATORY'] . "')\" 
                                             class='bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm transition duration-200'>
                                             Feedback
                                           </button>";
@@ -184,16 +195,30 @@ if ($userId) {
                                     echo "</tr>";
                                 }
                             } else {
-                                echo "<tr><td colspan='9' class='px-6 py-4 text-center text-gray-500 italic'>No history records found</td></tr>";
+                                echo "<tr><td colspan='9' class='px-6 py-4 text-center'>";
+                                echo "<div class='text-gray-500 italic'>No sit-in records found</div>";
+                                echo "<div class='text-sm text-gray-400 mt-1'>Your sit-in history will appear here once you start using the facilities</div>";
+                                echo "</td></tr>";
                             }
                             $stmt->close();
-                            ?>
-                        </tbody>
+                        } else {
+                            echo "<tr><td colspan='9' class='px-6 py-4 text-center'>";
+                            echo "<div class='text-gray-500 italic'>Welcome new user!</div>";
+                            echo "<div class='text-sm text-gray-400 mt-1'>Your sit-in history will be displayed here after your first facility use</div>";
+                            echo "</td></tr>";
+                        }
+                        ?>
                     </table>
                 </div>
 
                 <div class="flex justify-between items-center mt-4">
-                    <div class="text-gray-600">Showing 0 to 0 of 0 entries</div>
+                    <div class="text-gray-600">
+                        <?php
+                        $start_entry = $total_entries > 0 ? $offset + 1 : 0;
+                        $end_entry = min($offset + $entries_per_page, $total_entries);
+                        echo "Showing $start_entry to $end_entry of $total_entries entries";
+                        ?>
+                    </div>
                     <div class="flex space-x-1">
                         <button class="px-3 py-1 border rounded hover:bg-gray-100">&laquo;</button>
                         <button class="px-3 py-1 border rounded hover:bg-gray-100">&lt;</button>
@@ -206,6 +231,27 @@ if ($userId) {
         </div>
     </div>
 
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <h2 class="text-xl font-bold mb-4">Submit Feedback</h2>
+            <form id="feedbackForm" onsubmit="submitFeedback(event)">
+                <input type="hidden" id="sitinId" name="sitinId">
+                <input type="hidden" id="laboratory" name="laboratory">
+                <textarea id="feedbackText" name="feedback" rows="4" 
+                    class="w-full p-2 border rounded mb-4" 
+                    placeholder="Enter your feedback here..." 
+                    required></textarea>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeFeedbackModal()" 
+                        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                    <button type="submit" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         function toggleNav(x) {
             document.getElementById("mySidenav").classList.toggle("-translate-x-0");
@@ -215,6 +261,40 @@ if ($userId) {
         function closeNav() {
             document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
+        }
+
+        function openFeedbackModal(sitinId, laboratory) {
+            document.getElementById('feedbackModal').classList.remove('hidden');
+            document.getElementById('feedbackModal').classList.add('flex');
+            document.getElementById('sitinId').value = sitinId;
+            document.getElementById('laboratory').value = laboratory;
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+            document.getElementById('feedbackModal').classList.remove('flex');
+        }
+
+        function submitFeedback(event) {
+            event.preventDefault();
+            const formData = new FormData(document.getElementById('feedbackForm'));
+
+            fetch('feedback_submit.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Feedback submitted successfully!');
+                    closeFeedbackModal();
+                } else {
+                    alert('Error submitting feedback: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error submitting feedback: ' + error);
+            });
         }
     </script>
 </body>

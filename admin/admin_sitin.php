@@ -96,7 +96,7 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
                 </a>
             </div>
             <div class="overflow-hidden">
-                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                <a href="admin_feedback.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                     <i class="fas fa-comments w-6 text-base"></i>
                     <span class="text-sm font-medium">VIEW FEEDBACKS</span>
                 </a>
@@ -176,7 +176,7 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
                                         <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['FULL_NAME']); ?></td>
                                         <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['PURPOSE']); ?></td>
                                         <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['LABORATORY']); ?></td>
-                                        <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['TIME_IN']); ?></td>
+                                        <td class="px-6 py-4"><?php echo date('h:i A', strtotime($sitin['TIME_IN'])); ?></td>
                                         <td class="px-6 py-4"><?php echo htmlspecialchars($sitin['DATE']); ?></td>
                                         <td class="px-6 py-4">
                                             <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-sm">

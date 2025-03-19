@@ -1,27 +1,13 @@
 <?php
 session_start();
-require '../db.php';
+require '../db.php'; // Add database connection
 
 if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
     header("Location: ../login.php");
     exit;
 }
-
-// Initialize search query
-$search = isset($_POST['search']) ? mysqli_real_escape_string($conn, $_POST['search']) : '';
-
-// Modify query to include search
-$query = "SELECT * FROM users";
-if (!empty($search)) {
-    $query .= " WHERE IDNO LIKE '%$search%' 
-                OR LAST_NAME LIKE '%$search%' 
-                OR FIRST_NAME LIKE '%$search%' 
-                OR COURSE LIKE '%$search%'
-                OR YEAR_LEVEL LIKE '%$search%'";
-}
-$result = mysqli_query($conn, $query);
-$total_records = mysqli_num_rows($result);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,8 +17,9 @@ $total_records = mysqli_num_rows($result);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Admin Student List</title>
-</head>   
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Admin Dashboard</title>
+</head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <!-- Header -->
     <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
@@ -54,14 +41,12 @@ $total_records = mysqli_num_rows($result);
         </div>
 
         <nav class="flex flex-col space-y-0.5 px-2">
-            <!-- Navigation items -->
             <div class="overflow-hidden">
                 <a href="admin_dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                     <i class="fas fa-home w-6 text-base"></i>
                     <span class="text-sm font-medium">HOME</span>
                 </a>
             </div>
-            <!-- Rest of navigation items -->
             <div class="overflow-hidden">
                 <a href="admin_search.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
                     <i class="fas fa-search w-6 text-base"></i>
@@ -120,23 +105,18 @@ $total_records = mysqli_num_rows($result);
         </div>
     </div>
 
+    <!-- Add the feedback table container -->
     <div class="content-container w-11/12 mx-auto my-8 bg-white p-6 rounded-lg shadow-lg overflow-hidden border border-gray-200">
         <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden -mx-6 -mt-6 mb-6">
             <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-            <i class="fas fa-list text-2xl mr-4 relative z-10"></i>
-            <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Student Information</h2>
+            <i class="fas fa-comments text-2xl mr-4 relative z-10"></i>
+            <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Student Feedbacks</h2>
         </div>
         
         <div class="p-6">
-            <!-- Buttons moved above the search bar and entry selector -->
-            <div class="flex mb-6">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Add Students</button>
-                <button class="bg-red-500 text-white px-4 py-2 rounded">Reset All Session</button>
-            </div>
-            
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center">
-                    <select class="border rounded px-2 py-1 mr-2">
+                    <select id="entriesSelect" class="border rounded px-2 py-1 mr-2">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -145,54 +125,63 @@ $total_records = mysqli_num_rows($result);
                     <span>entries per page</span>
                 </div>
                 <div class="flex items-center">
-                    <form method="POST" class="flex items-center">
-                        <span class="mr-2">Search:</span>
-                        <input type="text" 
-                               name="search"
-                               value="<?php echo htmlspecialchars($search); ?>"
-                               class="border rounded px-2 py-1">
-                        <button type="submit" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </form>
+                    <span class="mr-2">Search:</span>
+                    <input id="searchInput" type="text" class="border rounded px-2 py-1">
                 </div>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="min-w-full">
+                    <?php
+                    // UPDATED: Get total count of feedbacks
+                    $total_query = "SELECT COUNT(*) as total FROM feedback";
+                    $total_result = $conn->query($total_query);
+                    $total_row = $total_result->fetch_assoc();
+                    $total_entries = $total_row['total'];
+
+                    // Set entries per page (default 10)
+                    $entries_per_page = isset($_GET['entries']) ? (int)$_GET['entries'] : 10;
+                    $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                    $offset = ($current_page - 1) * $entries_per_page;
+
+                    // UPDATED: Sort by DATE DESC to get latest feedback first
+                    $query = "SELECT * FROM feedback ORDER BY DATE DESC, FEEDBACK_ID DESC LIMIT $entries_per_page OFFSET $offset";
+                    $result = $conn->query($query);
+                    ?>
                     <thead class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white">
                         <tr>
-                            <th class="px-6 py-3 text-left">ID Number</th>
-                            <th class="px-6 py-3 text-left">Name</th>
-                            <th class="px-6 py-3 text-left">Year Level</th>
-                            <th class="px-6 py-3 text-left">Course</th>
-                            <th class="px-6 py-3 text-left">Remaining Session</th>
+                            <th class="px-6 py-3 text-left">Student ID</th>
+                            <th class="px-6 py-3 text-left">Laboratory</th>
+                            <th class="px-6 py-3 text-left">Date</th>
+                            <th class="px-6 py-3 text-left">Feedback</th>
                             <th class="px-6 py-3 text-left">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="bg-white">
+                    <tbody>
                         <?php
-                        if (mysqli_num_rows($result) > 0) {
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                $fullName = $row['LAST_NAME'] . ', ' . $row['FIRST_NAME'] . ' ' . $row['MID_NAME'];
-                                echo "<tr class='hover:bg-gray-100'>";
-                                echo "<td class='px-6 py-4'>" . $row['IDNO'] . "</td>";
-                                echo "<td class='px-6 py-4'>" . $fullName . "</td>";
-                                echo "<td class='px-6 py-4'>" . $row['YEAR_LEVEL'] . "</td>";
-                                echo "<td class='px-6 py-4'>" . $row['COURSE'] . "</td>";
-                                echo "<td class='px-6 py-4'>" . $row['SESSION'] . "</td>";
-                                echo "<td class='px-6 py-4'>
-                                        <a href='edit_student.php?id=" . $row['STUD_NUM'] . "' class='text-blue-500 hover:text-blue-700 mr-3'>
-                                            <i class='fas fa-edit'></i>
-                                        </a>
-                                        <a href='delete_student.php?id=" . $row['STUD_NUM'] . "' class='text-red-500 hover:text-red-700' onclick='return confirm(\"Are you sure you want to delete this student?\");'>
-                                            <i class='fas fa-trash-alt'></i>
-                                        </a>
-                                    </td>";
+                        // Fetch all feedbacks
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<tr class='hover:bg-gray-50 feedback-row'>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['IDNO']) . "</td>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['LABORATORY']) . "</td>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['DATE']) . "</td>";
+                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['FEEDBACK']) . "</td>";
+                                echo "<td class='px-6 py-4'>";
+                                echo "<button onclick=\"deleteFeedback(" . $row['FEEDBACK_ID'] . ")\" 
+                                        class='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition duration-200'>
+                                        Delete
+                                      </button>";
+                                echo "</td>";
                                 echo "</tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='6' class='px-6 py-4 text-center text-gray-500 italic'>No data available</td></tr>";
+                            echo "<tr><td colspan='5' class='px-6 py-8 text-center text-gray-500'>";
+                            echo "<div class='flex flex-col items-center justify-center'>";
+                            echo "<i class='fas fa-comments text-4xl mb-2 text-gray-400'></i>";
+                            echo "<p class='text-lg font-medium'>No feedbacks found</p>";
+                            echo "<p class='text-sm'>Student feedbacks will appear here once they are submitted.</p>";
+                            echo "</div></td></tr>";
                         }
                         ?>
                     </tbody>
@@ -201,10 +190,10 @@ $total_records = mysqli_num_rows($result);
 
             <div class="flex justify-between items-center mt-4">
                 <div class="text-gray-600">
-                    <?php 
-                    $start = 1;
-                    $end = $total_records;
-                    echo "Showing $start to $end of $total_records entries";
+                    <?php
+                    $start_entry = $total_entries > 0 ? $offset + 1 : 0;
+                    $end_entry = min($offset + $entries_per_page, $total_entries);
+                    echo "Showing $start_entry to $end_entry of $total_entries entries";
                     ?>
                 </div>
                 <div class="flex space-x-1">
@@ -217,36 +206,8 @@ $total_records = mysqli_num_rows($result);
             </div>
         </div>
     </div>
-    
+
     <script>
-        function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                searchTable();
-            }
-        }
-
-        function searchTable() {
-            const input = document.getElementById('searchInput');
-            const filter = input.value.toLowerCase();
-            const tbody = document.getElementById('tableBody');
-            const rows = tbody.getElementsByTagName('tr');
-
-            for (let row of rows) {
-                let found = false;
-                const cells = row.getElementsByTagName('td');
-                
-                for (let cell of cells) {
-                    const text = cell.textContent || cell.innerText;
-                    if (text.toLowerCase().indexOf(filter) > -1) {
-                        found = true;
-                        break;
-                    }
-                }
-                
-                row.style.display = found ? '' : 'none';
-            }
-        }
-
         function toggleNav(x) {
             document.getElementById("mySidenav").classList.toggle("-translate-x-0");
             document.getElementById("mySidenav").classList.toggle("-translate-x-full");
@@ -256,6 +217,95 @@ $total_records = mysqli_num_rows($result);
             document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
         }
+
+        function deleteFeedback(feedbackId) {
+            if (confirm('Are you sure you want to delete this feedback?')) {
+                fetch('delete_feedback.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'feedback_id=' + feedbackId
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting feedback: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error deleting feedback: ' + error);
+                });
+            }
+        }
+
+        // ADDED: Search functionality script
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get reference to the search input and entries selector
+            const searchInput = document.getElementById('searchInput');
+            const entriesSelect = document.getElementById('entriesSelect');
+            const feedbackRows = document.querySelectorAll('.feedback-row');
+            
+            // Function to filter table rows based on search input
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                let visibleCount = 0;
+                
+                feedbackRows.forEach(function(row) {
+                    // Get text from all cells in this row
+                    const idNo = row.cells[0].textContent.toLowerCase();
+                    const lab = row.cells[1].textContent.toLowerCase();
+                    const date = row.cells[2].textContent.toLowerCase();
+                    const feedback = row.cells[3].textContent.toLowerCase();
+                    
+                    // Check if any cell contains the search term
+                    if (idNo.includes(searchTerm) || 
+                        lab.includes(searchTerm) || 
+                        date.includes(searchTerm) || 
+                        feedback.includes(searchTerm)) {
+                        row.style.display = ''; // Show the row
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none'; // Hide the row
+                    }
+                });
+                
+                // Update the "Showing X to Y of Z entries" text
+                updateEntryInfo(visibleCount);
+            }
+            
+            // Function to update entry information text
+            function updateEntryInfo(visibleCount) {
+                const infoElement = document.querySelector('.text-gray-600');
+                if (infoElement) {
+                    const totalEntries = feedbackRows.length;
+                    const start = visibleCount > 0 ? 1 : 0;
+                    const end = visibleCount;
+                    infoElement.textContent = `Showing ${start} to ${end} of ${visibleCount} entries (filtered from ${totalEntries} total entries)`;
+                }
+            }
+            
+            // Add event listener to search input
+            if (searchInput) {
+                searchInput.addEventListener('keyup', filterTable);
+            }
+            
+            // Initialize entries select with current value from URL if present
+            const urlParams = new URLSearchParams(window.location.search);
+            const entriesParam = urlParams.get('entries');
+            if (entriesParam && entriesSelect) {
+                entriesSelect.value = entriesParam;
+            }
+            
+            // Add event listener to entries select
+            if (entriesSelect) {
+                entriesSelect.addEventListener('change', function() {
+                    window.location.href = `admin_feedback.php?entries=${entriesSelect.value}`;
+                });
+            }
+        });
     </script>
 </body>
 </html>
