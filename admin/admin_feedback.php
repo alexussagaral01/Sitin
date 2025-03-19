@@ -126,7 +126,12 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
                 </div>
                 <div class="flex items-center">
                     <span class="mr-2">Search:</span>
-                    <input id="searchInput" type="text" class="border rounded px-2 py-1">
+                    <form id="searchForm" class="flex items-center">
+                        <input id="searchInput" type="text" class="border rounded px-2 py-1">
+                        <button type="submit" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -219,52 +224,72 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
         }
 
         function deleteFeedback(feedbackId) {
-            if (confirm('Are you sure you want to delete this feedback?')) {
-                fetch('delete_feedback.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'feedback_id=' + feedbackId
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error deleting feedback: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    alert('Error deleting feedback: ' + error);
-                });
-            }
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send delete request
+                    fetch('delete_feedback.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'feedback_id=' + feedbackId
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Deleted!',
+                                'Feedback has been deleted.',
+                                'success'
+                            ).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'Failed to delete feedback: ' + data.message,
+                                'error'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while deleting: ' + error,
+                            'error'
+                        );
+                    });
+                }
+            });
         }
 
-        // ADDED: Search functionality script
+        // UPDATED: Search functionality script - requires Enter key press
         document.addEventListener('DOMContentLoaded', function() {
-            // Get reference to the search input and entries selector
+            // Get reference to the search form and input
+            const searchForm = document.getElementById('searchForm');
             const searchInput = document.getElementById('searchInput');
             const entriesSelect = document.getElementById('entriesSelect');
-            const feedbackRows = document.querySelectorAll('.feedback-row');
             
             // Function to filter table rows based on search input
             function filterTable() {
                 const searchTerm = searchInput.value.toLowerCase();
+                const feedbackRows = document.querySelectorAll('.feedback-row');
                 let visibleCount = 0;
                 
                 feedbackRows.forEach(function(row) {
                     // Get text from all cells in this row
-                    const idNo = row.cells[0].textContent.toLowerCase();
-                    const lab = row.cells[1].textContent.toLowerCase();
-                    const date = row.cells[2].textContent.toLowerCase();
-                    const feedback = row.cells[3].textContent.toLowerCase();
+                    const rowText = Array.from(row.cells).map(cell => cell.textContent.toLowerCase()).join(' ');
                     
                     // Check if any cell contains the search term
-                    if (idNo.includes(searchTerm) || 
-                        lab.includes(searchTerm) || 
-                        date.includes(searchTerm) || 
-                        feedback.includes(searchTerm)) {
+                    if (rowText.includes(searchTerm)) {
                         row.style.display = ''; // Show the row
                         visibleCount++;
                     } else {
@@ -273,23 +298,31 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
                 });
                 
                 // Update the "Showing X to Y of Z entries" text
-                updateEntryInfo(visibleCount);
-            }
-            
-            // Function to update entry information text
-            function updateEntryInfo(visibleCount) {
                 const infoElement = document.querySelector('.text-gray-600');
                 if (infoElement) {
-                    const totalEntries = feedbackRows.length;
+                    const totalEntries = document.querySelectorAll('.feedback-row').length;
                     const start = visibleCount > 0 ? 1 : 0;
                     const end = visibleCount;
-                    infoElement.textContent = `Showing ${start} to ${end} of ${visibleCount} entries (filtered from ${totalEntries} total entries)`;
+                    infoElement.textContent = `Showing ${start} to ${end} of ${visibleCount} entries`;
                 }
             }
             
-            // Add event listener to search input
+            // Add event listener to search form submit
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Prevent the form from submitting
+                    filterTable(); // Filter the table when form is submitted
+                });
+            }
+            
+            // Add event listener for Enter key in search input
             if (searchInput) {
-                searchInput.addEventListener('keyup', filterTable);
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Prevent default form submission
+                        filterTable(); // Filter the table when Enter is pressed
+                    }
+                });
             }
             
             // Initialize entries select with current value from URL if present
