@@ -33,6 +33,10 @@ if ($userId) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
     <title>History</title>
 </head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
@@ -286,14 +290,39 @@ if ($userId) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Feedback submitted successfully!');
+                    // SweetAlert success message
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Feedback Successfully Submitted',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3085d6',
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
                     closeFeedbackModal();
+                    // Optionally refresh the page or update UI
+                    // setTimeout(() => location.reload(), 2000);
                 } else {
-                    alert('Error submitting feedback: ' + data.message);
+                    // SweetAlert error message
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Error submitting feedback: ' + data.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#d33'
+                    });
                 }
             })
             .catch(error => {
-                alert('Error submitting feedback: ' + error);
+                // SweetAlert error message for network issues
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Network error submitting feedback. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#d33'
+                });
             });
         }
     </script>
