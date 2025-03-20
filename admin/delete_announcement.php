@@ -11,15 +11,20 @@ if (isset($_GET['id'])) {
     $stmt->execute();
     
     if ($stmt->affected_rows > 0) {
-        $_SESSION['message'] = "Announcement deleted successfully.";
+        // For AJAX requests, return a success message
+        echo "success";
     } else {
-        $_SESSION['message'] = "Error deleting announcement.";
+        // For AJAX requests, return an error message
+        echo "error";
     }
     
     $stmt->close();
+    
+    // Don't redirect if this is an AJAX request
+    exit();
 }
 
-// Redirect back to dashboard
+// Redirect back to dashboard (this will only happen for non-AJAX requests)
 header("Location: admin_dashboard.php");
 exit();
 ?>

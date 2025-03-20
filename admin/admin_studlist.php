@@ -31,6 +31,8 @@ $total_records = mysqli_num_rows($result);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Admin Student List</title>
 </head>   
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
@@ -185,7 +187,8 @@ $total_records = mysqli_num_rows($result);
                                         <a href='edit_student.php?id=" . $row['STUD_NUM'] . "' class='text-blue-500 hover:text-blue-700 mr-3'>
                                             <i class='fas fa-edit'></i>
                                         </a>
-                                        <a href='delete_student.php?id=" . $row['STUD_NUM'] . "' class='text-red-500 hover:text-red-700' onclick='return confirm(\"Are you sure you want to delete this student?\");'>
+                                        <a href='javascript:void(0);' class='text-red-500 hover:text-red-700' 
+                                           onclick='confirmDelete(" . $row['STUD_NUM'] . ")'>
                                             <i class='fas fa-trash-alt'></i>
                                         </a>
                                     </td>";
@@ -255,6 +258,55 @@ $total_records = mysqli_num_rows($result);
         function closeNav() {
             document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
+        }
+        
+        // Delete confirmation function using SweetAlert2
+        function confirmDelete(studentId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, redirect to delete script
+                    window.location.href = 'delete_student.php?id=' + studentId + '&confirmed=true';
+                }
+            });
+        }
+        
+        // Check URL parameters for deletion status
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const deletedParam = urlParams.get('deleted');
+            
+            if (deletedParam === 'success') {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Student information deleted successfully.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // Remove the parameter from URL to prevent showing the message again on refresh
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('deleted');
+                    window.history.replaceState({}, '', url);
+                });
+            } else if (deletedParam === 'error') {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Could not delete student information.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('deleted');
+                    window.history.replaceState({}, '', url);
+                });
+            }
         }
     </script>
 </body>

@@ -360,9 +360,34 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `delete_announcement.php?id=${id}`;
+                    // Send AJAX request to delete the announcement
+                    fetch(`delete_announcement.php?id=${id}`, {
+                        method: 'GET'
+                    })
+                    .then(response => response.text())
+                    .then(() => {
+                        // Show success message
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Announcement has been deleted successfully.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            // Reload the page after clicking OK
+                            window.location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'There was an error deleting the announcement.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    });
                 }
-            })
+            });
         }
 
         // Initialize the charts
