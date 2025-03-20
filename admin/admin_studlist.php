@@ -7,6 +7,32 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
     exit;
 }
 
+// Handle student addition via POST request
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Idno'])) {
+    $idno = $_POST['Idno'];
+    $lastname = $_POST['Lastname'];
+    $firstname = $_POST['Firstname'];
+    $midname = $_POST['Midname'];
+    $course = $_POST['Course'];
+    $year_level = $_POST['Year_Level'];
+    $username = $_POST['Username'];
+    $password = password_hash($_POST['Password'], PASSWORD_DEFAULT);
+
+    // Prepare statement to insert new student
+    $stmt = $conn->prepare("INSERT INTO users (idno, last_name, first_name, mid_name, course, year_level, user_name, password_hash, session) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 30)");
+    $stmt->bind_param("ssssssss", $idno, $lastname, $firstname, $midname, $course, $year_level, $username, $password);
+
+    if ($stmt->execute()) {
+        echo "Student added successfully";
+        exit; // Exit to prevent the rest of the page from loading when this is an AJAX call
+    } else {
+        echo "Error adding student: " . $stmt->error;
+        exit;
+    }
+
+    $stmt->close();
+}
+
 // Initialize search query
 $search = isset($_POST['search']) ? mysqli_real_escape_string($conn, $_POST['search']) : '';
 
@@ -22,6 +48,7 @@ if (!empty($search)) {
 $result = mysqli_query($conn, $query);
 $total_records = mysqli_num_rows($result);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,8 +159,91 @@ $total_records = mysqli_num_rows($result);
         <div class="p-6">
             <!-- Buttons moved above the search bar and entry selector -->
             <div class="flex mb-6">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Add Students</button>
-                <button class="bg-red-500 text-white px-4 py-2 rounded">Reset All Session</button>
+                <button id="addStudentBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    Add Student
+                </button>
+
+                <div id="addStudentModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
+                <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <h2 class="text-xl font-semibold">Add Student</h2>
+                        <button id="closeModal" class="text-gray-500 hover:text-gray-700">&times;</button>
+                    </div>
+
+                    <form id="addStudentForm" method="POST" class="mt-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Left Column -->
+                            <div>
+                                <div class="mb-3">
+                                    <label for="Idno" class="block text-gray-700 font-medium">ID Number</label>
+                                    <input type="text" id="Idno" name="Idno" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Lastname" class="block text-gray-700 font-medium">Last Name</label>
+                                    <input type="text" id="Lastname" name="Lastname" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Firstname" class="block text-gray-700 font-medium">First Name</label>
+                                    <input type="text" id="Firstname" name="Firstname" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Midname" class="block text-gray-700 font-medium">Middle Name</label>
+                                    <input type="text" id="Midname" name="Midname" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div>
+                                <div class="mb-3">
+                                    <label for="Course" class="block text-gray-700 font-medium">Course</label>
+                                    <select id="Course" name="Course" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="" disabled selected>Select Course</option>
+                                        <option value="BS IN ACCOUNTANCY">BS IN ACCOUNTANCY</option>
+                                        <option value="BS IN BUSINESS ADMINISTRATION">BS IN BUSINESS ADMINISTRATION</option>
+                                        <option value="BS IN CRIMINOLOGY">BS IN CRIMINOLOGY</option>
+                                        <option value="BS IN CUSTOMS ADMINISTRATION">BS IN CUSTOMS ADMINISTRATION</option>
+                                        <option value="BS IN INFORMATION TECHNOLOGY">BS IN INFORMATION TECHNOLOGY</option>
+                                        <option value="BS IN COMPUTER SCIENCE">BS IN COMPUTER SCIENCE</option>
+                                        <option value="BS IN OFFICE ADMINISTRATION">BS IN OFFICE ADMINISTRATION</option>
+                                        <option value="BS IN SOCIAL WORK">BS IN SOCIAL WORK</option>
+                                        <option value="BACHELOR OF SECONDARY EDUCATION">BACHELOR OF SECONDARY EDUCATION</option>
+                                        <option value="BACHELOR OF ELEMENTARY EDUCATION">BACHELOR OF ELEMENTARY EDUCATION</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Year_Level" class="block text-gray-700 font-medium">Year Level</label>
+                                    <select id="Year_Level" name="Year_Level" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="" disabled selected>Select Year Level</option>
+                                        <option value="1st Year">1st Year</option>
+                                        <option value="2nd Year">2nd Year</option>
+                                        <option value="3rd Year">3rd Year</option>
+                                        <option value="4th Year">4th Year</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Username" class="block text-gray-700 font-medium">Username</label>
+                                    <input type="text" id="Username" name="Username" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Password" class="block text-gray-700 font-medium">Password</label>
+                                    <input type="password" id="Password" name="Password" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button type="button" id="cancelBtn" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg">
+                                Cancel
+                            </button>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                                Add Student
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+                <button id="resetSessionBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Reset All Session</button>
             </div>
             
             <div class="flex justify-between items-center mb-4">
@@ -278,6 +388,66 @@ $total_records = mysqli_num_rows($result);
             });
         }
         
+        // Reset all sessions functionality
+        document.getElementById('resetSessionBtn').addEventListener('click', function() {
+            // Show confirmation dialog
+            Swal.fire({
+                title: 'Reset All Sessions?',
+                text: "This will reset ALL student sessions back to 30. This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, reset all!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading state
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Resetting all sessions',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Send AJAX request to reset all sessions
+                    fetch('reset_all_session.php')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: 'Reset Complete!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    // Refresh the page to show updated session values
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'An error occurred while resetting sessions',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                            console.error('Error:', error);
+                        });
+                }
+            });
+        });
+        
         // Check URL parameters for deletion status
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -308,6 +478,116 @@ $total_records = mysqli_num_rows($result);
                 });
             }
         }
+
+        // Open modal
+        document.getElementById('addStudentBtn').addEventListener('click', () => {
+            document.getElementById('addStudentModal').classList.remove('hidden');
+            document.getElementById('addStudentModal').classList.add('flex');
+        });
+
+        // Close modal
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('addStudentModal').classList.add('hidden');
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.getElementById('addStudentModal').classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('addStudentModal')) {
+                document.getElementById('addStudentModal').classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation for ID number
+            const idnoInput = document.getElementById('Idno');
+            idnoInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 8);
+            });
+
+            // Name input validation (letters only)
+            const nameInputs = ['Lastname', 'Firstname', 'Midname'];
+            nameInputs.forEach(function(id) {
+                const input = document.getElementById(id);
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+                });
+            });
+
+            // Handle form submission with AJAX
+            const form = document.getElementById('addStudentForm');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Validate ID number length
+                if (idnoInput.value.length !== 8) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid ID Number',
+                        text: 'ID Number must be exactly 8 digits.'
+                    });
+                    return;
+                }
+                
+                // Create form data object
+                const formData = new FormData(this);
+                
+                // Show loading indicator
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Adding new student',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Send AJAX request
+                fetch('admin_studlist.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    // Check if response contains success message
+                    if (data.includes('Student added successfully')) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Student added successfully',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            // Clear form
+                            form.reset();
+                            // Close modal
+                            document.getElementById('addStudentModal').classList.add('hidden');
+                            // Refresh the page to show updated student list
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Failed to add student. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'An error occurred while processing your request',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            });
+        });
+
     </script>
 </body>
 </html>
