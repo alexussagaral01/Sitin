@@ -16,6 +16,6 @@ $result = mysqli_query($conn, $query);
 if ($result) {
     echo json_encode(['status' => 'success', 'message' => 'All sessions have been reset to 30']);
 } else {
-    echo json_encode(['status' => 'success', 'message' => 'All sessions are already set to 30']);
+    echo json_encode(['status' => 'error', 'message' => 'Failed to reset sessions']);
 }
 ?>
