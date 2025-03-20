@@ -201,15 +201,16 @@ $labCountsJSON = json_encode(array_values($labCounts));
                 
                 <div class="flex items-center space-x-2">
                     <label>Search:</label>
-                    <form method="POST" class="flex items-center">
+                    <div class="flex items-center">
                         <input type="text" 
-                               name="search"
-                               placeholder="Search..." 
-                               class="border rounded px-3 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button type="submit" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90">
+                            id="searchInput"
+                            name="search"
+                            placeholder="Search..." 
+                            class="border rounded px-3 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="button" onclick="searchTable()" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90">
                             <i class="fas fa-search"></i>
                         </button>
-                    </form>
+                    </div>
                 </div>
             </div>
             
@@ -285,21 +286,29 @@ $labCountsJSON = json_encode(array_values($labCounts));
             const tbody = document.getElementById('tableBody');
             const rows = tbody.getElementsByTagName('tr');
 
-            for (let row of rows) {
+            for (let i = 0; i < rows.length; i++) {
                 let found = false;
-                const cells = row.getElementsByTagName('td');
+                const cells = rows[i].getElementsByTagName('td');
                 
-                for (let cell of cells) {
-                    const text = cell.textContent || cell.innerText;
+                for (let j = 0; j < cells.length; j++) {
+                    const text = cells[j].textContent || cells[j].innerText;
                     if (text.toLowerCase().indexOf(filter) > -1) {
                         found = true;
                         break;
                     }
                 }
                 
-                row.style.display = found ? '' : 'none';
+                rows[i].style.display = found ? '' : 'none';
             }
         }
+
+        // Add event listener for Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission
+                searchTable();
+            }
+        });
 
         // Existing scripts continue here...
         function toggleNav(x) {
