@@ -33,70 +33,132 @@ if ($userId) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $idno = $_POST['Idno'];
-    $lastname = $_POST['Lastname'];
-    $firstname = $_POST['Firstname'];
-    $midname = $_POST['Midname'];
-    $course = $_POST['Course'];
-    $year_level = $_POST['Year_Level'];
-    $email = $_POST['Email'];
-    $address = $_POST['Address'];
-    
-    $uploadImagePath = $userImage; // Keep existing image by default
-    
-    // Handle image upload
-    if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] == 0) {
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-        $fileType = finfo_file($fileInfo, $_FILES['profileImage']['tmp_name']);
-        finfo_close($fileInfo);
+    // Handle profile update
+    if (isset($_POST['action']) && $_POST['action'] == 'update_profile') {
+        $idno = $_POST['Idno'];
+        $lastname = $_POST['Lastname'];
+        $firstname = $_POST['Firstname'];
+        $midname = $_POST['Midname'];
+        $course = $_POST['Course'];
+        $year_level = $_POST['Year_Level'];
+        $email = $_POST['Email'];
+        $address = $_POST['Address'];
         
-        if (in_array($fileType, $allowedTypes)) {
-            // Create images directory if it doesn't exist
-            $targetDir = "../images/";
-            if (!is_dir($targetDir)) {
-                mkdir($targetDir, 0777, true);
-            }
+        $uploadImagePath = $userImage; // Keep existing image by default
+        
+        // Handle image upload
+        if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] == 0) {
+            $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+            $fileType = finfo_file($fileInfo, $_FILES['profileImage']['tmp_name']);
+            finfo_close($fileInfo);
             
-            // Generate unique filename
-            $fileName = uniqid() . '_' . basename($_FILES["profileImage"]["name"]);
-            $targetFile = $targetDir . $fileName;
-            
-            if (move_uploaded_file($_FILES["profileImage"]["tmp_name"], $targetFile)) {
-                $uploadImagePath = $fileName;
-                $_SESSION['profile_image'] = $fileName;
+            if (in_array($fileType, $allowedTypes)) {
+                // Create images directory if it doesn't exist
+                $targetDir = "../images/";
+                if (!is_dir($targetDir)) {
+                    mkdir($targetDir, 0777, true);
+                }
                 
-                // Delete old image if it exists and is not the default image
-                if (!empty($userImage) && $userImage != "image.jpg" && file_exists($targetDir . $userImage)) {
-                    unlink($targetDir . $userImage);
+                // Generate unique filename
+                $fileName = uniqid() . '_' . basename($_FILES["profileImage"]["name"]);
+                $targetFile = $targetDir . $fileName;
+                
+                if (move_uploaded_file($_FILES["profileImage"]["tmp_name"], $targetFile)) {
+                    $uploadImagePath = $fileName;
+                    $_SESSION['profile_image'] = $fileName;
+                    
+                    // Delete old image if it exists and is not the default image
+                    if (!empty($userImage) && $userImage != "image.jpg" && file_exists($targetDir . $userImage)) {
+                        unlink($targetDir . $userImage);
+                    }
                 }
             }
         }
-    }
 
-    try {
-        $stmt = $conn->prepare("UPDATE users SET IDNO = ?, LAST_NAME = ?, FIRST_NAME = ?, MID_NAME = ?, COURSE = ?, YEAR_LEVEL = ?, EMAIL = ?, ADDRESS = ?, UPLOAD_IMAGE = ? WHERE STUD_NUM = ?");
-        $stmt->bind_param("sssssssssi", $idno, $lastname, $firstname, $midname, $course, $year_level, $email, $address, $uploadImagePath, $userId);
-        
-        if ($stmt->execute()) {
+        try {
+            $stmt = $conn->prepare("UPDATE users SET IDNO = ?, LAST_NAME = ?, FIRST_NAME = ?, MID_NAME = ?, COURSE = ?, YEAR_LEVEL = ?, EMAIL = ?, ADDRESS = ?, UPLOAD_IMAGE = ? WHERE STUD_NUM = ?");
+            $stmt->bind_param("sssssssssi", $idno, $lastname, $firstname, $midname, $course, $year_level, $email, $address, $uploadImagePath, $userId);
+            
+            if ($stmt->execute()) {
+                echo json_encode([
+                    "status" => "success",
+                    "message" => "Profile updated successfully.",
+                    "image" => $uploadImagePath
+                ]);
+            } else {
+                throw new Exception("Failed to update profile");
+            }
+            
+            $stmt->close();
+        } catch (Exception $e) {
             echo json_encode([
-                "status" => "success",
-                "message" => "Profile updated successfully.",
-                "image" => $uploadImagePath
+                "status" => "error",
+                "message" => $e->getMessage()
             ]);
-        } else {
-            throw new Exception("Failed to update profile");
         }
         
-        $stmt->close();
-    } catch (Exception $e) {
-        echo json_encode([
-            "status" => "error",
-            "message" => $e->getMessage()
-        ]);
+        exit;
+    } 
+    // Handle password change
+    elseif (isset($_POST['action']) && $_POST['action'] == 'change_password') {
+        $currentPassword = $_POST['currentPassword'];
+        $newPassword = $_POST['newPassword'];
+        $confirmPassword = $_POST['confirmPassword'];
+        
+        // Verify passwords match
+        if ($newPassword !== $confirmPassword) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "New passwords do not match."
+            ]);
+            exit;
+        }
+        
+        try {
+            // First verify current password
+            $stmt = $conn->prepare("SELECT PASSWORD_HASH FROM users WHERE STUD_NUM = ?");
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $stmt->bind_result($hashedPassword);
+            $stmt->fetch();
+            $stmt->close();
+            
+            // Verify current password
+            if (!password_verify($currentPassword, $hashedPassword)) {
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "Current password is incorrect."
+                ]);
+                exit;
+            }
+            
+            // Hash the new password
+            $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            
+            // Update the password
+            $stmt = $conn->prepare("UPDATE users SET PASSWORD_HASH = ? WHERE STUD_NUM = ?");
+            $stmt->bind_param("si", $newHashedPassword, $userId);
+            
+            if ($stmt->execute()) {
+                echo json_encode([
+                    "status" => "success",
+                    "message" => "Password updated successfully."
+                ]);
+            } else {
+                throw new Exception("Failed to update password");
+            }
+            
+            $stmt->close();
+        } catch (Exception $e) {
+            echo json_encode([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ]);
+        }
+        
+        exit;
     }
-    
-    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -131,7 +193,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <i class="fas fa-user-edit text-2xl mr-4 relative z-10"></i>
                     <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Edit Student Profile</h2>
                 </div>
-                <div class="p-6">
+
+                <!-- Tabs Navigation -->
+                <div class="flex border-b border-gray-200">
+                    <button type="button" 
+                            class="tab-button px-6 py-3 font-medium text-sm active text-blue-600 border-b-2 border-blue-600" 
+                            data-tab="edit-profile">
+                        <i class="fas fa-user-edit mr-2"></i>Edit Profile
+                    </button>
+                    <button type="button" 
+                            class="tab-button px-6 py-3 font-medium text-sm text-gray-500" 
+                            data-tab="change-password">
+                        <i class="fas fa-key mr-2"></i>Change Password
+                    </button>
+                </div>
+
+                <!-- Edit Profile Tab Content -->
+                <div id="edit-profile" class="tab-content p-6 block">
                     <img src="<?php echo htmlspecialchars($profileImage); ?>" 
                          alt="Student Image" 
                          class="w-[150px] h-[150px] rounded-full object-cover mx-auto block cursor-pointer border-3 border-white shadow-[0_0_15px_rgba(0,0,0,0.2)] mb-6 hover:opacity-80 transition-opacity"
@@ -140,6 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="file" id="fileInput" name="profileImage" accept="image/*" class="hidden" form="editForm">
                     
                     <form id="editForm" method="POST" action="" class="mt-4">
+                        <input type="hidden" name="action" value="update_profile">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- ID Number -->
                             <div class="mb-4 relative col-span-1 md:col-span-2">
@@ -213,6 +292,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </form>
                 </div>
+
+                <!-- Change Password Tab Content -->
+                <div id="change-password" class="tab-content p-6 hidden">
+                    <div class="max-w-md mx-auto">
+                        <div class="text-center mb-6">
+                            <i class="fas fa-key text-5xl text-purple-500 mb-3"></i>
+                            <h3 class="text-xl font-semibold">Change Your Password</h3>
+                            <p class="text-gray-500 text-sm">Make sure to choose a strong password</p>
+                        </div>
+                        
+                        <form id="passwordForm" method="POST" action="" class="mt-4">
+                            <input type="hidden" name="action" value="change_password">
+                            
+                            <!-- Current Password -->
+                            <div class="mb-4 relative">
+                                <i class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                                <input type="password" id="currentPassword" name="currentPassword" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Current Password" required>
+                            </div>
+                            
+                            <!-- New Password -->
+                            <div class="mb-4 relative">
+                                <i class="fas fa-key absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                                <input type="password" id="newPassword" name="newPassword" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="New Password" required>
+                            </div>
+                            
+                            <!-- Confirm New Password -->
+                            <div class="mb-4 relative">
+                                <i class="fas fa-check-circle absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Confirm New Password" required>
+                            </div>
+                            
+                            <div class="text-center mt-6">
+                                <button type="submit" class="bg-gradient-to-r from-purple-700 to-pink-500 text-white py-2 px-6 rounded-lg hover:from-pink-500 hover:to-purple-700 hover:text-black transition-all duration-300">
+                                    Update Password
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -277,6 +395,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active', 'text-blue-600', 'border-b-2', 'border-blue-600');
+                        btn.classList.add('text-gray-500');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active', 'text-blue-600', 'border-b-2', 'border-blue-600');
+                    this.classList.remove('text-gray-500');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                        content.classList.remove('block');
+                    });
+                    
+                    // Show the target tab content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.remove('hidden');
+                    document.getElementById(tabId).classList.add('block');
+                });
+            });
+
             const idnoInput = document.getElementById('Idno');
             idnoInput.addEventListener('input', function() {
                 this.value = this.value.replace(/\D/g, '').slice(0, 8);
@@ -290,7 +437,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 });
             });
 
-            const logoutLink = document.querySelector("a[href='logout.php']");
+            const logoutLink = document.querySelector("a[href='../logout.php']");
             if (logoutLink) {
                 logoutLink.addEventListener("click", function(e) {
                     e.preventDefault();
@@ -299,7 +446,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     })
                     .then(response => {
                         if (response.ok) {
-                            window.location.href = "login.php";
+                            window.location.href = "../login.php";
                         } else {
                             console.error("Logout failed");
                         }
@@ -326,7 +473,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         });
 
-        // Update form submission
+        // Update profile form submission
         document.getElementById('editForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -351,6 +498,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 sidebarImage.src = '../images/' + data.image;
                             }
                         }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An unexpected error occurred'
+                });
+            });
+        });
+
+        // Password form submission
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate password fields
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'New passwords do not match'
+                });
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            fetch('', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message
+                    }).then(() => {
+                        // Clear password fields after successful update
+                        document.getElementById('currentPassword').value = '';
+                        document.getElementById('newPassword').value = '';
+                        document.getElementById('confirmPassword').value = '';
                     });
                 } else {
                     Swal.fire({

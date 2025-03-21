@@ -238,8 +238,10 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
                 </div>
 
                 <!-- Chart Container -->
-                <div class="flex-1 relative min-h-[350px] bg-white/80 rounded-2xl p-4 shadow-inner">
-                    <canvas id="sitInChart"></canvas>
+                <div class="flex-1 relative bg-white/80 rounded-2xl p-4 shadow-inner">
+                    <div style="width: 400px; height: 350px; margin: 0 auto;">
+                        <canvas id="sitInChart" width="400" height="350"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -410,22 +412,13 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
                     borderWidth: 1
                 }]
             };
-            
+                        
             new Chart(sitInCtx, {
                 type: 'pie',
                 data: programData,
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 1.4, // Adjusted for better fit
-                    layout: {
-                        padding: {
-                            left: 15,
-                            right: 15,
-                            top: 10,
-                            bottom: 10
-                        }
-                    },
+                    responsive: false, // Change to false to prevent automatic resizing
+                    maintainAspectRatio: false, // Don't maintain aspect ratio
                     plugins: {
                         legend: {
                             position: 'right',
