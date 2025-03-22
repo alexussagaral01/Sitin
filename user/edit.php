@@ -195,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <!-- Tabs Navigation -->
-                <div class="flex border-b border-gray-200">
+                <div class="flex justify-center border-b border-gray-200">
                     <button type="button" 
                             class="tab-button px-6 py-3 font-medium text-sm active text-blue-600 border-b-2 border-blue-600" 
                             data-tab="edit-profile">

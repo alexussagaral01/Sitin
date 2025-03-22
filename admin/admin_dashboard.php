@@ -72,8 +72,12 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 
-// Convert to JavaScript array - Fix array methods syntax
-$programCountsJSON = json_encode(array_values($programCounts)); // Fixed from array.values to array_values
+// Prepare data for ECharts pie chart
+$echartsPieData = [];
+foreach ($programCounts as $program => $count) {
+    $echartsPieData[] = ['value' => $count, 'name' => $program];
+}
+$echartsPieDataJSON = json_encode($echartsPieData);
 
 // Get students by year level
 $yearLevelCounts = [
@@ -104,6 +108,8 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Add ECharts library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <title>Admin Dashboard</title>
 </head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
@@ -239,9 +245,7 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
 
                 <!-- Chart Container -->
                 <div class="flex-1 relative bg-white/80 rounded-2xl p-4 shadow-inner">
-                    <div style="width: 400px; height: 350px; margin: 0 auto;">
-                        <canvas id="sitInChart" width="400" height="350"></canvas>
-                    </div>
+                    <div id="sitInChart" style="width: 100%; height: 350px; margin: 0 auto;"></div>
                 </div>
             </div>
         </div>
@@ -394,57 +398,79 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
 
         // Initialize the charts
         document.addEventListener('DOMContentLoaded', function() {
-            // Sit-In Distribution Pie Chart
-            const sitInCtx = document.getElementById('sitInChart').getContext('2d');
+            // ECharts Nightingale (Rose) Chart for Sit-In distribution
+            const sitInChart = echarts.init(document.getElementById('sitInChart'));
             
-            const programData = {
-                labels: ['C Programming', 'C++ Programming', 'C# Programming', 'Java Programming', 'Python Programming', 'Other'],
-                datasets: [{
-                    data: <?php echo $programCountsJSON; ?>,
-                    backgroundColor: [
-                        '#36A2EB', // Blue
-                        '#FF6384', // Pink
-                        '#FFCE56', // Yellow
-                        '#4BC0C0', // Teal
-                        '#9966FF', // Purple
-                        '#FF9F40'  // Orange
-                    ],
-                    borderWidth: 1
-                }]
-            };
-                        
-            new Chart(sitInCtx, {
-                type: 'pie',
-                data: programData,
-                options: {
-                    responsive: false, // Change to false to prevent automatic resizing
-                    maintainAspectRatio: false, // Don't maintain aspect ratio
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            align: 'center',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 15,
-                                font: {
-                                    size: 12
-                                }
+            // Define colors for each program
+            const colors = [
+                '#36A2EB', // Blue
+                '#FF6384', // Pink
+                '#FFCE56', // Yellow
+                '#4BC0C0', // Teal
+                '#9966FF', // Purple
+                '#FF9F40'  // Orange
+            ];
+            
+            const pieOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
+                    
+                },
+                legend: {
+                    bottom: '0',
+                    left: 'center',
+                    data: ['C Programming', 'C++ Programming', 'C# Programming', 'Java Programming', 'Python Programming', 'Other']
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                title: {
+                    text: 'Sit-In Distribution by Program',
+                    left: 'center',
+                    top: '0',
+                    textStyle: {
+                        fontSize: 16,
+                        fontWeight: 'bold'
+                    }
+                },
+                series: [
+                    {
+                        name: 'Programming Language',
+                        type: 'pie',
+                        radius: [30, 120],
+                        center: ['50%', '50%'],
+                        roseType: 'area',
+                        itemStyle: {
+                            borderRadius: 8,
+                            color: function(params) {
+                                return colors[params.dataIndex % colors.length];
                             }
                         },
-                        title: {
-                            display: true,
-                            text: 'Sit-In Distribution by Program',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            },
-                            padding: {
-                                top: 5,
-                                bottom: 15
+                        label: {
+                            show: false
+                        },
+                        emphasis: {
+                            label: {
+                                show: true
                             }
-                        }
+                        },
+                        data: <?php echo $echartsPieDataJSON; ?>
                     }
-                }
+                ]
+            };
+            
+            sitInChart.setOption(pieOption);
+            
+            // Make the chart responsive
+            window.addEventListener('resize', function() {
+                sitInChart.resize();
             });
             
             // Year Level Bar Chart

@@ -51,9 +51,20 @@ while ($row = $result2->fetch_assoc()) {
     }
 }
 
+// Convert data to ECharts format
+$programData = [];
+foreach ($programCounts as $name => $value) {
+    $programData[] = ['value' => $value, 'name' => $name];
+}
+
+$labData = [];
+foreach ($labCounts as $name => $value) {
+    $labData[] = ['value' => $value, 'name' => $name];
+}
+
 // Convert to JSON for JavaScript
-$programCountsJSON = json_encode(array_values($programCounts));
-$labCountsJSON = json_encode(array_values($labCounts));
+$programDataJSON = json_encode($programData);
+$labDataJSON = json_encode($labData);
 
 ?>
 <!DOCTYPE html>
@@ -168,9 +179,7 @@ $labCountsJSON = json_encode(array_values($labCounts));
                 <div class="text-lg font-bold text-[#003d64] text-center mb-4">
                     Programming Languages Distribution
                 </div>
-                <div class="h-[280px] relative">
-                    <canvas id="pieChart1"></canvas>
-                </div>
+                <div id="programmingChart" class="h-[350px]"></div>
             </div>
             
             <!-- Chart Card 2 -->
@@ -178,9 +187,7 @@ $labCountsJSON = json_encode(array_values($labCounts));
                 <div class="text-lg font-bold text-[#003d64] text-center mb-4">
                     Room Distribution
                 </div>
-                <div class="h-[280px] relative">
-                    <canvas id="pieChart2"></canvas>
-                </div>
+                <div id="labChart" class="h-[350px]"></div>
             </div>
         </div>
 
@@ -270,11 +277,11 @@ $labCountsJSON = json_encode(array_values($labCounts));
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <!-- ECharts Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <script>
-        // Replace the existing searchTable function with these new functions
+        // SearchTable functions
         function handleKeyPress(event) {
-            // Check if the pressed key is Enter
             if (event.key === "Enter") {
                 searchTable();
             }
@@ -310,7 +317,7 @@ $labCountsJSON = json_encode(array_values($labCounts));
             }
         });
 
-        // Existing scripts continue here...
+        // Navigation functions
         function toggleNav(x) {
             document.getElementById("mySidenav").classList.toggle("-translate-x-0");
             document.getElementById("mySidenav").classList.toggle("-translate-x-full");
@@ -321,87 +328,99 @@ $labCountsJSON = json_encode(array_values($labCounts));
             document.getElementById("mySidenav").classList.add("-translate-x-full");
         }
         
-        // Data for the pie charts
-        const data1 = {
-            labels: ['C Programming', 'C++ Programming', 'C# Programming', 'Java Programming', 'Python Programming', 'Other'],
-            datasets: [{
-                data: <?php echo $programCountsJSON; ?>,
-                backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
-            }]
-        };
-
-        const data2 = {
-            labels: ['Lab 524', 'Lab 526', 'Lab 528', 'Lab 530', 'Lab 542', 'Lab 544'],
-            datasets: [{
-                data: <?php echo $labCountsJSON; ?>,
-                backgroundColor: ['#FF6384', '#FFCE56', '#FF9F40', '#36A2EB', '#9966FF', '#4BC0C0']
-            }]
-        };
-
-        // Configurations for the pie charts
-        const config1 = {
-            type: 'pie',
-            data: data1,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 10,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    title: {
-                        display: false
-                    }
-                },
-                layout: {
-                    padding: 15
-                }
-            }
-        };
-
-        const config2 = {
-            type: 'pie',
-            data: data2,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 10,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    title: {
-                        display: false
-                    }
-                },
-                layout: {
-                    padding: 15
-                }
-            }
-        };
-
-        // Render the pie charts after the DOM is fully loaded
+        // ECharts Implementation
         document.addEventListener('DOMContentLoaded', function() {
-            const pieChart1 = new Chart(
-                document.getElementById('pieChart1'),
-                config1
-            );
+            // Programming Languages Chart
+            const programmingChart = echarts.init(document.getElementById('programmingChart'));
+            const programmingOption = {
+                legend: {
+                    top: 'bottom',
+                    textStyle: {
+                        fontSize: 12
+                    }
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                series: [
+                    {
+                        name: 'Programming Languages',
+                        type: 'pie',
+                        radius: [30, 140],
+                        center: ['50%', '50%'],
+                        roseType: 'area',
+                        itemStyle: {
+                            borderRadius: 8
+                        },
+                        label: {
+                            show: false
+                        },
+                        emphasis: {
+                            label: {
+                                show: true
+                            }
+                        },
+                        data: <?php echo $programDataJSON; ?>
+                    }
+                ],
+                color: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+            };
+            programmingChart.setOption(programmingOption);
+            
+            // Laboratory Distribution Chart
+            const labChart = echarts.init(document.getElementById('labChart'));
+            const labOption = {
+                legend: {
+                    top: 'bottom',
+                    textStyle: {
+                        fontSize: 12
+                    }
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                series: [
+                    {
+                        name: 'Laboratory Distribution',
+                        type: 'pie',
+                        radius: [30, 140],
+                        center: ['50%', '50%'],
+                        roseType: 'area',
+                        itemStyle: {
+                            borderRadius: 8
+                        },
+                        label: {
+                            show: false
+                        },
+                        emphasis: {
+                            label: {
+                                show: true
+                            }
+                        },
+                        data: <?php echo $labDataJSON; ?>
+                    }
+                ],
+                color: ['#FF6384', '#FFCE56', '#FF9F40', '#36A2EB', '#9966FF', '#4BC0C0']
+            };
+            labChart.setOption(labOption);
 
-            const pieChart2 = new Chart(
-                document.getElementById('pieChart2'),
-                config2
-            );
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                programmingChart.resize();
+                labChart.resize();
+            });
         });
     </script>
 </body>
