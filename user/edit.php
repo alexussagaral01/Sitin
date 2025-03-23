@@ -210,84 +210,161 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <!-- Edit Profile Tab Content -->
                 <div id="edit-profile" class="tab-content p-6 block">
-                    <img src="<?php echo htmlspecialchars($profileImage); ?>" 
-                         alt="Student Image" 
-                         class="w-[150px] h-[150px] rounded-full object-cover mx-auto block cursor-pointer border-3 border-white shadow-[0_0_15px_rgba(0,0,0,0.2)] mb-6 hover:opacity-80 transition-opacity"
-                         id="profileImage"
-                         title="Click to change profile picture">
+                    <div class="relative group mx-auto w-[150px] h-[150px] mb-8">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
+                        <img src="<?php echo htmlspecialchars($profileImage); ?>" 
+                            alt="Student Image" 
+                            class="w-[150px] h-[150px] rounded-full object-cover mx-auto block cursor-pointer border-2 border-white shadow-lg relative group-hover:scale-105 transition-all duration-300"
+                            id="profileImage"
+                            title="Click to change profile picture">
+                        <div class="absolute bottom-1 right-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <i class="fas fa-camera text-white text-sm"></i>
+                        </div>
+                    </div>
                     <input type="file" id="fileInput" name="profileImage" accept="image/*" class="hidden" form="editForm">
                     
-                    <form id="editForm" method="POST" action="" class="mt-4">
+                    <form id="editForm" method="POST" action="" class="mt-6">
                         <input type="hidden" name="action" value="update_profile">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- ID Number -->
-                            <div class="mb-4 relative col-span-1 md:col-span-2">
-                                <i class="fas fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                <input type="text" id="Idno" name="Idno" class="w-full pl-12 py-2 border rounded-lg focus:outline-none cursor-not-allowed focus:ring-2 focus:ring-blue-500 bg-gray-100" value="<?php echo htmlspecialchars($idNo); ?>" readonly>
+                            <div class="relative col-span-1 md:col-span-2 group">
+                                <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-200"></div>
+                                <div class="relative bg-white rounded-lg overflow-hidden">
+                                    <input type="text" id="Idno" name="Idno" class="w-full pl-14 pr-4 py-3 border-0 focus:outline-none focus:ring-0 cursor-not-allowed bg-gray-50" value="<?php echo htmlspecialchars($idNo); ?>" readonly>
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <span class="p-1.5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+                                            <i class="fas fa-id-card text-white text-sm"></i>
+                                        </span>
+                                    </div>
+                                    <span class="absolute top-1/2 -translate-y-1/2 right-3 text-xs font-semibold text-purple-500">ID Number</span>
+                                </div>
                             </div>
 
                             <!-- Name Fields -->
-                            <div class="mb-4 relative col-span-1 md:col-span-2 grid grid-cols-3 gap-4">
-                                <div class="relative">
-                                    <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                    <input type="text" id="Lastname" name="Lastname" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Last Name" value="<?php echo htmlspecialchars($lastName); ?>" required>
+                            <div class="mb-0 col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="group relative">
+                                    <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-200"></div>
+                                    <div class="relative bg-white rounded-lg overflow-hidden">
+                                        <input type="text" id="Lastname" name="Lastname" class="w-full pl-14 pr-4 py-3 border-0 focus:outline-none focus:ring-0" placeholder="Last Name" value="<?php echo htmlspecialchars($lastName); ?>" required>
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <span class="p-1.5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+                                                <i class="fas fa-user text-white text-sm"></i>
+                                            </span>
+                                        </div>
+                                        <span class="absolute top-1/2 -translate-y-1/2 right-3 text-xs font-semibold text-purple-500">Last Name</span>
+                                    </div>
                                 </div>
-                                <div class="relative">
-                                    <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                    <input type="text" id="Firstname" name="Firstname" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="First Name" value="<?php echo htmlspecialchars($dbFirstName); ?>" required>
+                                <div class="group relative">
+                                    <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-200"></div>
+                                    <div class="relative bg-white rounded-lg overflow-hidden">
+                                        <input type="text" id="Firstname" name="Firstname" class="w-full pl-14 pr-4 py-3 border-0 focus:outline-none focus:ring-0" placeholder="First Name" value="<?php echo htmlspecialchars($dbFirstName); ?>" required>
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <span class="p-1.5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+                                                <i class="fas fa-user text-white text-sm"></i>
+                                            </span>
+                                        </div>
+                                        <span class="absolute top-1/2 -translate-y-1/2 right-3 text-xs font-semibold text-purple-500">First Name</span>
+                                    </div>
                                 </div>
-                                <div class="relative">
-                                    <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                    <input type="text" id="Midname" name="Midname" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Middle Name" value="<?php echo htmlspecialchars($midName); ?>">
+                                <div class="group relative">
+                                    <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-200"></div>
+                                    <div class="relative bg-white rounded-lg overflow-hidden">
+                                        <input type="text" id="Midname" name="Midname" class="w-full pl-14 pr-4 py-3 border-0 focus:outline-none focus:ring-0" placeholder="Middle Name" value="<?php echo htmlspecialchars($midName); ?>">
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <span class="p-1.5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+                                                <i class="fas fa-user text-white text-sm"></i>
+                                            </span>
+                                        </div>
+                                        <span class="absolute top-1/2 -translate-y-1/2 right-3 text-xs font-semibold text-purple-500">Middle Name</span>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Course -->
-                            <div class="mb-4 relative">
-                                <i class="fas fa-book absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                <select id="Course" name="Course" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                    <option value="" disabled>Select a Course</option>
-                                    <option value="BS IN ACCOUNTANCY" <?php if ($course == 'BS IN ACCOUNTANCY') echo 'selected'; ?>>BS IN ACCOUNTANCY</option>
-                                    <option value="BS IN BUSINESS ADMINISTRATION" <?php if ($course == 'BS IN BUSINESS ADMINISTRATION') echo 'selected'; ?>>BS IN BUSINESS ADMINISTRATION</option>
-                                    <option value="BS IN CRIMINOLOGY" <?php if ($course == 'BS IN CRIMINOLOGY') echo 'selected'; ?>>BS IN CRIMINOLOGY</option>
-                                    <option value="BS IN CUSTOMS ADMINISTRATION" <?php if ($course == 'BS IN CUSTOMS ADMINISTRATION') echo 'selected'; ?>>BS IN CUSTOMS ADMINISTRATION</option>
-                                    <option value="BS IN INFORMATION TECHNOLOGY" <?php if ($course == 'BS IN INFORMATION TECHNOLOGY') echo 'selected'; ?>>BS IN INFORMATION TECHNOLOGY</option>
-                                    <option value="BS IN COMPUTER SCIENCE" <?php if ($course == 'BS IN COMPUTER SCIENCE') echo 'selected'; ?>>BS IN COMPUTER SCIENCE</option>
-                                    <option value="BS IN OFFICE ADMINISTRATION" <?php if ($course == 'BS IN OFFICE ADMINISTRATION') echo 'selected'; ?>>BS IN OFFICE ADMINISTRATION</option>
-                                    <option value="BS IN SOCIAL WORK" <?php if ($course == 'BS IN SOCIAL WORK') echo 'selected'; ?>>BS IN SOCIAL WORK</option>
-                                    <option value="BACHELOR OF SECONDARY EDUCATION" <?php if ($course == 'BACHELOR OF SECONDARY EDUCATION') echo 'selected'; ?>>BACHELOR OF SECONDARY EDUCATION</option>
-                                    <option value="BACHELOR OF ELEMENTARY EDUCATION" <?php if ($course == 'BACHELOR OF ELEMENTARY EDUCATION') echo 'selected'; ?>>BACHELOR OF ELEMENTARY EDUCATION</option>
-                                </select>
+                            <div class="group relative">
+                                <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-200"></div>
+                                <div class="relative bg-white rounded-lg overflow-hidden">
+                                    <select id="Course" name="Course" class="w-full pl-14 pr-4 py-3 border-0 focus:outline-none focus:ring-0 appearance-none" required>
+                                        <option value="" disabled>Select a Course</option>
+                                        <option value="BS IN ACCOUNTANCY" <?php if ($course == 'BS IN ACCOUNTANCY') echo 'selected'; ?>>BS IN ACCOUNTANCY</option>
+                                        <option value="BS IN BUSINESS ADMINISTRATION" <?php if ($course == 'BS IN BUSINESS ADMINISTRATION') echo 'selected'; ?>>BS IN BUSINESS ADMINISTRATION</option>
+                                        <option value="BS IN CRIMINOLOGY" <?php if ($course == 'BS IN CRIMINOLOGY') echo 'selected'; ?>>BS IN CRIMINOLOGY</option>
+                                        <option value="BS IN CUSTOMS ADMINISTRATION" <?php if ($course == 'BS IN CUSTOMS ADMINISTRATION') echo 'selected'; ?>>BS IN CUSTOMS ADMINISTRATION</option>
+                                        <option value="BS IN INFORMATION TECHNOLOGY" <?php if ($course == 'BS IN INFORMATION TECHNOLOGY') echo 'selected'; ?>>BS IN INFORMATION TECHNOLOGY</option>
+                                        <option value="BS IN COMPUTER SCIENCE" <?php if ($course == 'BS IN COMPUTER SCIENCE') echo 'selected'; ?>>BS IN COMPUTER SCIENCE</option>
+                                        <option value="BS IN OFFICE ADMINISTRATION" <?php if ($course == 'BS IN OFFICE ADMINISTRATION') echo 'selected'; ?>>BS IN OFFICE ADMINISTRATION</option>
+                                        <option value="BS IN SOCIAL WORK" <?php if ($course == 'BS IN SOCIAL WORK') echo 'selected'; ?>>BS IN SOCIAL WORK</option>
+                                        <option value="BACHELOR OF SECONDARY EDUCATION" <?php if ($course == 'BACHELOR OF SECONDARY EDUCATION') echo 'selected'; ?>>BACHELOR OF SECONDARY EDUCATION</option>
+                                        <option value="BACHELOR OF ELEMENTARY EDUCATION" <?php if ($course == 'BACHELOR OF ELEMENTARY EDUCATION') echo 'selected'; ?>>BACHELOR OF ELEMENTARY EDUCATION</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <span class="p-1.5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+                                            <i class="fas fa-book text-white text-sm"></i>
+                                        </span>
+                                    </div>
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <i class="fas fa-chevron-down text-purple-500"></i>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Year Level -->
-                            <div class="mb-4 relative">
-                                <i class="fas fa-graduation-cap absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                <select id="Year_Level" name="Year_Level" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                    <option value="" disabled>Select a Year Level</option>
-                                    <option value="1st Year" <?php if ($yearLevel == '1st Year') echo 'selected'; ?>>1st Year</option>
-                                    <option value="2nd Year" <?php if ($yearLevel == '2nd Year') echo 'selected'; ?>>2nd Year</option>
-                                    <option value="3rd Year" <?php if ($yearLevel == '3rd Year') echo 'selected'; ?>>3rd Year</option>
-                                    <option value="4th Year" <?php if ($yearLevel == '4th Year') echo 'selected'; ?>>4th Year</option>
-                                </select>
+                            <div class="group relative">
+                                <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-200"></div>
+                                <div class="relative bg-white rounded-lg overflow-hidden">
+                                    <select id="Year_Level" name="Year_Level" class="w-full pl-14 pr-4 py-3 border-0 focus:outline-none focus:ring-0 appearance-none" required>
+                                        <option value="" disabled>Select a Year Level</option>
+                                        <option value="1st Year" <?php if ($yearLevel == '1st Year') echo 'selected'; ?>>1st Year</option>
+                                        <option value="2nd Year" <?php if ($yearLevel == '2nd Year') echo 'selected'; ?>>2nd Year</option>
+                                        <option value="3rd Year" <?php if ($yearLevel == '3rd Year') echo 'selected'; ?>>3rd Year</option>
+                                        <option value="4th Year" <?php if ($yearLevel == '4th Year') echo 'selected'; ?>>4th Year</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <span class="p-1.5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+                                            <i class="fas fa-graduation-cap text-white text-sm"></i>
+                                        </span>
+                                    </div>
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <i class="fas fa-chevron-down text-purple-500"></i>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Email -->
-                            <div class="mb-4 relative col-span-1 md:col-span-2">
-                                <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                <input type="email" id="Email" name="Email" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Email" value="<?php echo htmlspecialchars($email); ?>" required>
+                            <div class="group relative col-span-1 md:col-span-2">
+                                <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-200"></div>
+                                <div class="relative bg-white rounded-lg overflow-hidden">
+                                    <input type="email" id="Email" name="Email" class="w-full pl-14 pr-4 py-3 border-0 focus:outline-none focus:ring-0" placeholder="Email" value="<?php echo htmlspecialchars($email); ?>" required>
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <span class="p-1.5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+                                            <i class="fas fa-envelope text-white text-sm"></i>
+                                        </span>
+                                    </div>
+                                    <span class="absolute top-1/2 -translate-y-1/2 right-3 text-xs font-semibold text-purple-500">Email Address</span>
+                                </div>
                             </div>
 
                             <!-- Address -->
-                            <div class="mb-4 relative col-span-1 md:col-span-2">
-                                <i class="fas fa-home absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                <input type="text" id="Address" name="Address" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Address" value="<?php echo htmlspecialchars($address); ?>" required>
+                            <div class="group relative col-span-1 md:col-span-2">
+                                <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-200"></div>
+                                <div class="relative bg-white rounded-lg overflow-hidden">
+                                    <input type="text" id="Address" name="Address" class="w-full pl-14 pr-4 py-3 border-0 focus:outline-none focus:ring-0" placeholder="Address" value="<?php echo htmlspecialchars($address); ?>" required>
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <span class="p-1.5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+                                            <i class="fas fa-home text-white text-sm"></i>
+                                        </span>
+                                    </div>
+                                    <span class="absolute top-1/2 -translate-y-1/2 right-3 text-xs font-semibold text-purple-500">Complete Address</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="text-center mt-6">
-                            <button type="submit" class="bg-gradient-to-r from-purple-700 to-pink-500 text-white py-2 px-6 rounded-lg hover:from-pink-500 hover:to-purple-700 hover:text-black transition-all duration-300">
-                                Save Changes
+                        <div class="text-center mt-10 mb-4">
+                                <button type="submit" class="relative inline-flex items-center justify-center overflow-hidden rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium hover:text-white">
+                                <span class="relative rounded-md bg-white px-8 py-3 transition-all duration-300 ease-in-out group-hover:bg-opacity-0 text-purple-700 font-bold group-hover:text-white">
+                                    <i class="fas fa-save"></i>
+                                    <span>Save Profile Changes</span>
+                                </span>
                             </button>
                         </div>
                     </form>
@@ -297,44 +374,104 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div id="change-password" class="tab-content p-6 hidden">
                     <div class="max-w-md mx-auto">
                         <div class="text-center mb-6">
-                            <i class="fas fa-key text-5xl text-purple-500 mb-3"></i>
-                            <h3 class="text-xl font-semibold">Change Your Password</h3>
-                            <p class="text-gray-500 text-sm">Make sure to choose a strong password</p>
+                            <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg transform hover:rotate-12 transition-transform duration-300">
+                                <i class="fas fa-shield-alt text-4xl text-white"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">Secure Your Account</h3>
+                            <p class="text-gray-500 text-sm mt-2">Update your password regularly for better security</p>
                         </div>
                         
-                        <form id="passwordForm" method="POST" action="" class="mt-4">
+                        <form id="passwordForm" method="POST" action="" class="mt-8">
                             <input type="hidden" name="action" value="change_password">
                             
-                            <!-- Current Password -->
-                            <div class="mb-4 relative">
-                                <i class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                <input type="password" id="currentPassword" name="currentPassword" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Current Password" required>
+                            <!-- Password Fields with Updated Design -->
+                            <div class="space-y-5">
+                                <!-- Current Password -->
+                                <div class="relative group">
+                                    <div class="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
+                                    <div class="relative bg-white rounded-lg">
+                                        <input type="password" id="currentPassword" name="currentPassword" 
+                                            class="w-full pl-14 pr-10 py-3 border-0 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none" 
+                                            placeholder="Current Password" required>
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <span class="p-1.5 rounded-full bg-gradient-to-br from-pink-500 to-purple-600">
+                                                <i class="fas fa-unlock-alt text-white"></i>
+                                            </span>
+                                        </div>
+                                        <button type="button" class="toggle-password absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600" data-target="currentPassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- New Password -->
+                                <div class="relative group">
+                                    <div class="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
+                                    <div class="relative bg-white rounded-lg">
+                                        <input type="password" id="newPassword" name="newPassword" 
+                                            class="w-full pl-14 pr-10 py-3 border-0 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none" 
+                                            placeholder="New Password" required>
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <span class="p-1.5 rounded-full bg-gradient-to-br from-pink-500 to-purple-600">
+                                                <i class="fas fa-key text-white"></i>
+                                            </span>
+                                        </div>
+                                        <button type="button" class="toggle-password absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600" data-target="newPassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Confirm New Password -->
+                                <div class="relative group">
+                                    <div class="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
+                                    <div class="relative bg-white rounded-lg">
+                                        <input type="password" id="confirmPassword" name="confirmPassword" 
+                                            class="w-full pl-14 pr-10 py-3 border-0 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none" 
+                                            placeholder="Confirm New Password" required>
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <span class="p-1.5 rounded-full bg-gradient-to-br from-pink-500 to-purple-600">
+                                                <i class="fas fa-check-circle text-white"></i>
+                                            </span>
+                                        </div>
+                                        <button type="button" class="toggle-password absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600" data-target="confirmPassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             
-                            <!-- New Password -->
-                            <div class="mb-4 relative">
-                                <i class="fas fa-key absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                <input type="password" id="newPassword" name="newPassword" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="New Password" required>
+                            <!-- Password strength indicator -->
+                            <div class="mt-4">
+                                <p class="text-xs text-gray-500 mb-1">Password strength:</p>
+                                <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div id="passwordStrength" class="h-full w-0 bg-red-500 transition-all duration-300"></div>
+                                </div>
+                                <p id="strengthText" class="text-xs text-gray-500 mt-1">Enter a new password</p>
                             </div>
                             
-                            <!-- Confirm New Password -->
-                            <div class="mb-4 relative">
-                                <i class="fas fa-check-circle absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white px-2"></i>
-                                <input type="password" id="confirmPassword" name="confirmPassword" class="w-full pl-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Confirm New Password" required>
+                            <!-- Password requirements -->
+                            <div class="mt-4 bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500 mb-2">Password must include:</p>
+                                <ul class="space-y-1 text-xs">
+                                    <li id="req-length" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least 8 characters</li>
+                                    <li id="req-uppercase" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least one uppercase letter</li>
+                                    <li id="req-lowercase" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least one lowercase letter</li>
+                                    <li id="req-number" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least one number</li>
+                                    <li id="req-special" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least one special character</li>
+                                </ul>
                             </div>
                             
-                            <div class="text-center mt-6">
-                                <button type="submit" class="bg-gradient-to-r from-purple-700 to-pink-500 text-white py-2 px-6 rounded-lg hover:from-pink-500 hover:to-purple-700 hover:text-black transition-all duration-300">
-                                    Update Password
+                            <div class="text-center mt-8">
+                                <button type="submit" class="relative inline-flex items-center justify-center overflow-hidden rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium hover:text-white">
+                                    <span class="relative rounded-md bg-white px-8 py-3 transition-all duration-300 ease-in-out group-hover:bg-opacity-0 text-purple-700 font-bold group-hover:text-white">
+                                        <i class="fas fa-lock mr-2"></i>Update Password
+                                    </span>
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Side Navigation -->
     <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
         <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
@@ -570,6 +707,155 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 });
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle visibility
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+        
+        // Password strength meter
+        const newPasswordInput = document.getElementById('newPassword');
+        const strengthBar = document.getElementById('passwordStrength');
+        const strengthText = document.getElementById('strengthText');
+        
+        const reqLength = document.getElementById('req-length');
+        const reqUppercase = document.getElementById('req-uppercase');
+        const reqLowercase = document.getElementById('req-lowercase');
+        const reqNumber = document.getElementById('req-number');
+        const reqSpecial = document.getElementById('req-special');
+        
+        newPasswordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            // Check length
+            if (password.length >= 8) {
+                strength += 20;
+                reqLength.classList.remove('text-gray-500');
+                reqLength.classList.add('text-green-500');
+                reqLength.querySelector('i').classList.remove('fa-circle');
+                reqLength.querySelector('i').classList.add('fa-check-circle');
+            } else {
+                reqLength.classList.remove('text-green-500');
+                reqLength.classList.add('text-gray-500');
+                reqLength.querySelector('i').classList.remove('fa-check-circle');
+                reqLength.querySelector('i').classList.add('fa-circle');
+            }
+            
+            // Check uppercase
+            if (/[A-Z]/.test(password)) {
+                strength += 20;
+                reqUppercase.classList.remove('text-gray-500');
+                reqUppercase.classList.add('text-green-500');
+                reqUppercase.querySelector('i').classList.remove('fa-circle');
+                reqUppercase.querySelector('i').classList.add('fa-check-circle');
+            } else {
+                reqUppercase.classList.remove('text-green-500');
+                reqUppercase.classList.add('text-gray-500');
+                reqUppercase.querySelector('i').classList.remove('fa-check-circle');
+                reqUppercase.querySelector('i').classList.add('fa-circle');
+            }
+            
+            // Check lowercase
+            if (/[a-z]/.test(password)) {
+                strength += 20;
+                reqLowercase.classList.remove('text-gray-500');
+                reqLowercase.classList.add('text-green-500');
+                reqLowercase.querySelector('i').classList.remove('fa-circle');
+                reqLowercase.querySelector('i').classList.add('fa-check-circle');
+            } else {
+                reqLowercase.classList.remove('text-green-500');
+                reqLowercase.classList.add('text-gray-500');
+                reqLowercase.querySelector('i').classList.remove('fa-check-circle');
+                reqLowercase.querySelector('i').classList.add('fa-circle');
+            }
+            
+            // Check numbers
+            if (/[0-9]/.test(password)) {
+                strength += 20;
+                reqNumber.classList.remove('text-gray-500');
+                reqNumber.classList.add('text-green-500');
+                reqNumber.querySelector('i').classList.remove('fa-circle');
+                reqNumber.querySelector('i').classList.add('fa-check-circle');
+            } else {
+                reqNumber.classList.remove('text-green-500');
+                reqNumber.classList.add('text-gray-500');
+                reqNumber.querySelector('i').classList.remove('fa-check-circle');
+                reqNumber.querySelector('i').classList.add('fa-circle');
+            }
+            
+            // Check special characters
+            if (/[^A-Za-z0-9]/.test(password)) {
+                strength += 20;
+                reqSpecial.classList.remove('text-gray-500');
+                reqSpecial.classList.add('text-green-500');
+                reqSpecial.querySelector('i').classList.remove('fa-circle');
+                reqSpecial.querySelector('i').classList.add('fa-check-circle');
+            } else {
+                reqSpecial.classList.remove('text-green-500');
+                reqSpecial.classList.add('text-gray-500');
+                reqSpecial.querySelector('i').classList.remove('fa-check-circle');
+                reqSpecial.querySelector('i').classList.add('fa-circle');
+            }
+            
+            // Update the strength bar
+            strengthBar.style.width = strength + '%';
+            
+            // Update color and text based on strength
+            if (strength < 40) {
+                strengthBar.classList.remove('bg-yellow-500', 'bg-green-500');
+                strengthBar.classList.add('bg-red-500');
+                strengthText.textContent = 'Weak password';
+                strengthText.className = 'text-xs text-red-500 mt-1';
+            } else if (strength < 80) {
+                strengthBar.classList.remove('bg-red-500', 'bg-green-500');
+                strengthBar.classList.add('bg-yellow-500');
+                strengthText.textContent = 'Medium password';
+                strengthText.className = 'text-xs text-yellow-600 mt-1';
+            } else {
+                strengthBar.classList.remove('bg-red-500', 'bg-yellow-500');
+                strengthBar.classList.add('bg-green-500');
+                strengthText.textContent = 'Strong password';
+                strengthText.className = 'text-xs text-green-500 mt-1';
+            }
+            
+            // If password is empty
+            if (password === '') {
+                strengthBar.style.width = '0%';
+                strengthText.textContent = 'Enter a new password';
+                strengthText.className = 'text-xs text-gray-500 mt-1';
+            }
+        });
+        
+        // Check if passwords match
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        confirmPasswordInput.addEventListener('input', function() {
+            if (this.value !== newPasswordInput.value) {
+                this.classList.add('border-red-300');
+                this.classList.remove('border-green-300');
+            } else {
+                this.classList.remove('border-red-300');
+                this.classList.add('border-green-300');
+            }
+        });
+    });
+
     </script>
 </body>
 </html>

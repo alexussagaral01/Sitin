@@ -458,7 +458,7 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
                         },
                         emphasis: {
                             label: {
-                                show: true
+                                show: false
                             }
                         },
                         data: <?php echo $echartsPieDataJSON; ?>

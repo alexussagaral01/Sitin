@@ -133,7 +133,7 @@ $total_records = mysqli_num_rows($result);
                 <!-- Date and Search Controls -->
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex space-x-3">
-                        <input type="date" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <input type="date" class="border rounded px-3 py-2">
                         <button class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-2 rounded hover:opacity-90 transition-opacity duration-200">
                             <i class="fas fa-search mr-2"></i>Search
                         </button>
@@ -169,7 +169,8 @@ $total_records = mysqli_num_rows($result);
                             <span class="mr-2">Search:</span>
                             <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
                                    class="border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                            <button type="submit" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90 transition-opacity duration-200">
+                            <button type="submit" class="relative inline-flex items-center justify-center overflow-hidden rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium hover:text-white">
+                                   <span class="relative rounded-md bg-white px-4 py-1 transition-all duration-300 ease-in-out group-hover:bg-opacity-0 text-purple-700 font-bold group-hover:text-white">
                                 <i class="fas fa-search"></i>
                             </button>
                         </form>

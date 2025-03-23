@@ -160,9 +160,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($
                     <form method="POST" action="" class="space-y-3">
                         <div class="flex gap-2">
                             <input type="text" name="search" placeholder="Enter ID Number..." 
-                                   class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white rounded-lg hover:opacity-90 group">
-                                <i class="fas fa-search group-hover:text-black transition-colors"></i>
+                                   class="flex-1 p-3 border border-gray-300 rounded-lg">
+                            <button type="submit" class="relative inline-flex items-center justify-center overflow-hidden rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium hover:text-white">
+                            <span class="relative rounded-md bg-white px-8 py-3 transition-all duration-300 ease-in-out group-hover:bg-opacity-0 text-purple-700 font-bold group-hover:text-white">
+                                <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </form>
@@ -281,7 +282,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($
                                                 </div>
                                             </div>
                                             <div class="flex justify-end">
-                                                <button type="submit" name="time_in" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:opacity-90 transform hover:scale-105 transition-all duration-300 flex items-center gap-2 shadow-lg">
+                                                <button type="submit" name="time_in"class="relative inline-flex items-center justify-center overflow-hidden rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium hover:text-white">
+                                                <span class="relative rounded-md bg-white px-8 py-3 transition-all duration-300 ease-in-out group-hover:bg-opacity-0 text-purple-700 font-bold group-hover:text-white">
                                                     <i class="fas fa-clock"></i>
                                                     Time - In
                                                 </button>

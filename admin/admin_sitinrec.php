@@ -213,8 +213,9 @@ $labDataJSON = json_encode($labData);
                             id="searchInput"
                             name="search"
                             placeholder="Search..." 
-                            class="border rounded px-3 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button type="button" onclick="searchTable()" class="ml-2 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white px-4 py-1 rounded hover:opacity-90">
+                            class="border rounded px-3 py-1 w-48">
+                        <button type="submit" onclick="searchTable()" class="relative inline-flex items-center justify-center overflow-hidden rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium hover:text-white">
+                            <span class="relative rounded-md bg-white px-3 py-1 transition-all duration-300 ease-in-out group-hover:bg-opacity-0 text-purple-700 font-bold group-hover:text-white">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
@@ -363,7 +364,7 @@ $labDataJSON = json_encode($labData);
                         },
                         emphasis: {
                             label: {
-                                show: true
+                                show: false
                             }
                         },
                         data: <?php echo $programDataJSON; ?>
@@ -406,7 +407,7 @@ $labDataJSON = json_encode($labData);
                         },
                         emphasis: {
                             label: {
-                                show: true
+                                show: false
                             }
                         },
                         data: <?php echo $labDataJSON; ?>
