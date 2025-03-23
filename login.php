@@ -70,7 +70,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="text-center">
-                <button class="bg-gradient-to-r from-purple-700 to-pink-500 text-white py-2 px-4 rounded-lg hover:from-pink-500 hover:to-purple-700 hover:text-black" type="submit">Login</button>
+                <button type="submit" class="relative inline-flex items-center justify-center overflow-hidden rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium hover:text-white">
+                    <span class="relative rounded-md bg-white px-8 py-3 transition-all duration-300 ease-in-out group-hover:bg-opacity-0 text-purple-700 font-bold group-hover:text-white">
+                        <i class="fa fa-sign-in"></i>
+                        <span>Login</span>
+                    </span>
+                </button>
             </div>
 
             <div class="text-center mt-4">
