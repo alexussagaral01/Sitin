@@ -172,6 +172,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <title>Edit</title>
+    <style>
+        /* Add gradient text class for the footer */
+        .gradient-text {
+            background: linear-gradient(to right, #ec4899, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <div class="content-wrapper">
@@ -190,6 +200,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
                 <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                    <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                     <i class="fas fa-user-edit text-2xl mr-4 relative z-10"></i>
                     <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Edit Student Profile</h2>
                 </div>
@@ -472,54 +483,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </form>
                     </div>
                 </div>
-    <!-- Side Navigation -->
-    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
-        <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+        <!-- Side Navigation -->
+        <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
+            <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+            
+            <div class="flex flex-col items-center mt-4">
+                <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
+                <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+            </div>
+
+            <nav class="flex flex-col space-y-0.5 px-2">
+                <div class="overflow-hidden">
+                    <a href="dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                        <i class="fas fa-home w-6 text-base"></i>
+                        <span class="text-sm font-medium">HOME</span>
+                    </a>
+                </div>
+                <div class="overflow-hidden">
+                    <a href="profile.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                        <i class="fas fa-user w-6 text-base"></i>
+                        <span class="text-sm font-medium">PROFILE</span>
+                    </a>
+                </div>
+                <div class="overflow-hidden">
+                    <a href="edit.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                        <i class="fas fa-edit w-6 text-base"></i>
+                        <span class="text-sm font-medium">EDIT</span>
+                    </a>
+                </div>
+                <div class="overflow-hidden">
+                    <a href="history.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                        <i class="fas fa-history w-6 text-base"></i>
+                        <span class="text-sm font-medium">HISTORY</span>
+                    </a>
+                </div>
+                <div class="overflow-hidden">
+                    <a href="reservation.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                        <i class="fas fa-calendar-alt w-6 text-base"></i>
+                        <span class="text-sm font-medium">RESERVATION</span>
+                    </a>
+                </div>
+
+            <div class="overflow-hidden">
+                <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
+                    <i class="fas fa-sign-out-alt w-6 text-base"></i>
+                    <span class="text-sm font-medium">LOG OUT</span> <!-- Updated font size and weight -->
+                </a>
+            </div>
+        </div>
         
-        <div class="flex flex-col items-center mt-4">
-            <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
-            <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+        <div class="py-3 px-6 bg-gradient-to-r from-indigo-900/10 to-purple-900/10 relative mt-8">
+            <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
+            <p class="text-center text-xs text-gray-600">
+                &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
+            </p>
         </div>
-
-        <nav class="flex flex-col space-y-0.5 px-2">
-            <div class="overflow-hidden">
-                <a href="dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-home w-6 text-base"></i>
-                    <span class="text-sm font-medium">HOME</span>
-                </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="profile.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-user w-6 text-base"></i>
-                    <span class="text-sm font-medium">PROFILE</span>
-                </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="edit.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-edit w-6 text-base"></i>
-                    <span class="text-sm font-medium">EDIT</span>
-                </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="history.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-history w-6 text-base"></i>
-                    <span class="text-sm font-medium">HISTORY</span>
-                </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="reservation.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-calendar-alt w-6 text-base"></i>
-                    <span class="text-sm font-medium">RESERVATION</span>
-                </a>
-            </div>
-
-        <div class="overflow-hidden">
-            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-sign-out-alt w-6 text-base"></i>
-                <span class="text-sm font-medium">LOG OUT</span> <!-- Updated font size and weight -->
-            </a>
-        </div>
-    </div>
     <script>
         function toggleNav(x) {
             document.getElementById("mySidenav").classList.toggle("-translate-x-0");
@@ -855,7 +873,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         });
     });
-
     </script>
+    
 </body>
 </html>

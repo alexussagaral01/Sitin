@@ -37,6 +37,16 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Admin Sit-in</title>
+    <style>
+        /* Add gradient text class for the footer */
+        .gradient-text {
+            background: linear-gradient(to right, #ec4899, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+    </style>
 </head>   
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <!-- Header -->
@@ -127,6 +137,7 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
         <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
             <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 <i class="fas fa-user-check text-2xl mr-4 relative z-10"></i>
                 <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Current Sit-in</h2>
             </div>
@@ -217,6 +228,13 @@ $current_sitins = $result->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
     
+    <div class="py-3 px-6 bg-white relative mt-8">
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
+        <p class="text-center text-xs text-gray-600">
+            &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
+        </p>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
         function toggleNav(x) {

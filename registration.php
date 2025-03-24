@@ -42,6 +42,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="icon" href="logo/ccs.png" type="image/x-icon">
     <title>Student Registration</title>
     <style>
+        /* Add gradient text class for the footer */
+        .gradient-text {
+            background: linear-gradient(to right, #ec4899, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
         .bg-gradient {
             background-image: linear-gradient(111.3deg, rgba(74,105,187,1) 9.6%, rgba(205,77,204,1) 93.6%);
         }
@@ -250,6 +258,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
                 </form>
+            </div>
+            
+            <!-- Footer with decorative elements -->
+            <div class="py-3 px-6 bg-gradient-to-r from-indigo-900/10 to-purple-900/10 relative">
+                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
+                <p class="text-center text-xs text-gray-600">
+                    &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
+                </p>
             </div>
         </div>
     </div>

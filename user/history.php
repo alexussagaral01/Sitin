@@ -38,6 +38,16 @@ if ($userId) {
     <!-- SweetAlert2 JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
     <title>History</title>
+    <style>
+        /* Add gradient text class for the footer */
+        .gradient-text {
+            background: linear-gradient(to right, #ec4899, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
     <!-- Header -->
@@ -104,6 +114,7 @@ if ($userId) {
         <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
             <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 <i class="fas fa-history text-2xl mr-4 relative z-10"></i>
                 <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">History Information</h2>
             </div>
@@ -254,6 +265,14 @@ if ($userId) {
                 </div>
             </form>
         </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="py-3 px-6 bg-white relative mt-8">
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
+        <p class="text-center text-xs text-gray-600">
+            &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
+        </p>
     </div>
 
     <script>
