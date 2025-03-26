@@ -8,7 +8,6 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
     exit;
 }
 
-
 // Add time-in handling
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['time_in'])) {
     $idno = $_POST['idno'];
@@ -23,18 +22,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['time_in'])) {
     $result = $checkStmt->get_result();
     
     if ($result->num_rows > 0) {
-        $_SESSION['error'] = "Student already has an active sit-in session.";
+        // Store error message for SweetAlert
+        $_SESSION['swal_error'] = "Student already has an active sit-in session.";
     } else {
         // Insert new sit-in record
         $stmt = $conn->prepare("INSERT INTO curr_sitin (IDNO, FULL_NAME, PURPOSE, LABORATORY, TIME_IN, DATE, STATUS) VALUES (?, ?, ?, ?, NOW(), CURDATE(), 'Active')");
         $stmt->bind_param("isss", $idno, $fullName, $purpose, $laboratory);
         
         if ($stmt->execute()) {
-            $_SESSION['success'] = "Time-in recorded successfully.";
-            header("Location: admin_sitin.php");
+            $_SESSION['swal_success'] = "Time-in recorded successfully.";
+            header("Location: admin_search.php");
             exit();
         } else {
-            $_SESSION['error'] = "Error recording time-in.";
+            $_SESSION['swal_error'] = "Error recording time-in.";
         }
     }
 }
@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* Add gradient text class for the footer */
         .gradient-text {
@@ -249,15 +250,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($
                                             <i class="fas fa-clipboard-list mr-2"></i>
                                             New Sit-In Session Registration
                                         </h4>
-                                        
-                                        <?php if (isset($_SESSION['error'])): ?>
-                                            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-r-lg">
-                                                <?php 
-                                                    echo $_SESSION['error'];
-                                                    unset($_SESSION['error']);
-                                                ?>
-                                            </div>
-                                        <?php endif; ?>
 
                                         <form method="POST" action="" class="space-y-4">
                                             <input type="hidden" name="idno" value="<?php echo htmlspecialchars($student['IDNO']); ?>">
@@ -334,6 +326,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search']) && !empty($
             document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
         }
+
+        // SweetAlert for success and error messages
+        <?php if(isset($_SESSION['swal_error'])): ?>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '<?php echo $_SESSION['swal_error']; unset($_SESSION['swal_error']); ?>',
+            background: '#f3f4f6',
+            customClass: {
+                popup: 'rounded-lg',
+                title: 'text-xl font-bold text-gray-800',
+                content: 'text-gray-600'
+            }
+        });
+        <?php endif; ?>
+
+        <?php if(isset($_SESSION['swal_success'])): ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '<?php echo $_SESSION['swal_success']; unset($_SESSION['swal_success']); ?>',
+            background: '#f3f4f6',
+            customClass: {
+                popup: 'rounded-lg',
+                title: 'text-xl font-bold text-gray-800',
+                content: 'text-gray-600'
+            }
+        });
+        <?php endif; ?>
     </script>
 </body>
 </html>
