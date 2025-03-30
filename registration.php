@@ -71,11 +71,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
-<body class="bg-gradient min-h-screen flex items-center justify-center p-4">
+<body class="bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 min-h-screen flex items-center justify-center p-4">
     <div class="form-container max-w-4xl w-full mx-auto">
         <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
             <!-- Header with decorative elements -->
-            <div class="bg-gradient text-white p-6 relative overflow-hidden">
+            <div class="bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 text-white p-6 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 
@@ -238,6 +238,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <p id="strengthText" class="text-xs text-gray-500 mt-1">Enter a password</p>
                         </div>
+
+                        <!-- Password requirements checklist -->
+                        <div class="mt-4 bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs text-gray-500 mb-2">Password must include:</p>
+                            <ul class="space-y-1 text-xs">
+                                <li id="req-length" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least 8 characters</li>
+                                <li id="req-uppercase" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least one uppercase letter</li>
+                                <li id="req-lowercase" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least one lowercase letter</li>
+                                <li id="req-number" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least one number</li>
+                                <li id="req-special" class="text-gray-500"><i class="fas fa-circle text-xs mr-2"></i>At least one special character</li>
+                            </ul>
+                        </div>
                     </div>
                     
                     <!-- Submit button with enhanced styling -->
@@ -258,14 +270,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
                 </form>
-            </div>
-            
-            <!-- Footer with decorative elements -->
-            <div class="py-3 px-6 bg-gradient-to-r from-indigo-900/10 to-purple-900/10 relative">
-                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
-                <p class="text-center text-xs text-gray-600">
-                    &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
-                </p>
             </div>
         </div>
     </div>
@@ -363,48 +367,103 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             const strengthBar = document.getElementById('passwordStrength');
             const strengthText = document.getElementById('strengthText');
             
+            const reqLength = document.getElementById('req-length');
+            const reqUppercase = document.getElementById('req-uppercase');
+            const reqLowercase = document.getElementById('req-lowercase');
+            const reqNumber = document.getElementById('req-number');
+            const reqSpecial = document.getElementById('req-special');
+            
             passwordInput.addEventListener('input', function() {
                 const password = this.value;
                 let strength = 0;
                 
-                // Check password length
+                // Check length
                 if (password.length >= 8) {
-                    strength += 25;
+                    strength += 20;
+                    reqLength.classList.remove('text-gray-500');
+                    reqLength.classList.add('text-green-500');
+                    reqLength.querySelector('i').classList.remove('fa-circle');
+                    reqLength.querySelector('i').classList.add('fa-check-circle');
+                } else {
+                    reqLength.classList.remove('text-green-500');
+                    reqLength.classList.add('text-gray-500');
+                    reqLength.querySelector('i').classList.remove('fa-check-circle');
+                    reqLength.querySelector('i').classList.add('fa-circle');
                 }
                 
-                // Check for uppercase letters
+                // Check uppercase
                 if (/[A-Z]/.test(password)) {
-                    strength += 25;
+                    strength += 20;
+                    reqUppercase.classList.remove('text-gray-500');
+                    reqUppercase.classList.add('text-green-500');
+                    reqUppercase.querySelector('i').classList.remove('fa-circle');
+                    reqUppercase.querySelector('i').classList.add('fa-check-circle');
+                } else {
+                    reqUppercase.classList.remove('text-green-500');
+                    reqUppercase.classList.add('text-gray-500');
+                    reqUppercase.querySelector('i').classList.remove('fa-check-circle');
+                    reqUppercase.querySelector('i').classList.add('fa-circle');
                 }
                 
-                // Check for lowercase letters
+                // Check lowercase
                 if (/[a-z]/.test(password)) {
-                    strength += 25;
+                    strength += 20;
+                    reqLowercase.classList.remove('text-gray-500');
+                    reqLowercase.classList.add('text-green-500');
+                    reqLowercase.querySelector('i').classList.remove('fa-circle');
+                    reqLowercase.querySelector('i').classList.add('fa-check-circle');
+                } else {
+                    reqLowercase.classList.remove('text-green-500');
+                    reqLowercase.classList.add('text-gray-500');
+                    reqLowercase.querySelector('i').classList.remove('fa-check-circle');
+                    reqLowercase.querySelector('i').classList.add('fa-circle');
                 }
                 
-                // Check for numbers or special characters
-                if (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password)) {
-                    strength += 25;
+                // Check numbers
+                if (/[0-9]/.test(password)) {
+                    strength += 20;
+                    reqNumber.classList.remove('text-gray-500');
+                    reqNumber.classList.add('text-green-500');
+                    reqNumber.querySelector('i').classList.remove('fa-circle');
+                    reqNumber.querySelector('i').classList.add('fa-check-circle');
+                } else {
+                    reqNumber.classList.remove('text-green-500');
+                    reqNumber.classList.add('text-gray-500');
+                    reqNumber.querySelector('i').classList.remove('fa-check-circle');
+                    reqNumber.querySelector('i').classList.add('fa-circle');
+                }
+                
+                // Check special characters
+                if (/[^A-Za-z0-9]/.test(password)) {
+                    strength += 20;
+                    reqSpecial.classList.remove('text-gray-500');
+                    reqSpecial.classList.add('text-green-500');
+                    reqSpecial.querySelector('i').classList.remove('fa-circle');
+                    reqSpecial.querySelector('i').classList.add('fa-check-circle');
+                } else {
+                    reqSpecial.classList.remove('text-green-500');
+                    reqSpecial.classList.add('text-gray-500');
+                    reqSpecial.querySelector('i').classList.remove('fa-check-circle');
+                    reqSpecial.querySelector('i').classList.add('fa-circle');
                 }
                 
                 // Update the strength bar
                 strengthBar.style.width = strength + '%';
                 
                 // Update color and text based on strength
-                if (strength <= 25) {
-                    strengthBar.className = 'h-full transition-all duration-300 bg-red-500';
+                if (strength < 40) {
+                    strengthBar.classList.remove('bg-yellow-500', 'bg-green-500');
+                    strengthBar.classList.add('bg-red-500');
                     strengthText.textContent = 'Weak password';
                     strengthText.className = 'text-xs text-red-500 mt-1';
-                } else if (strength <= 50) {
-                    strengthBar.className = 'h-full transition-all duration-300 bg-orange-500';
-                    strengthText.textContent = 'Fair password';
-                    strengthText.className = 'text-xs text-orange-600 mt-1';
-                } else if (strength <= 75) {
-                    strengthBar.className = 'h-full transition-all duration-300 bg-yellow-500';
-                    strengthText.textContent = 'Good password';
+                } else if (strength < 80) {
+                    strengthBar.classList.remove('bg-red-500', 'bg-green-500');
+                    strengthBar.classList.add('bg-yellow-500');
+                    strengthText.textContent = 'Medium password';
                     strengthText.className = 'text-xs text-yellow-600 mt-1';
                 } else {
-                    strengthBar.className = 'h-full transition-all duration-300 bg-green-500';
+                    strengthBar.classList.remove('bg-red-500', 'bg-yellow-500');
+                    strengthBar.classList.add('bg-green-500');
                     strengthText.textContent = 'Strong password';
                     strengthText.className = 'text-xs text-green-500 mt-1';
                 }
@@ -415,6 +474,81 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     strengthText.textContent = 'Enter a password';
                     strengthText.className = 'text-xs text-gray-500 mt-1';
                 }
+            });
+
+            // Form validation with password requirements
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const password = passwordInput.value;
+                const errors = [];
+
+                if (password.length < 8) {
+                    errors.push("Password must be at least 8 characters long");
+                }
+                if (!/[A-Z]/.test(password)) {
+                    errors.push("Password must contain at least one uppercase letter");
+                }
+                if (!/[a-z]/.test(password)) {
+                    errors.push("Password must contain at least one lowercase letter");
+                }
+                if (!/[0-9]/.test(password)) {
+                    errors.push("Password must contain at least one number");
+                }
+                if (!/[^A-Za-z0-9]/.test(password)) {
+                    errors.push("Password must contain at least one special character");
+                }
+
+                if (errors.length > 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Password Requirements Not Met',
+                        html: errors.map(error => `<div class="text-left"><i class="fas fa-times-circle text-red-500 mr-2"></i>${error}</div>`).join('<br>'),
+                        customClass: {
+                            container: 'password-policy-alert'
+                        }
+                    });
+                    return;
+                }
+                
+                // Continue with form submission if password requirements are met
+                const formData = new FormData(this);
+                
+                fetch('registration.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Registration Successful!',
+                            text: 'You can now login to your account.',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Go to Login',
+                            confirmButtonColor: '#6366F1'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = 'login.php';
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Registration Failed',
+                            text: data.message
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Something went wrong',
+                        text: 'Please try again later.'
+                    });
+                });
             });
             
             // Login link redirection

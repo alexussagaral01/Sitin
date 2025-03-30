@@ -51,8 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-image: linear-gradient(111.3deg, rgba(74,105,187,1) 9.6%, rgba(205,77,204,1) 93.6%),
-                            url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(%23smallGrid)"/><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)" /></svg>');
+            background-image: none;
             background-size: cover;
             overflow: hidden;
         }
@@ -243,7 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
-<body class="h-screen flex items-center justify-center">
+<body class="h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700">
     <!-- Animated background elements -->
     <div class="floating-circles">
         <div class="circle" style="width: 80px; height: 80px; top: 10%; left: 10%; animation-duration: 20s;"></div>
@@ -358,14 +357,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </p>
                 </div>
             </form>
-        </div>
-        
-        <!-- Footer with animated border -->
-        <div class="py-3 px-6 bg-gradient-to-r from-indigo-900/10 to-purple-900/10 relative">
-            <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
-            <p class="text-center text-xs text-gray-600">
-                &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
-            </p>
         </div>
     </div>
 

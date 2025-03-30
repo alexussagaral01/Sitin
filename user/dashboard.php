@@ -38,11 +38,22 @@ while ($row = $result->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Dashboard</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                }
+            }
+        }
+    </script>
     <style>
         /* Add gradient text class for the footer */
         .gradient-text {
@@ -85,9 +96,9 @@ while ($row = $result->fetch_assoc()) {
         }
     </style>
 </head>
-<body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] flex flex-col min-h-screen">
+<body class="bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 min-h-screen font-poppins">
     <!-- Header -->
-    <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
+    <div class="text-center text-white font-bold text-2xl py-4 relative shadow-lg" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
         CCS SIT-IN MONITORING SYSTEM
         <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
             <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
@@ -97,59 +108,58 @@ while ($row = $result->fetch_assoc()) {
     </div>
 
     <!-- Side Navigation -->
-    <div id="mySidenav" class="fixed top-0 left-0 h-full w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg">
-        <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-72 bg-gradient-to-b from-indigo-900 to-purple-800 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-xl overflow-y-auto">
+        <div class="absolute top-0 right-0 m-3">
+            <button onclick="closeNav()" class="text-white hover:text-pink-200 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
         
-        <div class="flex flex-col items-center mt-4">
-            <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
-            <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+        <div class="flex flex-col items-center mt-6">
+            <div class="relative">
+                <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Profile" class="w-20 h-20 rounded-full border-4 border-white/30 object-cover shadow-lg">
+                <div class="absolute bottom-0 right-0 bg-green-500 w-3 h-3 rounded-full border-2 border-white"></div>
+            </div>
+            <p class="text-white font-semibold text-lg mt-2 mb-0"><?php echo htmlspecialchars($firstName); ?></p>
+            <p class="text-purple-200 text-xs mb-3">Student</p>
         </div>
 
-        <nav class="flex flex-col space-y-0.5 px-2">
-            <div class="overflow-hidden">
-                <a href="dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-home w-6 text-base"></i>
-                    <span class="text-sm font-medium">HOME</span>
+        <div class="px-2 py-2">
+            <nav class="flex flex-col space-y-1">
+                <a href="dashboard.php" class="group px-3 py-2 text-white/90 bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-home w-5 mr-2 text-center"></i>
+                    <span class="font-medium">HOME</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="profile.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-user w-6 text-base"></i>
-                    <span class="text-sm font-medium">PROFILE</span>
+                <a href="profile.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-user w-5 mr-2 text-center"></i>
+                    <span class="font-medium">PROFILE</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="edit.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-edit w-6 text-base"></i>
-                    <span class="text-sm font-medium">EDIT</span>
+                <a href="edit.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-edit w-5 mr-2 text-center"></i>
+                    <span class="font-medium">EDIT</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="history.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-history w-6 text-base"></i>
-                    <span class="text-sm font-medium">HISTORY</span>
+                <a href="history.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-history w-5 mr-2 text-center"></i>
+                    <span class="font-medium">HISTORY</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="reservation.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-calendar-alt w-6 text-base"></i>
-                    <span class="text-sm font-medium">RESERVATION</span>
+                <a href="reservation.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-calendar-alt w-5 mr-2 text-center"></i>
+                    <span class="font-medium">RESERVATION</span>
                 </a>
-            </div>
-
-        <div class="overflow-hidden">
-            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-sign-out-alt w-6 text-base"></i>
-                <span class="text-sm font-medium">LOG OUT</span> <!-- Updated font size and weight -->
-            </a>
+                <div class="border-t border-white/10 my-2"></div>
+                <a href="../logout.php" class="group px-3 py-2 text-white/90 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-sign-out-alt w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">LOG OUT</span>
+                </a>
+            </nav>
         </div>
     </div>
 
     <!-- Main Content Container -->
     <div class="flex-grow">
-        <!-- Announcements Section - Modified Styling -->
+        <!-- Announcements Section -->
         <div class="w-11/12 md:w-4/12 mx-4 my-8 bg-white rounded-lg shadow-lg overflow-hidden float-left border border-gray-200">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+            <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 <i class="fas fa-bullhorn text-2xl mr-4 relative z-10"></i>
@@ -157,33 +167,27 @@ while ($row = $result->fetch_assoc()) {
             </div>
             <div class="p-6">
                 <?php if (empty($announcements)): ?>
-                    <p class="text-gray-600 text-center">There are no announcements yet.</p>
+                    <p class="text-gray-500 text-center py-4">No announcements available.</p>
                 <?php else: ?>
                     <div class="h-[60vh] overflow-y-auto custom-scrollbar pr-2">
-                        <div class="space-y-6">
-                            <?php 
-                            $delay = 0;
-                            foreach ($announcements as $announcement): 
-                                $delay += 0.1;
-                            ?>
-                                <div class="bg-gray-50 rounded-xl p-5 shadow-md border-t-4 border-indigo-500 hover:shadow-lg transition-all duration-300 announcement-fade-in" style="animation-delay: <?php echo $delay; ?>s">
-                                    <div class="flex items-center mb-4">
-                                        <span class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-                                            <i class="fas fa-bell text-white"></i>
-                                        </span>
-                                        <div class="ml-3">
-                                            <h3 class="font-bold text-purple-800"><?php echo htmlspecialchars($announcement['CREATED_BY']); ?></h3>
-                                            <p class="text-xs text-gray-500">
-                                                <i class="far fa-calendar-alt mr-1"></i>
-                                                <?php echo date('M d, Y', strtotime($announcement['CREATED_DATE'])); ?>
-                                            </p>
-                                        </div>
+                        <div class="space-y-4">
+                            <?php foreach ($announcements as $announcement): ?>
+                                <div class="bg-white/80 rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300 border-l-4 border-gradient-purple" 
+                                     style="border-image: linear-gradient(to bottom, #4A69BB, #CD4DCC) 1;">
+                                    <div class="flex items-center text-sm font-bold text-purple-600 mb-3">
+                                        <i class="fas fa-user-shield mr-2"></i>
+                                        <?php echo htmlspecialchars($announcement['CREATED_BY']); ?>
+                                        <span class="mx-2">•</span>
+                                        <i class="far fa-calendar-alt mr-2"></i>
+                                        <?php echo date('Y-M-d', strtotime($announcement['CREATED_DATE'])); ?>
                                     </div>
-                                    <div class="text-gray-700 pl-4 border-l-2 border-indigo-300 bg-white rounded-r-lg p-3 shadow-inner">
+                                    <div class="text-gray-700 bg-gray-50/80 p-4 rounded-lg">
                                         <?php echo htmlspecialchars($announcement['CONTENT']); ?>
                                     </div>
                                     <div class="mt-3 flex justify-end">
-                                        <span class="text-xs text-gray-500 italic"><?php echo date('h:i A', strtotime($announcement['CREATED_DATE'])); ?></span>
+                                        <span class="text-xs text-gray-500 italic">
+                                            <?php echo date('h:i A', strtotime($announcement['CREATED_DATE'])); ?>
+                                        </span>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -195,7 +199,7 @@ while ($row = $result->fetch_assoc()) {
 
         <!-- Rules Section - Modified Styling -->
         <div class="w-11/12 md:w-7/12 mx-4 my-8 bg-white rounded-lg shadow-lg overflow-hidden float-right border border-gray-200">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+            <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 <i class="fas fa-clipboard-list text-2xl mr-4 relative z-10"></i>
@@ -283,9 +287,9 @@ while ($row = $result->fetch_assoc()) {
     </div>
     
     <!-- Footer -->
-    <div class="py-3 px-6 bg-white relative mt-8">
+    <div class="py-4 px-6 bg-white/95 backdrop-blur-sm mt-8 relative">
         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
-        <p class="text-center text-xs text-gray-600">
+        <p class="text-center text-sm text-gray-600">
             &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
         </p>
     </div>

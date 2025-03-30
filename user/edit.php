@@ -106,6 +106,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $newPassword = $_POST['newPassword'];
         $confirmPassword = $_POST['confirmPassword'];
         
+        // Password policy validation
+        $errors = [];
+        if (strlen($newPassword) < 8) {
+            $errors[] = "Password must be at least 8 characters long";
+        }
+        if (!preg_match('/[A-Z]/', $newPassword)) {
+            $errors[] = "Password must contain at least one uppercase letter";
+        }
+        if (!preg_match('/[a-z]/', $newPassword)) {
+            $errors[] = "Password must contain at least one lowercase letter";
+        }
+        if (!preg_match('/[0-9]/', $newPassword)) {
+            $errors[] = "Password must contain at least one number";
+        }
+        if (!preg_match('/[^A-Za-z0-9]/', $newPassword)) {
+            $errors[] = "Password must contain at least one special character";
+        }
+
+        if (!empty($errors)) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Password requirements not met:",
+                "errors" => $errors
+            ]);
+            exit;
+        }
+        
         // Verify passwords match
         if ($newPassword !== $confirmPassword) {
             echo json_encode([
@@ -166,12 +193,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <title>Edit</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                }
+            }
+        }
+    </script>
     <style>
         /* Add gradient text class for the footer */
         .gradient-text {
@@ -183,22 +221,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
-<body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
-    <div class="content-wrapper">
-        <!-- Header (removed fixed positioning) -->
-        <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
-            CCS SIT-IN MONITORING SYSTEM
-            <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
-                <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
-                <div class="bar2 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
-                <div class="bar3 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
-            </div>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 min-h-screen font-poppins">
+    <!-- Header -->
+    <div class="text-center text-white font-bold text-2xl py-4 relative shadow-lg" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
+        CCS SIT-IN MONITORING SYSTEM
+        <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
+            <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
+            <div class="bar2 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
+            <div class="bar3 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
         </div>
+    </div>
 
         <!-- Form Container - Updated with border styling -->
         <div class="mx-auto my-8 max-w-4xl">
             <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-                <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+            <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                     <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                     <i class="fas fa-user-edit text-2xl mr-4 relative z-10"></i>
@@ -483,61 +520,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </form>
                     </div>
                 </div>
+            </div>
+        </div>
+
         <!-- Side Navigation -->
-        <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
-            <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+        <div id="mySidenav" class="fixed top-0 left-0 h-screen w-72 bg-gradient-to-b from-indigo-900 to-purple-800 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-xl overflow-y-auto">
+            <div class="absolute top-0 right-0 m-3">
+                <button onclick="closeNav()" class="text-white hover:text-pink-200 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
             
-            <div class="flex flex-col items-center mt-4">
-                <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
-                <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+            <div class="flex flex-col items-center mt-6">
+                <div class="relative">
+                    <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Profile" class="w-20 h-20 rounded-full border-4 border-white/30 object-cover shadow-lg">
+                    <div class="absolute bottom-0 right-0 bg-green-500 w-3 h-3 rounded-full border-2 border-white"></div>
+                </div>
+                <p class="text-white font-semibold text-lg mt-2 mb-0"><?php echo htmlspecialchars($firstName); ?></p>
+                <p class="text-purple-200 text-xs mb-3">Student</p>
             </div>
 
-            <nav class="flex flex-col space-y-0.5 px-2">
-                <div class="overflow-hidden">
-                    <a href="dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                        <i class="fas fa-home w-6 text-base"></i>
-                        <span class="text-sm font-medium">HOME</span>
+            <div class="px-2 py-2">
+                <nav class="flex flex-col space-y-1">
+                    <a href="dashboard.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                        <i class="fas fa-home w-5 mr-2 text-center"></i>
+                        <span class="font-medium group-hover:translate-x-1 transition-transform">HOME</span>
                     </a>
-                </div>
-                <div class="overflow-hidden">
-                    <a href="profile.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                        <i class="fas fa-user w-6 text-base"></i>
-                        <span class="text-sm font-medium">PROFILE</span>
+                    <a href="profile.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                        <i class="fas fa-user w-5 mr-2 text-center"></i>
+                        <span class="font-medium group-hover:translate-x-1 transition-transform">PROFILE</span>
                     </a>
-                </div>
-                <div class="overflow-hidden">
-                    <a href="edit.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                        <i class="fas fa-edit w-6 text-base"></i>
-                        <span class="text-sm font-medium">EDIT</span>
+                    <a href="edit.php" class="group px-3 py-2 text-white/90 bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                        <i class="fas fa-edit w-5 mr-2 text-center"></i>
+                        <span class="font-medium">EDIT</span>
                     </a>
-                </div>
-                <div class="overflow-hidden">
-                    <a href="history.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                        <i class="fas fa-history w-6 text-base"></i>
-                        <span class="text-sm font-medium">HISTORY</span>
+                    <a href="history.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                        <i class="fas fa-history w-5 mr-2 text-center"></i>
+                        <span class="font-medium group-hover:translate-x-1 transition-transform">HISTORY</span>
                     </a>
-                </div>
-                <div class="overflow-hidden">
-                    <a href="reservation.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                        <i class="fas fa-calendar-alt w-6 text-base"></i>
-                        <span class="text-sm font-medium">RESERVATION</span>
+                    <a href="reservation.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                        <i class="fas fa-calendar-alt w-5 mr-2 text-center"></i>
+                        <span class="font-medium group-hover:translate-x-1 transition-transform">RESERVATION</span>
                     </a>
-                </div>
-
-            <div class="overflow-hidden">
-                <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-sign-out-alt w-6 text-base"></i>
-                    <span class="text-sm font-medium">LOG OUT</span> <!-- Updated font size and weight -->
-                </a>
+                    
+                    <div class="border-t border-white/10 my-2"></div>
+                    
+                    <a href="../logout.php" class="group px-3 py-2 text-white/90 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex items-center">
+                        <i class="fas fa-sign-out-alt w-5 mr-2 text-center"></i>
+                        <span class="font-medium group-hover:translate-x-1 transition-transform">LOG OUT</span>
+                    </a>
+                </nav>
             </div>
         </div>
         
-        <div class="py-3 px-6 bg-gradient-to-r from-indigo-900/10 to-purple-900/10 relative mt-8">
+        <!-- Footer - Moved outside the card container -->
+        <div class="py-4 px-6 bg-white/95 backdrop-blur-sm mt-8 relative">
             <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
-            <p class="text-center text-xs text-gray-600">
+            <p class="text-center text-sm text-gray-600">
                 &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
             </p>
         </div>
+
     <script>
         function toggleNav(x) {
             document.getElementById("mySidenav").classList.toggle("-translate-x-0");
@@ -676,9 +719,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.getElementById('passwordForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Validate password fields
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Client-side password policy validation
+            const errors = [];
+            if (newPassword.length < 8) {
+                errors.push("Password must be at least 8 characters long");
+            }
+            if (!/[A-Z]/.test(newPassword)) {
+                errors.push("Password must contain at least one uppercase letter");
+            }
+            if (!/[a-z]/.test(newPassword)) {
+                errors.push("Password must contain at least one lowercase letter");
+            }
+            if (!/[0-9]/.test(newPassword)) {
+                errors.push("Password must contain at least one number");
+            }
+            if (!/[^A-Za-z0-9]/.test(newPassword)) {
+                errors.push("Password must contain at least one special character");
+            }
+            
+            if (errors.length > 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password Requirements Not Met',
+                    html: errors.map(error => `<div class="text-left"><i class="fas fa-times-circle text-red-500 mr-2"></i>${error}</div>`).join('<br>'),
+                    customClass: {
+                        container: 'password-policy-alert'
+                    }
+                });
+                return;
+            }
             
             if (newPassword !== confirmPassword) {
                 Swal.fire({
@@ -703,17 +775,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         title: 'Success!',
                         text: data.message
                     }).then(() => {
-                        // Clear password fields after successful update
-                        document.getElementById('currentPassword').value = '';
-                        document.getElementById('newPassword').value = '';
-                        document.getElementById('confirmPassword').value = '';
+                        this.reset();
+                        document.getElementById('passwordStrength').style.width = '0%';
+                        document.getElementById('strengthText').textContent = 'Enter a new password';
+                        document.getElementById('strengthText').className = 'text-xs text-gray-500 mt-1';
                     });
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: data.message
-                    });
+                    if (data.errors) {
+                        // Display multiple validation errors
+                        Swal.fire({
+                            icon: 'error',
+                            title: data.message,
+                            html: data.errors.map(error => `<div class="text-left"><i class="fas fa-times-circle text-red-500 mr-2"></i>${error}</div>`).join('<br>'),
+                            customClass: {
+                                container: 'password-policy-alert'
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: data.message
+                        });
+                    }
                 }
             })
             .catch(error => {

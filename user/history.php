@@ -2,6 +2,11 @@
 session_start();
 require '../db.php'; // Updated path
 
+// Initialize pagination variables
+$entries_per_page = isset($_GET['entries']) ? (int)$_GET['entries'] : 10;
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($current_page - 1) * $entries_per_page;
+
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit;
@@ -29,7 +34,7 @@ if ($userId) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -47,11 +52,42 @@ if ($userId) {
             background-clip: text;
             display: inline-block;
         }
+        
+        /* Custom animation for the sidebar */
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        
+        /* Frosted glass effect */
+        .frosted-glass {
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'custom': '0 4px 20px rgba(0, 0, 0, 0.1)',
+                        'hover': '0 8px 30px rgba(0, 0, 0, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
+<body class="bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 min-h-screen font-poppins">
     <!-- Header -->
-    <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
+    <div class="text-center text-white font-bold text-2xl py-4 relative shadow-lg" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
         CCS SIT-IN MONITORING SYSTEM
         <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
             <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
@@ -61,58 +97,60 @@ if ($userId) {
     </div>
 
     <!-- Side Navigation -->
-    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
-        <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-72 bg-gradient-to-b from-indigo-900 to-purple-800 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-xl overflow-y-auto">
+        <div class="absolute top-0 right-0 m-3">
+            <button onclick="closeNav()" class="text-white hover:text-pink-200 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
         
-        <div class="flex flex-col items-center mt-4">
-            <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
-            <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+        <div class="flex flex-col items-center mt-6">
+            <div class="relative">
+                <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Profile" class="w-20 h-20 rounded-full border-4 border-white/30 object-cover shadow-lg">
+                <div class="absolute bottom-0 right-0 bg-green-500 w-3 h-3 rounded-full border-2 border-white"></div>
+            </div>
+            <p class="text-white font-semibold text-lg mt-2 mb-0"><?php echo htmlspecialchars($firstName); ?></p>
+            <p class="text-purple-200 text-xs mb-3">Student</p>
         </div>
 
-        <nav class="flex flex-col space-y-0.5 px-2">
-            <div class="overflow-hidden">
-                <a href="dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-home w-6 text-base"></i>
-                    <span class="text-sm font-medium">HOME</span>
+        <div class="px-2 py-2">
+            <nav class="flex flex-col space-y-1">
+                <a href="dashboard.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-home w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">HOME</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="profile.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-user w-6 text-base"></i>
-                    <span class="text-sm font-medium">PROFILE</span>
+                <a href="profile.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-user w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">PROFILE</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="edit.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-edit w-6 text-base"></i>
-                    <span class="text-sm font-medium">EDIT</span>
+                <a href="edit.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-edit w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">EDIT</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="history.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-history w-6 text-base"></i>
-                    <span class="text-sm font-medium">HISTORY</span>
+                <a href="history.php" class="group px-3 py-2 text-white/90 bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-history w-5 mr-2 text-center"></i>
+                    <span class="font-medium">HISTORY</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="reservation.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-calendar-alt w-6 text-base"></i>
-                    <span class="text-sm font-medium">RESERVATION</span>
+                <a href="reservation.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-calendar-alt w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">RESERVATION</span>
                 </a>
-            </div>
-
-        <div class="overflow-hidden">
-            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-sign-out-alt w-6 text-base"></i>
-                <span class="text-sm font-medium">LOG OUT</span> <!-- Updated font size and weight -->
-            </a>
+                
+                <div class="border-t border-white/10 my-2"></div>
+                
+                <a href="../logout.php" class="group px-3 py-2 text-white/90 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-sign-out-alt w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">LOG OUT</span>
+                </a>
+            </nav>
         </div>
     </div>
 
     <!-- History Content -->
-    <div class="container mx-auto px-4 mt-8">
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white/95 rounded-2xl shadow-custom backdrop-blur-sm overflow-hidden border border-white/20 transition-shadow duration-300 hover:shadow-hover">
+            <!-- Keep the original header design as requested -->
+            <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 <i class="fas fa-history text-2xl mr-4 relative z-10"></i>
@@ -120,38 +158,44 @@ if ($userId) {
             </div>
             
             <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center">
-                        <select class="border rounded px-2 py-1 mr-2">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
+                <!-- Redesigned controls -->
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+                    <div class="flex items-center bg-gray-50 rounded-lg p-2 shadow-sm">
+                        <label class="text-gray-600 mr-2 text-sm">Show</label>
+                        <select id="entriesPerPage" onchange="changeEntries(this.value)" class="bg-white border border-gray-200 rounded-md px-3 py-1.5 shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none">
+                            <option value="10" <?php echo $entries_per_page == 10 ? 'selected' : ''; ?>>10</option>
+                            <option value="25" <?php echo $entries_per_page == 25 ? 'selected' : ''; ?>>25</option>
+                            <option value="50" <?php echo $entries_per_page == 50 ? 'selected' : ''; ?>>50</option>
+                            <option value="100" <?php echo $entries_per_page == 100 ? 'selected' : ''; ?>>100</option>
                         </select>
-                        <span>entries per page</span>
+                        <span class="text-gray-600 ml-2 text-sm">entries</span>
                     </div>
-                    <div class="flex items-center">
-                        <span class="mr-2">Search:</span>
-                        <input type="text" class="border rounded px-2 py-1">
+                    
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Search records..." 
+                            class="w-full md:w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none"
+                            onkeypress="if(event.key === 'Enter') { event.preventDefault(); searchTable(); }">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
+                <!-- Redesigned table -->
+                <div class="overflow-x-auto rounded-xl shadow-sm border border-gray-100">
                     <table class="min-w-full">
-                        <thead class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white">
-                            <tr>
-                                <th class="px-6 py-3 text-left">ID Number</th>
-                                <th class="px-6 py-3 text-left">Name</th>
-                                <th class="px-6 py-3 text-left">Purpose</th>
-                                <th class="px-6 py-3 text-left">Laboratory</th>
-                                <th class="px-6 py-3 text-left">Time In</th>
-                                <th class="px-6 py-3 text-left">Time Out</th>
-                                <th class="px-6 py-3 text-left">Date</th>
-                                <th class="px-6 py-3 text-left">Status</th>
-                                <th class="px-6 py-3 text-left">Action</th>
+                        <thead>
+                            <tr style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))" class="text-white">
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">ID Number</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Name</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Purpose</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Laboratory</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Time In</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Time Out</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-gray-100 bg-white">
                         <?php
                         // Get user's IDNO
                         $getUserQuery = "SELECT IDNO FROM users WHERE STUD_NUM = ?";
@@ -175,11 +219,6 @@ if ($userId) {
                             $total_entries = $total_row['total'];
                             $stmt->close();
 
-                            // Set entries per page (default 10)
-                            $entries_per_page = isset($_GET['entries']) ? (int)$_GET['entries'] : 10;
-                            $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-                            $offset = ($current_page - 1) * $entries_per_page;
-
                             // Fetch sit-in history with pagination
                             $query = "SELECT * FROM curr_sitin WHERE IDNO = ? ORDER BY DATE DESC, TIME_IN DESC LIMIT ? OFFSET ?";
                             $stmt = $conn->prepare($query);
@@ -188,119 +227,253 @@ if ($userId) {
                             $result = $stmt->get_result();
 
                             if ($result->num_rows > 0) {
+                                $rowNum = 0;
                                 while ($row = $result->fetch_assoc()) {
-                                    echo "<tr class='hover:bg-gray-50'>";
-                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['IDNO']) . "</td>";
-                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['FULL_NAME']) . "</td>";
-                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['PURPOSE']) . "</td>";
-                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['LABORATORY']) . "</td>";
+                                    $rowClass = $rowNum % 2 === 0 ? "bg-white" : "bg-gray-50";
+                                    $rowNum++;
+                                    
+                                    echo "<tr class='$rowClass hover:bg-indigo-50 transition-colors'>";
+                                    echo "<td class='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800'>" . htmlspecialchars($row['IDNO']) . "</td>";
+                                    echo "<td class='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>" . htmlspecialchars($row['FULL_NAME']) . "</td>";
+                                    echo "<td class='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>" . htmlspecialchars($row['PURPOSE']) . "</td>";
+                                    echo "<td class='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>" . htmlspecialchars($row['LABORATORY']) . "</td>";
+                                    
                                     // Convert time format
                                     $timeIn = date('h:i A', strtotime($row['TIME_IN']));
                                     $timeOut = $row['TIME_OUT'] ? date('h:i A', strtotime($row['TIME_OUT'])) : '-';
-                                    echo "<td class='px-6 py-4'>" . $timeIn . "</td>";
-                                    echo "<td class='px-6 py-4'>" . $timeOut . "</td>";
-                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['DATE']) . "</td>";
-                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['STATUS']) . "</td>";
-                                    echo "<td class='px-6 py-4'>";
+                                    
+                                    echo "<td class='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>" . $timeIn . "</td>";
+                                    echo "<td class='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>" . $timeOut . "</td>";
+                                    echo "<td class='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>" . htmlspecialchars($row['DATE']) . "</td>";
+                                    
+                                    // Status with custom styling
+                                    $statusClass = '';
+                                    if ($row['STATUS'] == 'completed') {
+                                        $statusClass = 'bg-green-100 text-green-800';
+                                    } elseif ($row['STATUS'] == 'pending') {
+                                        $statusClass = 'bg-yellow-100 text-yellow-800';
+                                    } elseif ($row['STATUS'] == 'cancelled') {
+                                        $statusClass = 'bg-red-100 text-red-800';
+                                    } else {
+                                        $statusClass = 'bg-blue-100 text-blue-800';
+                                    }
+                                    
+                                    echo "<td class='px-6 py-4 whitespace-nowrap'>";
+                                    echo "<span class='px-2 py-1 text-xs font-medium rounded-full $statusClass'>" . htmlspecialchars($row['STATUS']) . "</span>";
+                                    echo "</td>";
+                                    
+                                    echo "<td class='px-6 py-4 whitespace-nowrap text-sm'>";
                                     echo "<button onclick=\"openFeedbackModal(" . $row['SITIN_ID'] . ", '" . $row['LABORATORY'] . "')\" 
-                                            class='bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm transition duration-200'>
-                                            Feedback
+                                            class='bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition duration-200 flex items-center'>
+                                            <i class='fas fa-comment-alt mr-1.5'></i> Feedback
                                           </button>";
                                     echo "</td>";
                                     echo "</tr>";
                                 }
                             } else {
-                                echo "<tr><td colspan='9' class='px-6 py-4 text-center'>";
-                                echo "<div class='text-gray-500 italic'>No sit-in records found</div>";
-                                echo "<div class='text-sm text-gray-400 mt-1'>Your sit-in history will appear here once you start using the facilities</div>";
+                                echo "<tr><td colspan='9' class='px-6 py-10 text-center'>";
+                                echo "<div class='flex flex-col items-center justify-center'>";
+                                echo "<i class='fas fa-history text-5xl text-gray-300 mb-3'></i>";
+                                echo "<div class='text-gray-500 font-medium text-lg'>No sit-in records found</div>";
+                                echo "<div class='text-sm text-gray-400 mt-1 max-w-md'>Your sit-in history will appear here once you start using the facilities</div>";
+                                echo "</div>";
                                 echo "</td></tr>";
                             }
                             $stmt->close();
                         } else {
-                            echo "<tr><td colspan='9' class='px-6 py-4 text-center'>";
-                            echo "<div class='text-gray-500 italic'>Welcome new user!</div>";
-                            echo "<div class='text-sm text-gray-400 mt-1'>Your sit-in history will be displayed here after your first facility use</div>";
+                            echo "<tr><td colspan='9' class='px-6 py-10 text-center'>";
+                            echo "<div class='flex flex-col items-center justify-center'>";
+                            echo "<i class='fas fa-user-plus text-5xl text-gray-300 mb-3'></i>";
+                            echo "<div class='text-gray-500 font-medium text-lg'>Welcome new user!</div>";
+                            echo "<div class='text-sm text-gray-400 mt-1 max-w-md'>Your sit-in history will be displayed here after your first facility use</div>";
+                            echo "</div>";
                             echo "</td></tr>";
                         }
                         ?>
+                        </tbody>
                     </table>
                 </div>
 
-                <div class="flex justify-between items-center mt-4">
-                    <div class="text-gray-600">
+                <!-- Redesigned pagination -->
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center mt-6 gap-4">
+                    <div class="text-gray-600 text-sm">
                         <?php
                         $start_entry = $total_entries > 0 ? $offset + 1 : 0;
                         $end_entry = min($offset + $entries_per_page, $total_entries);
-                        echo "Showing $start_entry to $end_entry of $total_entries entries";
+                        echo "Showing <span class='font-semibold'>$start_entry</span> to <span class='font-semibold'>$end_entry</span> of <span class='font-semibold'>$total_entries</span> entries";
                         ?>
                     </div>
-                    <div class="flex space-x-1">
-                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&laquo;</button>
-                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&lt;</button>
-                        <button class="px-3 py-1 border rounded bg-blue-500 text-white">1</button>
-                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&gt;</button>
-                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&raquo;</button>
+                    <div class="inline-flex rounded-lg shadow-sm">
+                        <?php
+                        $total_pages = ceil($total_entries / $entries_per_page);
+                        
+                        // First page button
+                        echo "<button onclick=\"changePage(1)\" " . ($current_page == 1 ? 'disabled' : '') . " 
+                              class=\"px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-l-lg hover:bg-gray-50 text-gray-500" . 
+                              ($current_page == 1 ? ' opacity-50 cursor-not-allowed' : '') . "\">
+                              <i class=\"fas fa-angle-double-left\"></i>
+                          </button>";
+
+                        // Previous page button
+                        $prev_page = max(1, $current_page - 1);
+                        echo "<button onclick=\"changePage($prev_page)\" " . ($current_page == 1 ? 'disabled' : '') . " 
+                              class=\"px-3.5 py-2 text-sm bg-white border-t border-b border-l border-gray-300 hover:bg-gray-50 text-gray-500" . 
+                              ($current_page == 1 ? ' opacity-50 cursor-not-allowed' : '') . "\">
+                              <i class=\"fas fa-angle-left\"></i>
+                          </button>";
+
+                        // Page numbers
+                        for($i = 1; $i <= $total_pages; $i++) {
+                            if($i == $current_page) {
+                                echo "<button class=\"px-3.5 py-2 text-sm bg-indigo-600 text-white border border-indigo-600\">$i</button>";
+                            } else {
+                                echo "<button onclick=\"changePage($i)\" 
+                                      class=\"px-3.5 py-2 text-sm bg-white border border-gray-300 hover:bg-gray-50 text-gray-700\">$i</button>";
+                            }
+                        }
+
+                        // Next page button
+                        $next_page = min($total_pages, $current_page + 1);
+                        echo "<button onclick=\"changePage($next_page)\" " . ($current_page == $total_pages ? 'disabled' : '') . "
+                              class=\"px-3.5 py-2 text-sm bg-white border-t border-b border-r border-gray-300 hover:bg-gray-50 text-gray-500" . 
+                              ($current_page == $total_pages ? ' opacity-50 cursor-not-allowed' : '') . "\">
+                              <i class=\"fas fa-angle-right\"></i>
+                          </button>";
+
+                        // Last page button
+                        echo "<button onclick=\"changePage($total_pages)\" " . ($current_page == $total_pages ? 'disabled' : '') . "
+                              class=\"px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-r-lg hover:bg-gray-50 text-gray-500" . 
+                              ($current_page == $total_pages ? ' opacity-50 cursor-not-allowed' : '') . "\">
+                              <i class=\"fas fa-angle-double-right\"></i>
+                          </button>";
+                        ?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Feedback Modal -->
-    <div id="feedbackModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-6 w-96">
-            <h2 class="text-xl font-bold mb-4">Submit Feedback</h2>
+    <!-- Redesigned Feedback Modal -->
+    <div id="feedbackModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-xl transform transition-all duration-300 scale-100">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Submit Feedback</h2>
+                <button onclick="closeFeedbackModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mb-5"></div>
+            
             <form id="feedbackForm" onsubmit="submitFeedback(event)">
                 <input type="hidden" id="sitinId" name="sitinId">
                 <input type="hidden" id="laboratory" name="laboratory">
-                <textarea id="feedbackText" name="feedback" rows="4" 
-                    class="w-full p-2 border rounded mb-4" 
-                    placeholder="Enter your feedback here..." 
-                    required></textarea>
-                <div class="flex justify-end space-x-2">
+                <input type="hidden" id="rating" name="rating" value="0">
+                
+                <!-- Star Rating -->
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rate your experience:</label>
+                    <div class="flex items-center space-x-1" id="starRating">
+                        <i class="far fa-star text-2xl cursor-pointer text-yellow-400 hover:text-yellow-500" data-rating="1"></i>
+                        <i class="far fa-star text-2xl cursor-pointer text-yellow-400 hover:text-yellow-500" data-rating="2"></i>
+                        <i class="far fa-star text-2xl cursor-pointer text-yellow-400 hover:text-yellow-500" data-rating="3"></i>
+                        <i class="far fa-star text-2xl cursor-pointer text-yellow-400 hover:text-yellow-500" data-rating="4"></i>
+                        <i class="far fa-star text-2xl cursor-pointer text-yellow-400 hover:text-yellow-500" data-rating="5"></i>
+                    </div>
+                </div>
+                
+                <div class="mb-5">
+                    <label for="feedbackText" class="block text-sm font-medium text-gray-700 mb-2">Your feedback:</label>
+                    <textarea id="feedbackText" name="feedback" rows="4" 
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none" 
+                        placeholder="Share your experience with this lab session..." 
+                        required></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeFeedbackModal()" 
-                        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors">
+                        Cancel
+                    </button>
                     <button type="submit" 
-                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Submit</button>
+                        class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium transition-colors flex items-center">
+                        <i class="fas fa-paper-plane mr-2"></i> Submit Feedback
+                    </button>
                 </div>
             </form>
         </div>
     </div>
     
     <!-- Footer -->
-    <div class="py-3 px-6 bg-white relative mt-8">
+    <div class="py-4 px-6 bg-white/95 backdrop-blur-sm mt-8 relative">
         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
-        <p class="text-center text-xs text-gray-600">
+        <p class="text-center text-sm text-gray-600">
             &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
         </p>
     </div>
 
     <script>
-        function toggleNav(x) {
-            document.getElementById("mySidenav").classList.toggle("-translate-x-0");
-            document.getElementById("mySidenav").classList.toggle("-translate-x-full");
+        function toggleNav() {
+            const sidenav = document.getElementById("mySidenav");
+            if (sidenav.classList.contains("-translate-x-full")) {
+                sidenav.classList.remove("-translate-x-full");
+                sidenav.classList.add("-translate-x-0");
+                sidenav.classList.add("animate-slide-in");
+            } else {
+                closeNav();
+            }
         }
 
         function closeNav() {
-            document.getElementById("mySidenav").classList.remove("-translate-x-0");
-            document.getElementById("mySidenav").classList.add("-translate-x-full");
+            const sidenav = document.getElementById("mySidenav");
+            sidenav.classList.remove("-translate-x-0");
+            sidenav.classList.add("-translate-x-full");
+            sidenav.classList.remove("animate-slide-in");
         }
 
         function openFeedbackModal(sitinId, laboratory) {
-            document.getElementById('feedbackModal').classList.remove('hidden');
-            document.getElementById('feedbackModal').classList.add('flex');
+            const modal = document.getElementById('feedbackModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
             document.getElementById('sitinId').value = sitinId;
             document.getElementById('laboratory').value = laboratory;
+            
+            // Add entrance animation
+            const modalContent = modal.querySelector('div');
+            modalContent.classList.add('scale-100');
+            modalContent.classList.remove('scale-95');
         }
 
         function closeFeedbackModal() {
-            document.getElementById('feedbackModal').classList.add('hidden');
-            document.getElementById('feedbackModal').classList.remove('flex');
+            const modal = document.getElementById('feedbackModal');
+            const modalContent = modal.querySelector('div');
+            
+            // Add exit animation
+            modalContent.classList.add('scale-95');
+            modalContent.classList.remove('scale-100');
+            
+            // Delay hiding the modal to allow animation to complete
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 200);
         }
 
         function submitFeedback(event) {
             event.preventDefault();
             const formData = new FormData(document.getElementById('feedbackForm'));
+            const rating = document.getElementById('rating').value;
+            
+            if (rating === '0') {
+                Swal.fire({
+                    title: 'Rating Required',
+                    text: 'Please select a rating before submitting your feedback',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#4f46e5'
+                });
+                return;
+            }
 
             fetch('feedback_submit.php', {
                 method: 'POST',
@@ -315,7 +488,7 @@ if ($userId) {
                         text: 'Feedback Successfully Submitted',
                         icon: 'success',
                         confirmButtonText: 'OK',
-                        confirmButtonColor: '#3085d6',
+                        confirmButtonColor: '#4f46e5',
                         timer: 3000,
                         timerProgressBar: true
                     });
@@ -342,6 +515,117 @@ if ($userId) {
                     confirmButtonText: 'OK',
                     confirmButtonColor: '#d33'
                 });
+            });
+        }
+
+        function searchTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.querySelector('table');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) { // Start from 1 to skip header row
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    const cellText = cells[j].textContent || cells[j].innerText;
+                    if (cellText.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                rows[i].style.display = found ? '' : 'none';
+            }
+
+            // Show "No results found" message if no matches
+            const noResults = document.getElementById('noResults');
+            const hasVisibleRows = Array.from(rows).slice(1).some(row => row.style.display !== 'none');
+            
+            if (!hasVisibleRows && filter !== '') {
+                if (!noResults) {
+                    const tbody = table.querySelector('tbody');
+                    const messageRow = document.createElement('tr');
+                    messageRow.id = 'noResults';
+                    messageRow.innerHTML = `
+                        <td colspan="9" class="px-6 py-10 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <i class="fas fa-search text-4xl text-gray-300 mb-3"></i>
+                                <div class="text-gray-500 font-medium">No matching records found</div>
+                                <div class="text-sm text-gray-400 mt-1">Try adjusting your search criteria</div>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(messageRow);
+                }
+            } else if (noResults) {
+                noResults.remove();
+            }
+        }
+
+        function changeEntries(entries) {
+            window.location.href = `history.php?entries=${entries}&page=1`;
+        }
+
+        function changePage(page) {
+            const entries = document.getElementById('entriesPerPage').value;
+            window.location.href = `history.php?entries=${entries}&page=${page}`;
+        }
+
+        // Add this to your existing JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const starContainer = document.getElementById('starRating');
+            const stars = starContainer.getElementsByTagName('i');
+            const ratingInput = document.getElementById('rating');
+
+            // Handle star rating
+            Array.from(stars).forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const rating = this.dataset.rating;
+                    highlightStars(rating);
+                });
+
+                star.addEventListener('click', function() {
+                    const rating = this.dataset.rating;
+                    ratingInput.value = rating;
+                    setStars(rating);
+                });
+            });
+
+            starContainer.addEventListener('mouseout', function() {
+                const currentRating = ratingInput.value;
+                if (currentRating > 0) {
+                    setStars(currentRating);
+                } else {
+                    resetStars();
+                }
+            });
+        });
+
+        function highlightStars(rating) {
+            const stars = document.querySelectorAll('#starRating i');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
+        }
+
+        function setStars(rating) {
+            highlightStars(rating);
+            document.getElementById('rating').value = rating;
+        }
+
+        function resetStars() {
+            const stars = document.querySelectorAll('#starRating i');
+            stars.forEach(star => {
+                star.classList.remove('fas');
+                star.classList.add('far');
             });
         }
     </script>

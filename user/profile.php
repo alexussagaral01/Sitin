@@ -38,11 +38,22 @@ if ($userId) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Profile</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                }
+            }
+        }
+    </script>
     <style>
         /* Add gradient text class for the footer */
         .gradient-text {
@@ -72,9 +83,9 @@ if ($userId) {
         }
     </style>
 </head>
-<body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
-    <!-- Header - Kept unchanged -->
-    <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
+<body class="bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 min-h-screen font-poppins">
+    <!-- Header -->
+    <div class="text-center text-white font-bold text-2xl py-4 relative shadow-lg" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
         CCS SIT-IN MONITORING SYSTEM
         <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
             <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
@@ -83,59 +94,60 @@ if ($userId) {
         </div>
     </div>
 
-    <!-- Side Navigation - Kept unchanged -->
-    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
-        <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+    <!-- Side Navigation -->
+    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-72 bg-gradient-to-b from-indigo-900 to-purple-800 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-xl overflow-y-auto">
+        <div class="absolute top-0 right-0 m-3">
+            <button onclick="closeNav()" class="text-white hover:text-pink-200 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
         
-        <div class="flex flex-col items-center mt-4">
-            <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
-            <p class="text-white font-bold text-lg mb-3"><?php echo htmlspecialchars($firstName); ?></p>
+        <div class="flex flex-col items-center mt-6">
+            <div class="relative">
+                <img src="<?php echo htmlspecialchars($profileImage); ?>" alt="Profile" class="w-20 h-20 rounded-full border-4 border-white/30 object-cover shadow-lg">
+                <div class="absolute bottom-0 right-0 bg-green-500 w-3 h-3 rounded-full border-2 border-white"></div>
+            </div>
+            <p class="text-white font-semibold text-lg mt-2 mb-0"><?php echo htmlspecialchars($firstName); ?></p>
+            <p class="text-purple-200 text-xs mb-3">Student</p>
         </div>
 
-        <nav class="flex flex-col space-y-0.5 px-2">
-            <div class="overflow-hidden">
-                <a href="dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-home w-6 text-base"></i>
-                    <span class="text-sm font-medium">HOME</span>
+        <div class="px-2 py-2">
+            <nav class="flex flex-col space-y-1">
+                <a href="dashboard.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-home w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">HOME</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="profile.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-user w-6 text-base"></i>
-                    <span class="text-sm font-medium">PROFILE</span>
+                <a href="profile.php" class="group px-3 py-2 text-white/90 bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-user w-5 mr-2 text-center"></i>
+                    <span class="font-medium">PROFILE</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="edit.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-edit w-6 text-base"></i>
-                    <span class="text-sm font-medium">EDIT</span>
+                <a href="edit.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-edit w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">EDIT</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="history.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-history w-6 text-base"></i>
-                    <span class="text-sm font-medium">HISTORY</span>
+                <a href="history.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-history w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">HISTORY</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="reservation.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-calendar-alt w-6 text-base"></i>
-                    <span class="text-sm font-medium">RESERVATION</span>
+                <a href="reservation.php" class="group px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-calendar-alt w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">RESERVATION</span>
                 </a>
-            </div>
-
-        <div class="overflow-hidden">
-            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-sign-out-alt w-6 text-base"></i>
-                <span class="text-sm font-medium">LOG OUT</span>
-            </a>
+                
+                <div class="border-t border-white/10 my-2"></div>
+                
+                <a href="../logout.php" class="group px-3 py-2 text-white/90 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-sign-out-alt w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">LOG OUT</span>
+                </a>
+            </nav>
         </div>
     </div>
 
     <!-- Student Info Section with original header style -->
     <div class="w-11/12 md:w-8/12 mx-auto my-8 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
         <!-- Original header style kept intact -->
-        <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+        <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
             <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
             <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
             <i class="fas fa-user-graduate text-2xl mr-4 relative z-10"></i>
@@ -219,9 +231,9 @@ if ($userId) {
     </div>
 
     <!-- Footer -->
-    <div class="py-3 px-6 bg-white relative mt-8">
+    <div class="py-4 px-6 bg-white/95 backdrop-blur-sm mt-8 relative">
         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
-        <p class="text-center text-xs text-gray-600">
+        <p class="text-center text-sm text-gray-600">
             &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
         </p>
     </div>

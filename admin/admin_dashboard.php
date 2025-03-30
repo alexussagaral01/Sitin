@@ -103,7 +103,7 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -111,6 +111,17 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
     <!-- Add ECharts library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <title>Admin Dashboard</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                }
+            }
+        }
+    </script>
     <style>
         /* Add gradient text class for the footer */
         .gradient-text {
@@ -122,9 +133,9 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
         }
     </style>
 </head>
-<body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
+<body class="bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 min-h-screen font-poppins">
     <!-- Header -->
-    <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
+    <div class="text-center text-white font-bold text-2xl py-4 relative shadow-lg" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
         CCS SIT-IN MONITORING SYSTEM
         <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
             <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
@@ -134,76 +145,66 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
     </div>
 
     <!-- Side Navigation -->
-    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
-        <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-72 bg-gradient-to-b from-indigo-900 to-purple-800 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-xl overflow-y-auto">
+        <div class="absolute top-0 right-0 m-3">
+            <button onclick="closeNav()" class="text-white hover:text-pink-200 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
         
-        <div class="flex flex-col items-center mt-4">
-            <img src="../images/image.jpg" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
-            <p class="text-white font-bold text-lg mb-3">Admin</p>
+        <div class="flex flex-col items-center mt-6">
+            <div class="relative">
+                <img src="../images/image.jpg" alt="Logo" class="w-20 h-20 rounded-full border-4 border-white/30 object-cover shadow-lg">
+                <div class="absolute bottom-0 right-0 bg-green-500 w-3 h-3 rounded-full border-2 border-white"></div>
+            </div>
+            <p class="text-white font-semibold text-lg mt-2 mb-0">Admin</p>
+            <p class="text-purple-200 text-xs mb-3">Administrator</p>
         </div>
 
-        <nav class="flex flex-col space-y-0.5 px-2">
-            <div class="overflow-hidden">
-                <a href="admin_dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-home w-6 text-base"></i>
-                    <span class="text-sm font-medium">HOME</span>
+        <div class="px-2 py-2">
+            <nav class="flex flex-col space-y-1">
+                <a href="admin_dashboard.php" class="group px-3 py-2 text-white/90 bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-home w-5 mr-2 text-center"></i>
+                    <span class="font-medium">HOME</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_search.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-search w-6 text-base"></i>
-                    <span class="text-sm font-medium">SEARCH</span>
+                <a href="admin_search.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-search w-5 mr-2 text-center"></i>
+                    <span class="font-medium">SEARCH</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_sitin.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-user-check w-6 text-base"></i>
-                    <span class="text-sm font-medium">SIT-IN</span>
+                <a href="admin_sitin.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-user-check w-5 mr-2 text-center"></i>
+                    <span class="font-medium">SIT-IN</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_sitinrec.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-book w-6 text-base"></i>
-                    <span class="text-sm font-medium">VIEW SIT-IN RECORDS</span>
+                <a href="admin_sitinrec.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-book w-5 mr-2 text-center"></i>
+                    <span class="font-medium">VIEW SIT-IN RECORDS</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_studlist.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-list w-6 text-base"></i>
-                    <span class="text-sm font-medium">VIEW LIST OF STUDENT</span>
+                <a href="admin_studlist.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-list w-5 mr-2 text-center"></i>
+                    <span class="font-medium">VIEW LIST OF STUDENT</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_report.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-chart-line w-6 text-base"></i>
-                    <span class="text-sm font-medium">SIT-IN REPORT</span>
+                <a href="admin_report.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-chart-line w-5 mr-2 text-center"></i>
+                    <span class="font-medium">SIT-IN REPORT</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_feedback.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-comments w-6 text-base"></i>
-                    <span class="text-sm font-medium">VIEW FEEDBACKS</span>
+                <a href="admin_feedback.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-comments w-5 mr-2 text-center"></i>
+                    <span class="font-medium">VIEW FEEDBACKS</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-chart-pie w-6 text-base"></i>
-                    <span class="text-sm font-medium">VIEW DAILY ANALYTICS</span>
+                <a href="#" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-chart-pie w-5 mr-2 text-center"></i>
+                    <span class="font-medium">VIEW DAILY ANALYTICS</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-calendar-check w-6 text-base"></i>
-                    <span class="text-sm font-medium">RESERVATION/APPROVAL</span>
+                <a href="#" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-calendar-check w-5 mr-2 text-center"></i>
+                    <span class="font-medium">RESERVATION/APPROVAL</span>
                 </a>
-            </div>
-        </nav>
-
-        <div class="mt-3 px-2 pb-2">
-            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-sign-out-alt w-6 text-base"></i>
-                <span class="text-sm font-medium">LOG OUT</span>
-            </a>
+                <div class="border-t border-white/10 my-2"></div>
+                <a href="../logout.php" class="group px-3 py-2 text-white/90 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-sign-out-alt w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">LOG OUT</span>
+                </a>
+            </nav>
         </div>
     </div>
 
@@ -211,7 +212,7 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
     <div class="px-8 py-8 w-full flex flex-wrap gap-8">
         <!-- Statistics Card -->
         <div class="flex-1 min-w-[400px] bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-2xl overflow-hidden h-[700px] backdrop-blur-sm border border-white/30">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+            <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 <i class="fas fa-chart-bar text-2xl mr-4 relative z-10"></i>
@@ -263,7 +264,7 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
 
         <!-- Announcements Card -->
         <div class="flex-1 min-w-[400px] bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-2xl overflow-hidden h-[700px] backdrop-blur-sm border border-white/30">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+            <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 <i class="fas fa-bullhorn text-2xl mr-4 relative z-10"></i>
@@ -292,7 +293,8 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
                             <p class="text-gray-500 text-center py-4">No announcements available.</p>
                         <?php else: ?>
                             <?php foreach ($announcements as $announcement): ?>
-                                <div class="bg-white/80 rounded-xl p-5 shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                                <div class="bg-white/80 rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300 border-l-4 border-gradient-purple" 
+                                     style="border-image: linear-gradient(to bottom, #4A69BB, #CD4DCC) 1;">
                                     <div class="flex items-center text-sm font-bold text-purple-600 mb-3">
                                         <i class="fas fa-user-shield mr-2"></i>
                                         <?php echo htmlspecialchars($announcement['CREATED_BY']); ?>
@@ -310,7 +312,7 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="text-gray-700 pl-4 border-l-4 border-gradient-purple announcement-content" 
+                                    <div class="text-gray-700 bg-gray-50/80 p-4 rounded-lg announcement-content" 
                                          id="content-<?php echo $announcement['ID']; ?>">
                                         <?php echo htmlspecialchars($announcement['CONTENT']); ?>
                                     </div>
@@ -327,6 +329,11 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
                                             </button>
                                         </div>
                                     </div>
+                                    <div class="mt-3 flex justify-end">
+                                        <span class="text-xs text-gray-500 italic">
+                                            <?php echo date('h:i A', strtotime($announcement['CREATED_DATE'])); ?>
+                                        </span>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -340,7 +347,7 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
     <div class="px-8 pb-8 w-full">
         <!-- Year Level Chart Card -->
         <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-2xl overflow-hidden backdrop-blur-sm border border-white/30">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+            <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 <i class="fas fa-users text-2xl mr-4 relative z-10"></i>
@@ -355,9 +362,10 @@ $yearLevelLabelsJSON = json_encode(array_keys($yearLevelCounts)); // Fixed from 
         </div>
     </div>
 
-    <div class="py-3 px-6 bg-white relative mt-8">
+     <!-- Footer -->
+    <div class="py-4 px-6 bg-white/95 backdrop-blur-sm mt-8 relative">
         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
-        <p class="text-center text-xs text-gray-600">
+        <p class="text-center text-sm text-gray-600">
             &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
         </p>
     </div>

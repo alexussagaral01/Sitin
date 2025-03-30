@@ -2,16 +2,34 @@
 session_start();
 require '../db.php';
 
-// Check if admin is not logged in, redirect to login page
+// Check if admin is not logged in
 if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
     header("Location: ../login.php");
     exit;
 }
 
+// Initialize pagination variables
+$entries_per_page = isset($_GET['entries']) ? (int)$_GET['entries'] : 10;
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($current_page - 1) * $entries_per_page;
+
 // Initialize search query
 $search = isset($_POST['search']) ? mysqli_real_escape_string($conn, $_POST['search']) : '';
 
-// Modify the base query to include search
+// Get total records count
+$count_query = "SELECT COUNT(*) as total FROM curr_sitin";
+if (!empty($search)) {
+    $count_query .= " WHERE IDNO LIKE '%$search%' 
+                      OR FULL_NAME LIKE '%$search%' 
+                      OR PURPOSE LIKE '%$search%' 
+                      OR LABORATORY LIKE '%$search%'";
+}
+$count_result = mysqli_query($conn, $count_query);
+$count_row = mysqli_fetch_assoc($count_result);
+$total_records = $count_row['total'];
+$total_pages = ceil($total_records / $entries_per_page);
+
+// Modify the base query to include pagination
 $query = "SELECT IDNO, FULL_NAME, PURPOSE, LABORATORY, TIME_IN, TIME_OUT, DATE FROM curr_sitin";
 if (!empty($search)) {
     $query .= " WHERE IDNO LIKE '%$search%' 
@@ -19,10 +37,13 @@ if (!empty($search)) {
                 OR PURPOSE LIKE '%$search%' 
                 OR LABORATORY LIKE '%$search%'";
 }
-$query .= " ORDER BY DATE DESC";
+$query .= " ORDER BY DATE DESC LIMIT ? OFFSET ?";
 
-$result = mysqli_query($conn, $query);
-$total_records = mysqli_num_rows($result);
+// Use prepared statement for the main query
+$stmt = $conn->prepare($query);
+$stmt->bind_param("ii", $entries_per_page, $offset);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,10 +51,32 @@ $total_records = mysqli_num_rows($result);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sitin Reports</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add DataTables CSS and JS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                }
+            }
+        }
+    </script>
     <style>
         /* Add gradient text class for the footer */
         .gradient-text {
@@ -45,9 +88,9 @@ $total_records = mysqli_num_rows($result);
         }
     </style>
 </head>
-<body class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)]">
+<body class="bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 min-h-screen font-poppins">
     <!-- Header -->
-    <div class="text-center bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-bold text-2xl py-4 relative">
+    <div class="text-center text-white font-bold text-2xl py-4 relative shadow-lg" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
         CCS SIT-IN MONITORING SYSTEM
         <div class="absolute top-4 left-6 cursor-pointer" onclick="toggleNav(this)">
             <div class="bar1 w-8 h-1 bg-white my-1 transition-all duration-300"></div>
@@ -57,83 +100,73 @@ $total_records = mysqli_num_rows($result);
     </div>
 
     <!-- Side Navigation -->
-    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-lg overflow-y-auto">
-        <span class="absolute top-0 right-0 p-4 text-3xl cursor-pointer text-white hover:text-gray-200" onclick="closeNav()">&times;</span>
+    <div id="mySidenav" class="fixed top-0 left-0 h-screen w-72 bg-gradient-to-b from-indigo-900 to-purple-800 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-xl overflow-y-auto">
+        <div class="absolute top-0 right-0 m-3">
+            <button onclick="closeNav()" class="text-white hover:text-pink-200 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
         
-        <div class="flex flex-col items-center mt-4">
-            <img src="../images/image.jpg" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white object-cover mb-2">
-            <p class="text-white font-bold text-lg mb-3">Admin</p>
+        <div class="flex flex-col items-center mt-6">
+            <div class="relative">
+                <img src="../images/image.jpg" alt="Logo" class="w-20 h-20 rounded-full border-4 border-white/30 object-cover shadow-lg">
+                <div class="absolute bottom-0 right-0 bg-green-500 w-3 h-3 rounded-full border-2 border-white"></div>
+            </div>
+            <p class="text-white font-semibold text-lg mt-2 mb-0">Admin</p>
+            <p class="text-purple-200 text-xs mb-3">Administrator</p>
         </div>
 
-        <nav class="flex flex-col space-y-0.5 px-2">
-            <div class="overflow-hidden">
-                <a href="admin_dashboard.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-home w-6 text-base"></i>
-                    <span class="text-sm font-medium">HOME</span>
+        <div class="px-2 py-2">
+            <nav class="flex flex-col space-y-1">
+                <a href="admin_dashboard.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-home w-5 mr-2 text-center"></i>
+                    <span class="font-medium">HOME</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_search.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-search w-6 text-base"></i>
-                    <span class="text-sm font-medium">SEARCH</span>
+                <a href="admin_search.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-search w-5 mr-2 text-center"></i>
+                    <span class="font-medium">SEARCH</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_sitin.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-user-check w-6 text-base"></i>
-                    <span class="text-sm font-medium">SIT-IN</span>
+                <a href="admin_sitin.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-user-check w-5 mr-2 text-center"></i>
+                    <span class="font-medium">SIT-IN</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_sitinrec.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-book w-6 text-base"></i>
-                    <span class="text-sm font-medium">VIEW SIT-IN RECORDS</span>
+                <a href="admin_sitinrec.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-book w-5 mr-2 text-center"></i>
+                    <span class="font-medium">VIEW SIT-IN RECORDS</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_studlist.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-list w-6 text-base"></i>
-                    <span class="text-sm font-medium">VIEW LIST OF STUDENT</span>
+                <a href="admin_studlist.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-list w-5 mr-2 text-center"></i>
+                    <span class="font-medium">VIEW LIST OF STUDENT</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_report.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-chart-line w-6 text-base"></i>
-                    <span class="text-sm font-medium">SIT-IN REPORT</span>
+                <a href="admin_report.php" class="group px-3 py-2 text-white/90 bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-chart-line w-5 mr-2 text-center"></i>
+                    <span class="font-medium">SIT-IN REPORT</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="admin_feedback.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-comments w-6 text-base"></i>
-                    <span class="text-sm font-medium">VIEW FEEDBACKS</span>
+                <a href="admin_feedback.php" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-comments w-5 mr-2 text-center"></i>
+                    <span class="font-medium">VIEW FEEDBACKS</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-chart-pie w-6 text-base"></i>
-                    <span class="text-sm font-medium">VIEW DAILY ANALYTICS</span>
+                <a href="#" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-chart-pie w-5 mr-2 text-center"></i>
+                    <span class="font-medium">VIEW DAILY ANALYTICS</span>
                 </a>
-            </div>
-            <div class="overflow-hidden">
-                <a href="#" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                    <i class="fas fa-calendar-check w-6 text-base"></i>
-                    <span class="text-sm font-medium">RESERVATION/APPROVAL</span>
+                <a href="#" class="group px-3 py-2 text-white/90 hover:bg-white/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-calendar-check w-5 mr-2 text-center"></i>
+                    <span class="font-medium">RESERVATION/APPROVAL</span>
                 </a>
-            </div>
-        </nav>
-
-        <div class="mt-3 px-2 pb-2">
-            <a href="../logout.php" class="px-3 py-2 text-white hover:bg-white/20 hover:translate-x-1 transition-all duration-200 flex items-center w-full rounded">
-                <i class="fas fa-sign-out-alt w-6 text-base"></i>
-                <span class="text-sm font-medium">LOG OUT</span>
-            </a>
+                <div class="border-t border-white/10 my-2"></div>
+                <a href="../logout.php" class="group px-3 py-2 text-white/90 hover:bg-red-500/20 rounded-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-sign-out-alt w-5 mr-2 text-center"></i>
+                    <span class="font-medium group-hover:translate-x-1 transition-transform">LOG OUT</span>
+                </a>
+            </nav>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 mt-8">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-            <div class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white p-4 flex items-center justify-center relative overflow-hidden">
+        <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
                 <i class="fas fa-chart-line text-2xl mr-4 relative z-10"></i>
@@ -156,41 +189,39 @@ $total_records = mysqli_num_rows($result);
 
                 <!-- Export Options -->
                 <div class="flex justify-between items-center mb-4">
-                    <div class="flex space-x-2">
-                        <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-colors duration-200">CSV</button>
-                        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition-colors duration-200">Excel</button>
-                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors duration-200">PDF</button>
-                        <button class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition-colors duration-200">Print</button>
+                    <div class="dt-buttons flex space-x-3">
+                        <!-- DataTables will automatically insert buttons here -->
                     </div>
                 </div>
 
                 <!-- Entries per page and Search Bar -->
                 <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center">
-                        <select class="border rounded px-2 py-1 mr-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
+                    <div class="flex items-center bg-gray-50 rounded-lg p-2 shadow-sm">
+                        <label class="text-gray-600 mr-2 text-sm">Show</label>
+                        <select id="entriesPerPage" onchange="changeEntries(this.value)" 
+                                class="bg-white border border-gray-200 rounded-md px-3 py-1.5 shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none">
+                            <option value="10" <?php echo $entries_per_page == 10 ? 'selected' : ''; ?>>10</option>
+                            <option value="25" <?php echo $entries_per_page == 25 ? 'selected' : ''; ?>>25</option>
+                            <option value="50" <?php echo $entries_per_page == 50 ? 'selected' : ''; ?>>50</option>
+                            <option value="100" <?php echo $entries_per_page == 100 ? 'selected' : ''; ?>>100</option>
                         </select>
-                        <span>entries per page</span>
+                        <span class="text-gray-600 ml-2 text-sm">entries</span>
                     </div>
+                    
                     <div class="flex items-center">
-                        <form method="POST" class="flex items-center">
-                            <span class="mr-2">Search:</span>
-                            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
-                                   class="border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                            <button type="submit" class="relative inline-flex items-center justify-center overflow-hidden rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium hover:text-white">
-                                   <span class="relative rounded-md bg-white px-4 py-1 transition-all duration-300 ease-in-out group-hover:bg-opacity-0 text-purple-700 font-bold group-hover:text-white">
-                                <i class="fas fa-search"></i>
-                            </button>
+                        <form method="POST" class="relative" onsubmit="return searchTable();">
+                            <input type="text" name="search" id="searchInput" placeholder="Search reports..." 
+                                value="<?php echo isset($_POST['search']) ? htmlspecialchars($_POST['search']) : ''; ?>"
+                                class="w-full md:w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <button type="submit" class="hidden">Search</button>
                         </form>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead class="bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white">
+                    <table id="reportsTable" class="min-w-full">
+                    <thead style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93));" class="text-white">
                             <tr>
                                 <th class="px-6 py-3 text-left">ID Number</th>
                                 <th class="px-6 py-3 text-left">Name</th>
@@ -205,13 +236,17 @@ $total_records = mysqli_num_rows($result);
                             <?php
                             if (mysqli_num_rows($result) > 0) {
                                 while ($row = mysqli_fetch_assoc($result)) {
+                                    // Convert time to Asia/Manila timezone and 12-hour format
+                                    $time_in = date('h:i A', strtotime($row['TIME_IN']));
+                                    $time_out = $row['TIME_OUT'] ? date('h:i A', strtotime($row['TIME_OUT'])) : 'Active';
+                                    
                                     echo "<tr class='border-b hover:bg-gray-50'>";
                                     echo "<td class='px-6 py-4'>" . $row['IDNO'] . "</td>";
                                     echo "<td class='px-6 py-4'>" . $row['FULL_NAME'] . "</td>";
                                     echo "<td class='px-6 py-4'>" . $row['PURPOSE'] . "</td>";
                                     echo "<td class='px-6 py-4'>" . $row['LABORATORY'] . "</td>";
-                                    echo "<td class='px-6 py-4'>" . $row['TIME_IN'] . "</td>";
-                                    echo "<td class='px-6 py-4'>" . ($row['TIME_OUT'] ? $row['TIME_OUT'] : 'Active') . "</td>";
+                                    echo "<td class='px-6 py-4'>" . $time_in . "</td>";
+                                    echo "<td class='px-6 py-4'>" . $time_out . "</td>";
                                     echo "<td class='px-6 py-4'>" . $row['DATE'] . "</td>";
                                     echo "</tr>";
                                 }
@@ -225,20 +260,56 @@ $total_records = mysqli_num_rows($result);
                     </table>
                 </div>
 
-                <div class="flex justify-between items-center mt-4">
-                    <div class="text-gray-600">
-                        <?php 
-                        $start = 1;
-                        $end = $total_records;
-                        echo "Showing $start to $end of $total_records entries";
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center mt-6 gap-4">
+                    <div class="text-gray-600 text-sm">
+                        <?php
+                        $start_entry = $total_records > 0 ? $offset + 1 : 0;
+                        $end_entry = min($offset + $entries_per_page, $total_records);
+                        echo "Showing <span class='font-semibold'>$start_entry</span> to <span class='font-semibold'>$end_entry</span> of <span class='font-semibold'>$total_records</span> entries";
                         ?>
                     </div>
-                    <div class="flex space-x-1">
-                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&laquo;</button>
-                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&lt;</button>
-                        <button class="px-3 py-1 border rounded bg-blue-500 text-white">1</button>
-                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&gt;</button>
-                        <button class="px-3 py-1 border rounded hover:bg-gray-100">&raquo;</button>
+                    <div class="inline-flex rounded-lg shadow-sm">
+                        <?php
+                        // First page button
+                        echo "<button onclick=\"changePage(1)\" " . ($current_page == 1 ? 'disabled' : '') . " 
+                              class=\"px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-l-lg hover:bg-gray-50 text-gray-500" . 
+                              ($current_page == 1 ? ' opacity-50 cursor-not-allowed' : '') . "\">
+                              <i class=\"fas fa-angles-left\"></i>
+                          </button>";
+
+                        // Previous page button
+                        $prev_page = max(1, $current_page - 1);
+                        echo "<button onclick=\"changePage($prev_page)\" " . ($current_page == 1 ? 'disabled' : '') . " 
+                              class=\"px-3.5 py-2 text-sm bg-white border-t border-b border-l border-gray-300 hover:bg-gray-50 text-gray-500" . 
+                              ($current_page == 1 ? ' opacity-50 cursor-not-allowed' : '') . "\">
+                              <i class=\"fas fa-angle-left\"></i>
+                          </button>";
+
+                        // Page numbers
+                        for($i = 1; $i <= $total_pages; $i++) {
+                            if($i == $current_page) {
+                                echo "<button class=\"px-3.5 py-2 text-sm bg-indigo-600 text-white border border-indigo-600\">$i</button>";
+                            } else {
+                                echo "<button onclick=\"changePage($i)\" 
+                                      class=\"px-3.5 py-2 text-sm bg-white border border-gray-300 hover:bg-gray-50 text-gray-700\">$i</button>";
+                            }
+                        }
+
+                        // Next page button
+                        $next_page = min($total_pages, $current_page + 1);
+                        echo "<button onclick=\"changePage($next_page)\" " . ($current_page == $total_pages ? 'disabled' : '') . "
+                              class=\"px-3.5 py-2 text-sm bg-white border-t border-b border-r border-gray-300 hover:bg-gray-50 text-gray-500" . 
+                              ($current_page == $total_pages ? ' opacity-50 cursor-not-allowed' : '') . "\">
+                              <i class=\"fas fa-angle-right\"></i>
+                          </button>";
+
+                        // Last page button
+                        echo "<button onclick=\"changePage($total_pages)\" " . ($current_page == $total_pages ? 'disabled' : '') . "
+                              class=\"px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-r-lg hover:bg-gray-50 text-gray-500" . 
+                              ($current_page == $total_pages ? ' opacity-50 cursor-not-allowed' : '') . "\">
+                              <i class=\"fas fa-angles-right\"></i>
+                          </button>";
+                        ?>
                     </div>
                 </div>
             </div>
@@ -246,9 +317,9 @@ $total_records = mysqli_num_rows($result);
     </div>
 
     <!-- Footer -->
-    <div class="py-3 px-6 bg-white relative mt-8">
+    <div class="py-4 px-6 bg-white/95 backdrop-blur-sm mt-8 relative">
         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
-        <p class="text-center text-xs text-gray-600">
+        <p class="text-center text-sm text-gray-600">
             &copy; 2025 CCS Sit-in Monitoring System | <span class="gradient-text font-medium">UC - College of Computer Studies</span>
         </p>
     </div>
@@ -263,6 +334,87 @@ $total_records = mysqli_num_rows($result);
             document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
         }
+
+        function changeEntries(entries) {
+            window.location.href = `admin_report.php?entries=${entries}&page=1`;
+        }
+
+        function changePage(page) {
+            const entries = document.getElementById('entriesPerPage').value;
+            window.location.href = `admin_report.php?entries=${entries}&page=${page}`;
+        }
+
+        function searchTable() {
+            const searchValue = document.getElementById('searchInput').value;
+            if (searchValue.length > 0) {
+                document.forms[0].submit();
+            }
+            return false;
+        }
+
+        $(document).ready(function() {
+            $('#reportsTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'csv',
+                        className: 'relative inline-flex items-center px-6 py-2.5 border-2 border-blue-600 font-medium text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-300 group',
+                        text: `<span class="absolute w-32 h-32 -top-8 -left-2 bg-blue-600 scale-0 rounded-full group-hover:scale-100 transition-all duration-300 z-0 opacity-30"></span>
+                               <span class="relative z-10 flex items-center">
+                                   <i class="fas fa-file-csv mr-2 transform group-hover:scale-110 transition-transform"></i>
+                                   Export CSV
+                               </span>`
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'relative inline-flex items-center px-6 py-2.5 border-2 border-emerald-600 font-medium text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition-all duration-300 group overflow-hidden',
+                        text: `<span class="absolute inset-0 bg-emerald-600 w-0 group-hover:w-full transition-all duration-300 z-0"></span>
+                               <span class="relative z-10 flex items-center">
+                                   <i class="fas fa-file-excel mr-2 group-hover:animate-bounce"></i>
+                                   Export Excel
+                               </span>`
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'relative inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-red-500/50 hover:-translate-y-0.5',
+                        text: `<span class="flex items-center">
+                                   <i class="fas fa-file-pdf mr-2 animate-pulse"></i>
+                                   Export PDF
+                               </span>`
+                    },
+                    {
+                        extend: 'print',
+                        className: 'relative inline-flex items-center px-6 py-2.5 bg-gray-800 text-white rounded-xl transition-all duration-300 group hover:ring-2 hover:ring-offset-2 hover:ring-gray-600',
+                        text: `<span class="absolute inset-0 h-full w-full bg-white/10 block scale-0 group-hover:scale-100 transition-transform duration-300 rounded-xl"></span>
+                               <span class="relative z-10 flex items-center">
+                                   <i class="fas fa-print mr-2 group-hover:rotate-12 transition-transform"></i>
+                                   Print Report
+                               </span>`
+                    }
+                ],
+                paging: false,
+                searching: false,
+                info: false,
+                // Add these options to remove DataTables styling
+                ordering: false,
+                bSort: false,
+                bFilter: false,
+                bLengthChange: false,
+                bPaginate: false,
+                bInfo: false,
+                // Disable DataTables CSS
+                autoWidth: false,
+                initComplete: function() {
+                    // Remove DataTables classes from table
+                    $(this).removeClass('dataTable');
+                    $('.dataTables_wrapper').addClass('bg-transparent border-0');
+                }
+            });
+
+            // Move the buttons to our custom container and add spacing
+            $('.dt-buttons').addClass('flex flex-wrap gap-4');
+            $('.dt-button').addClass('!hover:no-underline');
+        });
     </script>
 </body>
 </html>
