@@ -116,6 +116,7 @@ body {
                 <a href="#home" class="nav-link">Home</a>
                 <a href="#about" class="nav-link">About</a>
                 <a href="#features" class="nav-link">Features</a>
+                <a href="#teachers" class="nav-link">Teachers</a>
                 <a href="login.php" class="gradient-border px-6 py-2 text-white hover:opacity-90 transition-all">
                     Login
                 </a>
@@ -168,6 +169,183 @@ body {
                     </ul>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- Teachers Section -->
+<section id="teachers" class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="glass-card rounded-2xl p-8 md:p-12">
+            <h2 class="text-3xl font-bold text-white text-center mb-12">Our Teachers</h2>
+            
+            <!-- Dean Card (Centered) -->
+            <div class="flex justify-center mb-12">
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Neil Basabe" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Neil Basabe</h3>
+                    <p class="text-purple-300 text-sm">Dean</p>
+                </div>
+            </div>
+
+            <!-- Full-time Teachers Heading -->
+            <h3 class="text-2xl font-bold text-white text-center mb-8 border-t border-purple-500/30 pt-8">
+                FULL-TIME TEACHERS
+            </h3>
+
+            <!-- Teachers Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                <!-- First row of teachers -->
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Heubert Ferolino</h3>
+                    <p class="text-purple-300 text-sm">hferolino@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Leo Bermudez</h3>
+                    <p class="text-purple-300 text-sm">lbermudez@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Jennifer Amores</h3>
+                    <p class="text-purple-300 text-sm">jamores@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Franz Josef Caminade</h3>
+                    <p class="text-purple-300 text-sm">fjcaminade@uc.edu.ph</p>
+                </div>
+
+                <!-- Second row of teachers -->
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Dennis Durano</h3>
+                    <p class="text-purple-300 text-sm">ddurano@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Leah Ybanez</h3>
+                    <p class="text-purple-300 text-sm">lybanez@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Jia Nova Montecino</h3>
+                    <p class="text-purple-300 text-sm">jnmontecino@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Jose Marcelito Brigoli</h3>
+                    <p class="text-purple-300 text-sm">brigolitech3gsc@gmail.com</p>
+                </div>
+
+                <!-- Third row (2 teachers) -->
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Wilson Gayo</h3>
+                    <p class="text-purple-300 text-sm">wilschoy78@gmail.com</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Brinda Demeterio</h3>
+                    <p class="text-purple-300 text-sm">bbdemeterio@gmail.com</p>
+                </div>
+            </div>
+
+            <!-- Part-time Teachers Heading -->
+            <h3 class="text-2xl font-bold text-white text-center mb-8 border-t border-purple-500/30 pt-8 mt-12">
+                PART-TIME TEACHERS
+            </h3>
+
+            <!-- Part-time Teachers Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Joaquin Patiño</h3>
+                    <p class="text-purple-300 text-sm">jpatiño@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Jeff Salimbangon</h3>
+                    <p class="text-purple-300 text-sm">jeff.salimbagon@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Beverly Lahaylahay</h3>
+                    <p class="text-purple-300 text-sm">blahaylahay@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Manuel Arranguez</h3>
+                    <p class="text-purple-300 text-sm">marranguez@uc.edu.ph</p>
+                </div>
+
+                <!-- Additional Part-time Teachers -->
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Sherwin Bentulan</h3>
+                    <p class="text-purple-300 text-sm">sbentulan@uc.edu.ph</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Kent Ivan Nacua</h3>
+                    <p class="text-purple-300 text-sm">kentivanunabia0211@gmail.com</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 text-center transform transition-all hover:-translate-y-2 w-64">
+                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-500">
+                        <img src="images/image.jpg" alt="Teacher Name" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Christian Barral</h3>
+                    <p class="text-purple-300 text-sm">cbarral@uc.edu.ph</p>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>

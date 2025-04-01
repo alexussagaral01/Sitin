@@ -26,6 +26,33 @@ if ($userId) {
     $idNumber = '';
     $studentName = 'Guest';
 }
+
+// Process reservation form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get form data
+    $purpose = isset($_POST['purpose']) ? $_POST['purpose'] : '';
+    $lab = isset($_POST['lab']) ? $_POST['lab'] : '';
+    $date = isset($_POST['date']) ? $_POST['date'] : '';
+    $timeIn = isset($_POST['time_in']) ? $_POST['time_in'] : '';
+    $pcNumber = isset($_POST['available_pc']) ? $_POST['available_pc'] : '';
+    
+    // Validate and insert reservation
+    if (!empty($purpose) && !empty($lab) && !empty($date) && !empty($timeIn) && !empty($pcNumber)) {
+        $stmt = $conn->prepare("INSERT INTO reservations (student_id, student_name, purpose, lab_number, reservation_date, time_in, pc_number) 
+                               VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssssi", $userId, $studentName, $purpose, $lab, $date, $timeIn, $pcNumber);
+        
+        if ($stmt->execute()) {
+            // Success message
+            $successMessage = "Reservation confirmed successfully!";
+        } else {
+            $errorMessage = "Error: " . $stmt->error;
+        }
+        $stmt->close();
+    } else {
+        $errorMessage = "All fields are required";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -121,101 +148,146 @@ if ($userId) {
         </div>
     </div>
 
-    <!-- Reservation Form Container -->
-    <div class="w-11/12 md:w-8/12 mx-auto my-8 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-    <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-            <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-            <i class="fas fa-calendar-alt text-2xl mr-4 relative z-10"></i>
-            <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Reservation</h2>
-        </div>
-        <form action="reservation.php" method="post" class="p-8 space-y-6">
-            <!-- Form Groups -->
-            <div class="space-y-4">
-                <!-- ID Number -->
-                <div class="flex items-center gap-4">
-                    <label for="id_number" class="w-40 font-medium text-gray-700">ID Number:</label>
-                    <input type="text" id="id_number" name="id_number" value="<?php echo htmlspecialchars($idNumber); ?>" 
-                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly>
-                </div>
-                
-                <!-- Student Name -->
-                <div class="flex items-center gap-4">
-                    <label for="student_name" class="w-40 font-medium text-gray-700">Student Name:</label>
-                    <input type="text" id="student_name" name="student_name" value="<?php echo htmlspecialchars($studentName); ?>" 
-                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly>
-                </div>
-                
-                <!-- Purpose -->
-                <div class="flex items-center gap-4">
-                    <label for="purpose" class="w-40 font-medium text-gray-700">Purpose:</label>
-                    <select id="purpose" name="purpose" 
-                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
-                        <option value="" disabled selected>Select a Purpose</option>
-                        <option value="C Programming">C Programming</option>
-                        <option value="C++ Programming">C++ Programming</option>
-                        <option value="C# Programming">C# Programming</option>
-                        <option value="Java Programming">Java Programming</option>
-                        <option value="Python Programming">Python Programming</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                
-                <!-- Lab -->
-                <div class="flex items-center gap-4">
-                    <label for="lab" class="w-40 font-medium text-gray-700">Lab:</label>
-                    <select id="lab" name="lab" 
-                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
-                        <option value="" disabled selected>Select a Lab</option>
-                        <?php foreach ([524, 526, 528, 530, 542, 544] as $labNumber): ?>
-                            <option value="<?php echo $labNumber; ?>"><?php echo $labNumber; ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                
-                <!-- Available PC -->
-                <div class="flex items-center gap-4">
-                    <label for="available_pc" class="w-40 font-medium text-gray-700">Available PC:</label>
-                    <select id="available_pc" name="available_pc" 
-                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
-                        <option value="" disabled selected>Select a PC</option>
-                        <?php for ($i = 1; $i <= 50; $i++): ?>
-                            <option value="<?php echo $i; ?>">PC <?php echo $i; ?></option>
-                        <?php endfor; ?>
-                    </select>
-                </div>
-                
-                <!-- Time In -->
-                <div class="flex items-center gap-4">
-                    <label for="time_in" class="w-40 font-medium text-gray-700">Time In:</label>
-                    <input type="time" id="time_in" name="time_in" 
-                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
-                </div>
-                
-                <!-- Date -->
-                <div class="flex items-center gap-4">
-                    <label for="date" class="w-40 font-medium text-gray-700">Date:</label>
-                    <input type="date" id="date" name="date" 
-                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
-                </div>
-                
-                <!-- Remaining Session -->
-                <div class="flex items-center gap-4">
-                    <label for="remaining_session" class="w-40 font-medium text-gray-700">Remaining Session:</label>
-                    <input type="text" id="remaining_session" name="remaining_session" value="30" 
-                        class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly>
+    <!-- Main Content: Reservation & PC Selection -->
+    <div class="container mx-auto p-4">
+        <?php if (isset($successMessage)): ?>
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+                <p class="font-medium"><?php echo $successMessage; ?></p>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($errorMessage)): ?>
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                <p class="font-medium"><?php echo $errorMessage; ?></p>
+            </div>
+        <?php endif; ?>
+        
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- Reservation Form -->
+            <div class="w-full md:w-1/2"> <!-- Reservation container -->
+                <div class="w-full bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+                    <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                        <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                        <i class="fas fa-calendar-alt text-2xl mr-4 relative z-10"></i>
+                        <h2 class="text-xl font-bold tracking-wider uppercase relative z-10">Make a Reservation</h2>
+                    </div>
+                    <form action="reservation.php" method="post" class="p-8 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Student ID -->
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-id-card text-purple-500"></i>
+                                <input type="text" id="id_number" name="id_number" value="<?php echo htmlspecialchars($idNumber); ?>" 
+                                    class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly placeholder="Student ID">
+                            </div>
+                            <!-- Full Name -->
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-user text-purple-500"></i>
+                                <input type="text" id="student_name" name="student_name" value="<?php echo htmlspecialchars($studentName); ?>" 
+                                    class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly placeholder="Full Name">
+                            </div>
+                            <!-- Course -->
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-graduation-cap text-purple-500"></i>
+                                <input type="text" id="course" name="course" value="BS-Information Technology" 
+                                    class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly placeholder="Course">
+                            </div>
+                            <!-- Year Level -->
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-calendar-alt text-purple-500"></i>
+                                <input type="text" id="year_level" name="year_level" value="3rd Year" 
+                                    class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly placeholder="Year Level">
+                            </div>
+                            <!-- Purpose -->
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-tasks text-purple-500"></i>
+                                <select id="purpose" name="purpose" required
+                                    class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
+                                    <option value="" disabled selected>Select Purpose</option>
+                                    <option value="C Programming">C Programming</option>
+                                    <option value="C++ Programming">C++ Programming</option>
+                                    <option value="C# Programming">C# Programming</option>
+                                    <option value="Java Programming">Java Programming</option>
+                                    <option value="Python Programming">Python Programming</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <!-- Laboratory -->
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-flask text-purple-500"></i>
+                                <select id="lab" name="lab" required
+                                    class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200" 
+                                    onchange="updatePcOptions()">
+                                    <option value="" disabled selected>Select Laboratory</option>
+                                    <?php foreach ([524, 526, 528, 530, 542, 544] as $labNumber): ?>
+                                        <option value="<?php echo $labNumber; ?>"><?php echo $labNumber; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <!-- Date -->
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-calendar text-purple-500"></i>
+                                <input type="date" id="date" name="date" required
+                                    min="<?php echo date('Y-m-d'); ?>"
+                                    class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
+                            </div>
+                            <!-- Time In -->
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-clock text-purple-500"></i>
+                                <input type="time" id="time_in" name="time_in" required
+                                    class="flex-1 p-3 border border-gray-300 rounded-lg bg-white hover:border-purple-400 focus:ring-2 focus:ring-purple-500/50 transition-colors duration-200">
+                            </div>
+                            <!-- Remaining Sessions -->
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-hourglass-half text-purple-500"></i>
+                                <input type="text" id="remaining_session" name="remaining_session" value="30" 
+                                    class="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed focus:ring-2 focus:ring-purple-500/50" readonly placeholder="Remaining Sessions">
+                            </div>
+                            
+                            <!-- Hidden PC input (will be updated by the PC selection panel) -->
+                            <input type="hidden" id="available_pc" name="available_pc" value="">
+                        </div>
+                        <!-- Submit Button -->
+                        <div class="flex justify-center pt-4">
+                            <button type="submit" 
+                                class="px-8 py-3 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-semibold rounded-lg 
+                                hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50">
+                                Confirm Reservation
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             
-            <!-- Submit Button -->
-            <div class="flex justify-center pt-4">
-                <button type="submit" 
-                    class="px-8 py-3 bg-gradient-to-r from-[rgba(74,105,187,1)] to-[rgba(205,77,204,1)] text-white font-semibold rounded-lg 
-                    hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50">
-                    Reserve Now
-                </button>
+            <!-- PC Selection Panel -->
+            <div class="w-full md:w-1/2 flex flex-col"> 
+                <div class="flex-1 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+                    <div class="text-white p-4 flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(to bottom right, rgb(49, 46, 129), rgb(107, 33, 168), rgb(190, 24, 93))">
+                        <i class="fas fa-desktop text-xl mr-3"></i>
+                        <h2 class="text-xl font-bold tracking-wider uppercase">Select a PC</h2>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="mb-4">
+                            <select id="lab_selector" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500/50" onchange="syncLabSelectors()">
+                                <option value="" disabled selected>Select Laboratory</option>
+                                <?php foreach ([524, 526, 528, 530, 542, 544] as $labNumber): ?>
+                                    <option value="<?php echo $labNumber; ?>"><?php echo $labNumber; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <div id="pc_message" class="text-center py-6 text-gray-500">
+                            Please select a laboratory to view available PCs
+                        </div>
+                        
+                        <div id="pc_grid" class="hidden grid grid-cols-5 gap-4 p-4 max-h-96 overflow-y-auto">
+                            <!-- PC cards will be dynamically generated -->
+                        </div>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 
     <div class="py-4 px-6 bg-white/95 backdrop-blur-sm mt-8 relative">
@@ -226,6 +298,7 @@ if ($userId) {
     </div>
 
     <script>
+        // Toggle sidebar navigation
         function toggleNav(x) {
             document.getElementById("mySidenav").classList.toggle("-translate-x-0");
             document.getElementById("mySidenav").classList.toggle("-translate-x-full");
@@ -235,7 +308,88 @@ if ($userId) {
             document.getElementById("mySidenav").classList.remove("-translate-x-0");
             document.getElementById("mySidenav").classList.add("-translate-x-full");
         }
+        
+        // Function to synchronize laboratory selectors
+        function syncLabSelectors() {
+            const labSelector = document.getElementById('lab_selector');
+            const mainLabSelector = document.getElementById('lab');
+            
+            if (labSelector.value) {
+                mainLabSelector.value = labSelector.value;
+                generatePcGrid(labSelector.value);
+            }
+        }
+        
+        // Function to update PC selector based on selected lab
+        function updatePcOptions() {
+            const labSelector = document.getElementById('lab');
+            const pcLabSelector = document.getElementById('lab_selector');
+            
+            if (labSelector.value) {
+                pcLabSelector.value = labSelector.value;
+                generatePcGrid(labSelector.value);
+            }
+        }
+        
+        // Function to generate PC grid with cards
+        function generatePcGrid(labNumber) {
+            const pcGrid = document.getElementById('pc_grid');
+            const pcMessage = document.getElementById('pc_message');
 
+            if (labNumber) {
+                // Show PC grid and hide message
+                pcGrid.classList.remove('hidden');
+                pcMessage.classList.add('hidden');
+
+                // Clear existing content
+                pcGrid.innerHTML = '';
+
+                // Generate PC cards
+                for (let i = 1; i <= 50; i++) {
+                    const pcCard = document.createElement('div');
+                    pcCard.className = 'rounded-lg border border-gray-200 overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md';
+                    pcCard.setAttribute('data-pc', i);
+                    pcCard.onclick = function() { selectPC(i); };
+
+                    // Create card content
+                    pcCard.innerHTML = `
+                        <div class="flex flex-col items-center justify-center p-3">
+                            <div class="text-purple-700 mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="text-center text-sm font-medium text-gray-800">PC ${i}</div>
+                            <div class="mt-1 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">AVAILABLE</div>
+                        </div>
+                    `;
+
+                    pcGrid.appendChild(pcCard);
+                }
+            } else {
+                // Hide PC grid and show message
+                pcGrid.classList.add('hidden');
+                pcMessage.classList.remove('hidden');
+            }
+        }
+
+        // Function to handle PC selection
+        function selectPC(pcNumber) {
+            // Reset all PC cards
+            const pcCards = document.querySelectorAll('#pc_grid > div');
+            pcCards.forEach(card => {
+                card.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-50');
+            });
+            
+            // Highlight selected PC
+            const selectedCard = document.querySelector(`div[data-pc="${pcNumber}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('ring-2', 'ring-purple-500', 'bg-purple-50');
+            }
+            
+            // Update the hidden input value
+            document.getElementById('available_pc').value = pcNumber;
+        }
     </script>
 </body>
 </html>
