@@ -157,44 +157,44 @@ $offset = ($current_page - 1) * $entries_per_page;
         <!-- Statistics Section Moved Here -->
         <div class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Average Rating Card -->
-            <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200">
+            <div class="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white p-6 rounded-lg shadow-lg">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-gray-500 text-sm font-medium">Average Rating</h3>
-                    <span class="text-yellow-500"><i class="fas fa-star"></i></span>
+                    <h3 class="text-sm font-medium uppercase">Average Rating</h3>
+                    <span class="text-white"><i class="fas fa-star text-2xl"></i></span>
                 </div>
-                <div class="mt-2 flex items-baseline">
-                    <p class="text-2xl font-semibold text-gray-900"><?php echo $avg_rating; ?></p>
-                    <p class="ml-1 text-sm text-gray-500">/5.0</p>
+                <div class="mt-4 flex items-baseline">
+                    <p class="text-4xl font-bold"><?php echo $avg_rating; ?></p>
+                    <p class="ml-2 text-lg">/5.0</p>
                 </div>
-                <div class="mt-1 text-xs text-gray-500">Based on <?php echo $total_ratings; ?> ratings</div>
+                <p class="mt-2 text-sm">Based on <?php echo $total_ratings; ?> ratings</p>
             </div>
 
             <!-- Rating Distribution -->
-            <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 md:col-span-2">
-                <h3 class="text-gray-500 text-sm font-medium mb-3">Rating Distribution</h3>
+            <div class="bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white p-6 rounded-lg shadow-lg md:col-span-2">
+                <h3 class="text-sm font-medium uppercase mb-4">Rating Distribution</h3>
                 <?php
-                for($i = 5; $i >= 1; $i--) {
+                for ($i = 5; $i >= 1; $i--) {
                     $count = isset($ratings_dist[$i]) ? $ratings_dist[$i] : 0;
                     $percentage = $total_ratings > 0 ? ($count / $total_ratings) * 100 : 0;
                     ?>
-                    <div class="flex items-center mb-2">
-                        <span class="text-xs w-12"><?php echo $i; ?> stars</span>
-                        <div class="flex-1 mx-2 h-2 rounded-full bg-gray-200">
-                            <div class="h-2 rounded-full bg-yellow-400" style="width: <?php echo $percentage; ?>%"></div>
+                    <div class="flex items-center mb-3">
+                        <span class="text-sm w-16"><?php echo $i; ?> stars</span>
+                        <div class="flex-1 mx-3 h-3 rounded-full bg-white/20">
+                            <div class="h-3 rounded-full bg-yellow-300" style="width: <?php echo $percentage; ?>%"></div>
                         </div>
-                        <span class="text-xs w-12"><?php echo number_format($percentage, 1); ?>%</span>
+                        <span class="text-sm"><?php echo number_format($percentage, 1); ?>%</span>
                     </div>
                 <?php } ?>
             </div>
 
             <!-- Total Feedback Card -->
-            <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200">
+            <div class="bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 text-white p-6 rounded-lg shadow-lg">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-gray-500 text-sm font-medium">Total Feedback</h3>
-                    <span class="text-indigo-500"><i class="fas fa-comments"></i></span>
+                    <h3 class="text-sm font-medium uppercase">Total Feedback</h3>
+                    <span class="text-white"><i class="fas fa-comments text-2xl"></i></span>
                 </div>
-                <p class="mt-2 text-2xl font-semibold text-gray-900"><?php echo $total_entries; ?></p>
-                <div class="mt-1 text-xs text-gray-500">All time feedback count</div>
+                <p class="mt-4 text-4xl font-bold"><?php echo $total_entries; ?></p>
+                <p class="mt-2 text-sm">All time feedback count</p>
             </div>
         </div>
 
