@@ -116,7 +116,7 @@ body {
                 <a href="#home" class="nav-link">Home</a>
                 <a href="#about" class="nav-link">About</a>
                 <a href="#features" class="nav-link">Features</a>
-                <a href="#teachers" class="nav-link">Teachers</a>
+                <a href="#teachers" class="nav-link">Faculties</a>
                 <a href="login.php" class="gradient-border px-6 py-2 text-white hover:opacity-90 transition-all">
                     Login
                 </a>
@@ -177,7 +177,7 @@ body {
 <section id="teachers" class="py-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="glass-card rounded-2xl p-8 md:p-12">
-            <h2 class="text-3xl font-bold text-white text-center mb-12">Our Teachers</h2>
+            <h2 class="text-3xl font-bold text-white text-center mb-12">Dean</h2>
             
             <!-- Dean Card (Centered) -->
             <div class="flex justify-center mb-12">

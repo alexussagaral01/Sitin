@@ -64,8 +64,9 @@ $result = $stmt->get_result();
     <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -357,39 +358,44 @@ $result = $stmt->get_result();
                 dom: 'Bfrtip',
                 buttons: [
                     {
-                        extend: 'csv',
-                        className: 'relative inline-flex items-center px-6 py-2.5 border-2 border-blue-600 font-medium text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-300 group',
-                        text: `<span class="absolute w-32 h-32 -top-8 -left-2 bg-blue-600 scale-0 rounded-full group-hover:scale-100 transition-all duration-300 z-0 opacity-30"></span>
-                               <span class="relative z-10 flex items-center">
-                                   <i class="fas fa-file-csv mr-2 transform group-hover:scale-110 transition-transform"></i>
-                                   Export CSV
-                               </span>`
+                        text: `<div class="flex items-center justify-center gap-2">
+                                   <i class="fas fa-file-csv text-xl"></i>
+                                   <span class="font-semibold">CSV</span>
+                               </div>`,
+                        className: 'px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2',
+                        action: function(e, dt, node, config) {
+                            exportTableToCSV('sitin_report.csv');
+                        }
                     },
                     {
-                        extend: 'excel',
-                        className: 'relative inline-flex items-center px-6 py-2.5 border-2 border-emerald-600 font-medium text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition-all duration-300 group overflow-hidden',
-                        text: `<span class="absolute inset-0 bg-emerald-600 w-0 group-hover:w-full transition-all duration-300 z-0"></span>
-                               <span class="relative z-10 flex items-center">
-                                   <i class="fas fa-file-excel mr-2 group-hover:animate-bounce"></i>
-                                   Export Excel
-                               </span>`
+                        text: `<div class="flex items-center justify-center gap-2">
+                                   <i class="fas fa-file-excel text-xl"></i>
+                                   <span class="font-semibold">Excel</span>
+                               </div>`,
+                        className: 'px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2',
+                        action: function(e, dt, node, config) {
+                            exportTableToExcel('sitin_report.xlsx');
+                        }
                     },
                     {
-                        extend: 'pdf',
-                        className: 'relative inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-red-500/50 hover:-translate-y-0.5',
-                        text: `<span class="flex items-center">
-                                   <i class="fas fa-file-pdf mr-2 animate-pulse"></i>
-                                   Export PDF
-                               </span>`
+                        text: `<div class="flex items-center justify-center gap-2">
+                                   <i class="fas fa-file-pdf text-xl"></i>
+                                   <span class="font-semibold">PDF</span>
+                               </div>`,
+                        className: 'px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-lg hover:shadow-red-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2',
+                        action: function(e, dt, node, config) {
+                            exportTableToPDF();
+                        }
                     },
                     {
-                        extend: 'print',
-                        className: 'relative inline-flex items-center px-6 py-2.5 bg-gray-800 text-white rounded-xl transition-all duration-300 group hover:ring-2 hover:ring-offset-2 hover:ring-gray-600',
-                        text: `<span class="absolute inset-0 h-full w-full bg-white/10 block scale-0 group-hover:scale-100 transition-transform duration-300 rounded-xl"></span>
-                               <span class="relative z-10 flex items-center">
-                                   <i class="fas fa-print mr-2 group-hover:rotate-12 transition-transform"></i>
-                                   Print Report
-                               </span>`
+                        text: `<div class="flex items-center justify-center gap-2">
+                                   <i class="fas fa-print text-xl"></i>
+                                   <span class="font-semibold">Print</span>
+                               </div>`,
+                        className: 'px-6 py-2.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg shadow-lg hover:shadow-gray-700/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2',
+                        action: function(e, dt, node, config) {
+                            printTable();
+                        }
                     }
                 ],
                 paging: false,
@@ -411,10 +417,162 @@ $result = $stmt->get_result();
                 }
             });
 
-            // Move the buttons to our custom container and add spacing
-            $('.dt-buttons').addClass('flex flex-wrap gap-4');
-            $('.dt-button').addClass('!hover:no-underline');
+            // Update the button container styles
+            $('.dt-buttons').addClass('flex flex-wrap gap-4 mb-6');
+            $('.dt-button').addClass('!no-underline relative');
+            
+            // Add glass morphism effect styles
+            $('.dt-buttons').append(`
+                <style>
+                    .dt-button {
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    
+                    .dt-button::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: -100%;
+                        width: 100%;
+                        height: 100%;
+                        background: linear-gradient(
+                            90deg,
+                            transparent,
+                            rgba(255, 255, 255, 0.2),
+                            transparent
+                        );
+                        transition: 0.5s;
+                    }
+                    
+                    .dt-button:hover::before {
+                        left: 100%;
+                    }
+                    
+                    .dt-button:active {
+                        transform: scale(0.95);
+                    }
+                </style>
+            `);
         });
+
+        // Print function
+        function printTable() {
+            const printWindow = window.open('', '_blank', 'height=600,width=800');
+            const title = 'Sit-in Reports';
+            const institutionName = 'CCS Sit-In Monitoring System';
+            
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>${title} - Print View</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { text-align: center; font-size: 20px; margin-bottom: 5px; }
+                        .institution { text-align: center; font-size: 16px; margin-bottom: 20px; }
+                        .date { text-align: center; font-size: 14px; margin-bottom: 20px; color: #666; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+                        th { background-color: #f2f2f2; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        .print-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+                        @media print {
+                            button { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-header">
+                        <div>
+                            <h1>${title}</h1>
+                            <div class="institution">${institutionName}</div>
+                            <div class="date">Generated on: ${new Date().toLocaleString()}</div>
+                        </div>
+                    </div>
+                    
+                    <table>${document.getElementById('reportsTable').outerHTML}</table>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="window.print();window.close();" style="padding: 10px 20px;">
+                            Print Document
+                        </button>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.focus();
+        }
+
+        // CSV Export function
+        function exportTableToCSV(filename) {
+            const table = document.getElementById('reportsTable');
+            let csv = [];
+            const rows = table.querySelectorAll('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = [], cols = rows[i].querySelectorAll('td, th');
+                for (let j = 0; j < cols.length; j++) {
+                    row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+                }
+                csv.push(row.join(','));
+            }
+
+            const csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
+            const link = document.createElement('a');
+            link.setAttribute('href', encodeURI(csvContent));
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Excel Export function
+        function exportTableToExcel(filename) {
+            const table = document.getElementById('reportsTable');
+            const ws = XLSX.utils.table_to_sheet(table);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Reports');
+            XLSX.writeFile(wb, filename);
+        }
+
+        // PDF Export function
+        function exportTableToPDF() {
+            // Create new jsPDF instance
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'pt', 'a4');
+
+            // Add title
+            doc.setFontSize(16);
+            doc.text('CCS Sit-In Report', 40, 40);
+
+            // Add generation date
+            doc.setFontSize(12);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 40, 60);
+
+            // Convert table to PDF using autoTable
+            doc.autoTable({
+                html: '#reportsTable',
+                startY: 80,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [49, 46, 129],
+                    textColor: 255,
+                    fontSize: 10
+                },
+                bodyStyles: {
+                    fontSize: 9
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 245, 245]
+                },
+                margin: { top: 80 }
+            });
+
+            // Save the PDF
+            doc.save('sitin_report.pdf');
+        }
     </script>
 </body>
 </html>
