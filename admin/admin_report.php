@@ -56,17 +56,17 @@ $result = $stmt->get_result();
     <link rel="icon" href="../logo/ccs.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Add DataTables CSS and JS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css">
-    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -77,6 +77,15 @@ $result = $stmt->get_result();
                 }
             }
         }
+    </script>
+    <script>
+        // Convert your logo to base64
+        const ucLogo = '<?php 
+            $logo_path = "../logo/ccs.png";
+            $type = pathinfo($logo_path, PATHINFO_EXTENSION);
+            $data = file_get_contents($logo_path);
+            echo 'data:image/' . $type . ';base64,' . base64_encode($data);
+        ?>';
     </script>
     <style>
         /* Add gradient text class for the footer */
@@ -353,226 +362,134 @@ $result = $stmt->get_result();
             return false;
         }
 
+        function getTableStyle() {
+            return {
+                header: {
+                    fillColor: '#312E81',
+                    color: '#ffffff',
+                    fontSize: 11,
+                    bold: true,
+                    alignment: 'left',
+                    margin: [5, 7, 5, 7]
+                },
+                cell: {
+                    fontSize: 10,
+                    alignment: 'left',
+                    padding: 7,
+                    borderColor: '#E5E7EB'
+                },
+                alternateRow: '#F9FAFB'
+            };
+        }
+
         $(document).ready(function() {
             $('#reportsTable').DataTable({
-                dom: 'Bfrtip',
+                dom: '<"flex flex-wrap gap-4 mb-6"B>',
                 buttons: [
                     {
-                        text: `<div class="flex items-center justify-center gap-2">
-                                   <i class="fas fa-file-csv text-xl"></i>
-                                   <span class="font-semibold">CSV</span>
-                               </div>`,
-                        className: 'px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2',
-                        action: function(e, dt, node, config) {
-                            exportTableToCSV('sitin_report.csv');
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv text-xl"></i> CSV',
+                        className: 'px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-lg',
+                        title: 'CCS Laboratory Report',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6]
                         }
                     },
                     {
-                        text: `<div class="flex items-center justify-center gap-2">
-                                   <i class="fas fa-file-excel text-xl"></i>
-                                   <span class="font-semibold">Excel</span>
-                               </div>`,
-                        className: 'px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2',
-                        action: function(e, dt, node, config) {
-                            exportTableToExcel('sitin_report.xlsx');
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel text-xl"></i> Excel',
+                        className: 'px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg shadow-lg',
+                        title: 'CCS Laboratory Report',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6]
                         }
                     },
                     {
-                        text: `<div class="flex items-center justify-center gap-2">
-                                   <i class="fas fa-file-pdf text-xl"></i>
-                                   <span class="font-semibold">PDF</span>
-                               </div>`,
-                        className: 'px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-lg hover:shadow-red-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2',
-                        action: function(e, dt, node, config) {
-                            exportTableToPDF();
+                        extend: 'pdfHtml5',
+                        text: '<i class="fas fa-file-pdf text-xl"></i> PDF',
+                        className: 'px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-lg',
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        title: function() {
+                            return '\n\nUNIVERSITY OF CEBU\nCollege of Computer Studies\nLaboratory Sit-in Report\n\n';
+                        },
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6]
+                        },
+                        customize: function(doc) {
+                            const tableStyle = getTableStyle();
+                            
+                            // Style header
+                            doc.styles.tableHeader = tableStyle.header;
+                            
+                            // Style cells and add alternating rows
+                            doc.content[1].table.body.forEach(function(row, i) {
+                                row.forEach(function(cell) {
+                                    cell.alignment = 'left';
+                                    cell.margin = [5, 3, 5, 3];
+                                    if (i !== 0) {
+                                        cell.fontSize = 10;
+                                        cell.fillColor = i % 2 === 0 ? tableStyle.alternateRow : null;
+                                    }
+                                });
+                            });
+
+                            // Set column widths
+                            doc.content[1].table.widths = [
+                                '15%', // ID
+                                '20%', // Name
+                                '15%', // Purpose
+                                '15%', // Lab
+                                '12%', // Time In
+                                '12%', // Time Out
+                                '11%'  // Date
+                            ];
+
+                            doc.pageMargins = [30, 30, 30, 30];
                         }
                     },
                     {
-                        text: `<div class="flex items-center justify-center gap-2">
-                                   <i class="fas fa-print text-xl"></i>
-                                   <span class="font-semibold">Print</span>
-                               </div>`,
-                        className: 'px-6 py-2.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg shadow-lg hover:shadow-gray-700/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2',
-                        action: function(e, dt, node, config) {
-                            printTable();
+                        extend: 'print',
+                        text: '<i class="fas fa-print text-xl"></i> Print',
+                        className: 'px-6 py-2.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg shadow-lg',
+                        title: '',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6]
+                        },
+                        customize: function(win) {
+                            // Add logo and headers with improved styling
+                            $(win.document.body).prepend(`
+                                <div style="text-align:center;margin:20px 0;">
+                                    <img src="${ucLogo}" style="width:100px;height:100px;margin:0 auto 15px;display:block;">
+                                    <div style="margin-bottom:20px;">
+                                        <h1 style="font-size:24px;font-weight:bold;margin:10px 0;color:#312E81;">UNIVERSITY OF CEBU</h1>
+                                        <h2 style="font-size:18px;margin:5px 0;color:#4338CA;">College of Computer Studies</h2>
+                                        <h3 style="font-size:16px;margin:5px 0;color:#1F2937;">Laboratory Sit-in Report</h3>
+                                    </div>
+                                </div>
+                            `);
+
+                            // Style the table
+                            $(win.document.body).find('table')
+                                .addClass('display')
+                                .css('font-size', '13px')
+                                .css('margin', '0 auto')
+                                .css('width', '100%');
+
+                            // Add zebra striping
+                            $(win.document.body).find('tr:nth-child(odd)').css('background-color', '#f8f9fa');
+                            
+                            // Add some padding
+                            $(win.document.body).css('padding', '20px');    
                         }
                     }
                 ],
                 paging: false,
                 searching: false,
                 info: false,
-                // Add these options to remove DataTables styling
-                ordering: false,
-                bSort: false,
-                bFilter: false,
-                bLengthChange: false,
-                bPaginate: false,
-                bInfo: false,
-                // Disable DataTables CSS
-                autoWidth: false,
-                initComplete: function() {
-                    // Remove DataTables classes from table
-                    $(this).removeClass('dataTable');
-                    $('.dataTables_wrapper').addClass('bg-transparent border-0');
-                }
+                processing: true
             });
-
-            // Update the button container styles
-            $('.dt-buttons').addClass('flex flex-wrap gap-4 mb-6');
-            $('.dt-button').addClass('!no-underline relative');
-            
-            // Add glass morphism effect styles
-            $('.dt-buttons').append(`
-                <style>
-                    .dt-button {
-                        position: relative;
-                        overflow: hidden;
-                    }
-                    
-                    .dt-button::before {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: -100%;
-                        width: 100%;
-                        height: 100%;
-                        background: linear-gradient(
-                            90deg,
-                            transparent,
-                            rgba(255, 255, 255, 0.2),
-                            transparent
-                        );
-                        transition: 0.5s;
-                    }
-                    
-                    .dt-button:hover::before {
-                        left: 100%;
-                    }
-                    
-                    .dt-button:active {
-                        transform: scale(0.95);
-                    }
-                </style>
-            `);
         });
-
-        // Print function
-        function printTable() {
-            const printWindow = window.open('', '_blank', 'height=600,width=800');
-            const title = 'Sit-in Reports';
-            const institutionName = 'CCS Sit-In Monitoring System';
-            
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>${title} - Print View</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        h1 { text-align: center; font-size: 20px; margin-bottom: 5px; }
-                        .institution { text-align: center; font-size: 16px; margin-bottom: 20px; }
-                        .date { text-align: center; font-size: 14px; margin-bottom: 20px; color: #666; }
-                        table { width: 100%; border-collapse: collapse; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
-                        th { background-color: #f2f2f2; }
-                        tr:nth-child(even) { background-color: #f9f9f9; }
-                        .print-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-                        @media print {
-                            button { display: none; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-header">
-                        <div>
-                            <h1>${title}</h1>
-                            <div class="institution">${institutionName}</div>
-                            <div class="date">Generated on: ${new Date().toLocaleString()}</div>
-                        </div>
-                    </div>
-                    
-                    <table>${document.getElementById('reportsTable').outerHTML}</table>
-                    
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="window.print();window.close();" style="padding: 10px 20px;">
-                            Print Document
-                        </button>
-                    </div>
-                </body>
-                </html>
-            `);
-            
-            printWindow.document.close();
-            printWindow.focus();
-        }
-
-        // CSV Export function
-        function exportTableToCSV(filename) {
-            const table = document.getElementById('reportsTable');
-            let csv = [];
-            const rows = table.querySelectorAll('tr');
-            
-            for (let i = 0; i < rows.length; i++) {
-                const row = [], cols = rows[i].querySelectorAll('td, th');
-                for (let j = 0; j < cols.length; j++) {
-                    row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
-                }
-                csv.push(row.join(','));
-            }
-
-            const csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
-            const link = document.createElement('a');
-            link.setAttribute('href', encodeURI(csvContent));
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Excel Export function
-        function exportTableToExcel(filename) {
-            const table = document.getElementById('reportsTable');
-            const ws = XLSX.utils.table_to_sheet(table);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Reports');
-            XLSX.writeFile(wb, filename);
-        }
-
-        // PDF Export function
-        function exportTableToPDF() {
-            // Create new jsPDF instance
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'pt', 'a4');
-
-            // Add title
-            doc.setFontSize(16);
-            doc.text('CCS Sit-In Report', 40, 40);
-
-            // Add generation date
-            doc.setFontSize(12);
-            doc.text(`Generated on: ${new Date().toLocaleString()}`, 40, 60);
-
-            // Convert table to PDF using autoTable
-            doc.autoTable({
-                html: '#reportsTable',
-                startY: 80,
-                theme: 'grid',
-                headStyles: {
-                    fillColor: [49, 46, 129],
-                    textColor: 255,
-                    fontSize: 10
-                },
-                bodyStyles: {
-                    fontSize: 9
-                },
-                alternateRowStyles: {
-                    fillColor: [245, 245, 245]
-                },
-                margin: { top: 80 }
-            });
-
-            // Save the PDF
-            doc.save('sitin_report.pdf');
-        }
     </script>
 </body>
 </html>
